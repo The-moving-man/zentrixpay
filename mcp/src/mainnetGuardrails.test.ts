@@ -53,10 +53,10 @@ describe("isTruthyConfirm", () => {
 });
 
 describe("mainnetAllowedFromEnv", () => {
-  it("reads MINDVAULT_ALLOW_MAINNET", () => {
-    expect(mainnetAllowedFromEnv({ MINDVAULT_ALLOW_MAINNET: "1" })).toBe(true);
-    expect(mainnetAllowedFromEnv({ MINDVAULT_ALLOW_MAINNET: "true" })).toBe(true);
-    expect(mainnetAllowedFromEnv({ MINDVAULT_ALLOW_MAINNET: "0" })).toBe(false);
+  it("reads ZENTRIXPAY_ALLOW_MAINNET", () => {
+    expect(mainnetAllowedFromEnv({ ZENTRIXPAY_ALLOW_MAINNET: "1" })).toBe(true);
+    expect(mainnetAllowedFromEnv({ ZENTRIXPAY_ALLOW_MAINNET: "true" })).toBe(true);
+    expect(mainnetAllowedFromEnv({ ZENTRIXPAY_ALLOW_MAINNET: "0" })).toBe(false);
     expect(mainnetAllowedFromEnv({})).toBe(false);
   });
 });
@@ -70,19 +70,19 @@ describe("isMainnetGatedTool", () => {
 
   it("leaves read-only tools free", () => {
     for (const t of [
-      "mindvault_browse",
-      "mindvault_search",
-      "mindvault_preview",
-      "mindvault_wallet_info",
-      "mindvault_list_profiles",
-      "mindvault_registry_info",
-      "mindvault_registry_lookup",
-      "mindvault_tx_status",
-      "mindvault_publish_status",
-      "mindvault_check_bindings",
-      "mindvault_agent_status",
-      "mindvault_metrics",
-      "mindvault_purchase_history",
+      "zentrixpay_browse",
+      "zentrixpay_search",
+      "zentrixpay_preview",
+      "zentrixpay_wallet_info",
+      "zentrixpay_list_profiles",
+      "zentrixpay_registry_info",
+      "zentrixpay_registry_lookup",
+      "zentrixpay_tx_status",
+      "zentrixpay_publish_status",
+      "zentrixpay_check_bindings",
+      "zentrixpay_agent_status",
+      "zentrixpay_metrics",
+      "zentrixpay_purchase_history",
     ]) {
       expect(isMainnetGatedTool(t)).toBe(false);
     }
@@ -91,49 +91,49 @@ describe("isMainnetGatedTool", () => {
 
 describe("assertMainnetMutationAllowed", () => {
   it("no-ops on testnet even without confirm", () => {
-    expect(() => assertMainnetMutationAllowed("testnet", "mindvault_buy", {}, {})).not.toThrow();
+    expect(() => assertMainnetMutationAllowed("testnet", "zentrixpay_buy", {}, {})).not.toThrow();
   });
 
   it("no-ops for read-only tools on mainnet", () => {
-    expect(() => assertMainnetMutationAllowed("mainnet", "mindvault_browse", {}, {})).not.toThrow();
+    expect(() => assertMainnetMutationAllowed("mainnet", "zentrixpay_browse", {}, {})).not.toThrow();
   });
 
   it("blocks gated tools on mainnet without confirm", () => {
-    expect(() => assertMainnetMutationAllowed("mainnet", "mindvault_buy", {}, {})).toThrow(
+    expect(() => assertMainnetMutationAllowed("mainnet", "zentrixpay_buy", {}, {})).toThrow(
       /Mainnet guardrail/,
     );
-    expect(() => assertMainnetMutationAllowed("mainnet", "mindvault_publish", {}, {})).toThrow(
+    expect(() => assertMainnetMutationAllowed("mainnet", "zentrixpay_publish", {}, {})).toThrow(
       /confirmMainnet/,
     );
-    expect(() => assertMainnetMutationAllowed("mainnet", "mindvault_set_tags", {}, {})).toThrow(
+    expect(() => assertMainnetMutationAllowed("mainnet", "zentrixpay_set_tags", {}, {})).toThrow(
       /confirmMainnet/,
     );
   });
 
   it("allows gated tools when confirmMainnet is true", () => {
     expect(() =>
-      assertMainnetMutationAllowed("mainnet", "mindvault_buy", { confirmMainnet: true }, {}),
+      assertMainnetMutationAllowed("mainnet", "zentrixpay_buy", { confirmMainnet: true }, {}),
     ).not.toThrow();
   });
 
-  it("allows gated tools when MINDVAULT_ALLOW_MAINNET is set", () => {
+  it("allows gated tools when ZENTRIXPAY_ALLOW_MAINNET is set", () => {
     expect(() =>
       assertMainnetMutationAllowed(
         "mainnet",
-        "mindvault_register",
+        "zentrixpay_register",
         {},
         {
-          MINDVAULT_ALLOW_MAINNET: "1",
+          ZENTRIXPAY_ALLOW_MAINNET: "1",
         },
       ),
     ).not.toThrow();
   });
 
   it("error message is deterministic and agent-safe", () => {
-    const err = mainnetConfirmationRequiredError("mindvault_buy");
-    expect(err.message).toContain("mindvault_buy");
+    const err = mainnetConfirmationRequiredError("zentrixpay_buy");
+    expect(err.message).toContain("zentrixpay_buy");
     expect(err.message).toContain("confirmMainnet");
-    expect(err.message).toContain("MINDVAULT_ALLOW_MAINNET");
+    expect(err.message).toContain("ZENTRIXPAY_ALLOW_MAINNET");
     expect(err.message).not.toMatch(/secret|private|key|password/i);
   });
 });
@@ -178,7 +178,7 @@ describe("formatMainnetBanner", () => {
     expect(text).toContain("real USDC");
     expect(text).toContain("CLIVE");
     expect(text).toContain("confirmMainnet: true");
-    expect(text).toContain("MINDVAULT_ALLOW_MAINNET=1");
+    expect(text).toContain("ZENTRIXPAY_ALLOW_MAINNET=1");
     for (const tool of MAINNET_GATED_TOOLS) {
       expect(text).toContain(tool);
     }

@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { networks, X402_NETWORK_IDS } from "@mindvault/registry-client";
+import { networks, X402_NETWORK_IDS } from "@zentrixpay/registry-client";
 
 import {
   buildConfig,
   resolveConfig,
-  DEFAULT_MINDVAULT_URL,
+  DEFAULT_ZENTRIXPAY_URL,
   DEFAULT_SPONSORED_ACCOUNT_URL,
 } from "./config.js";
 
@@ -18,7 +18,7 @@ describe("buildConfig — defaults", () => {
     expect(config).toMatchObject({
       stellarNetwork: "testnet",
       x402Network: X402_NETWORK_IDS.testnet,
-      baseUrl: DEFAULT_MINDVAULT_URL,
+      baseUrl: DEFAULT_ZENTRIXPAY_URL,
       sponsoredAccountUrl: DEFAULT_SPONSORED_ACCOUNT_URL,
       registryContractId: networks.testnet.defaultRegistryContractId,
       registryNetworkPassphrase: networks.testnet.networkPassphrase,
@@ -51,7 +51,7 @@ describe("buildConfig — environment overrides", () => {
   it("prefers explicit env vars over preset values", () => {
     const config = buildConfig({
       STELLAR_NETWORK: "testnet",
-      MINDVAULT_URL: "https://api.example.test",
+      ZENTRIXPAY_URL: "https://api.example.test",
       SPONSORED_ACCOUNT_URL: "https://sponsor.example.test",
       HORIZON_URL: "https://horizon.example.test",
       SOROBAN_RPC_URL: "https://rpc.example.test",
@@ -87,7 +87,7 @@ describe("buildConfig — purity", () => {
   });
 
   it("is deterministic for a given environment", () => {
-    const env = { STELLAR_NETWORK: "testnet", MINDVAULT_URL: "https://x.test" };
+    const env = { STELLAR_NETWORK: "testnet", ZENTRIXPAY_URL: "https://x.test" };
     expect(buildConfig(env)).toEqual(buildConfig(env));
   });
 
@@ -145,7 +145,7 @@ describe("resolveConfig — invalid environments", () => {
 
   it("returns a result instead of exiting for a fully broken environment", () => {
     expect(() =>
-      resolveConfig({ STELLAR_NETWORK: "mainnet", MINDVAULT_URL: "nope" }, false),
+      resolveConfig({ STELLAR_NETWORK: "mainnet", ZENTRIXPAY_URL: "nope" }, false),
     ).not.toThrow();
   });
 });

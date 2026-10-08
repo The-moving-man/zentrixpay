@@ -49,9 +49,9 @@ verification rejected, missing tx hash), the text is unchanged and
 
 Text-only: `check_bindings`, `reset`, `backup_state`, `restore_state`,
 `verify_install`, `registry_health`, `check_state_permissions`, `register`,
-`rotate_publisher_key`, `mindvault_set_tags`.
+`rotate_publisher_key`, `zentrixpay_set_tags`.
 
-`mindvault_publish_status` and `mindvault_purchase_history` are advertised in
+`zentrixpay_publish_status` and `zentrixpay_purchase_history` are advertised in
 ListTools with extra schemas (they are not in `TOOL_DEFINITIONS`).
 
 ## Adding a schema
@@ -65,7 +65,7 @@ ListTools with extra schemas (they are not in `TOOL_DEFINITIONS`).
    so the text string does not change.
 4. Add a schema-parity assertion in [`mcp/src/outputSchemas.test.ts`](../mcp/src/outputSchemas.test.ts)
    and a CallTool check in [`mcp/src/integration.test.ts`](../mcp/src/integration.test.ts).
-5. Run `pnpm --filter @mindvault/mcp generate-tool-docs` so the Structured
+5. Run `pnpm --filter @zentrixpay/mcp generate-tool-docs` so the Structured
    column stays in sync.
 
 ## Tests

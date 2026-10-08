@@ -1,6 +1,6 @@
 # Wallet Connection Troubleshooting
 
-Browser wallet connection and signing issues are common when first using MindVault. This guide covers the problems you may encounter when connecting a Stellar wallet (Freighter) to the web app and how to resolve them.
+Browser wallet connection and signing issues are common when first using ZentrixPay. This guide covers the problems you may encounter when connecting a Stellar wallet (Freighter) to the web app and how to resolve them.
 
 ## Quick checklist
 
@@ -8,7 +8,7 @@ Before diving into a specific error, confirm:
 
 1. **Extension installed** — Freighter must be installed from the [Chrome Web Store](https://chromewebstore.google.com/detail/freighter/bjacdkcmnpnlddgplnaoknjhfdbimmbh) or [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/freighter/).
 2. **Extension unlocked** — The extension must be unlocked (not just installed). Open the extension and enter your password.
-3. **Correct network** — Freighter must be set to **Stellar Testnet** to match MindVault's demo deployment.
+3. **Correct network** — Freighter must be set to **Stellar Testnet** to match ZentrixPay's demo deployment.
 4. **Wallet funded** — The connected account needs testnet XLM (for reserves) and USDC (for payments).
 
 ---
@@ -24,10 +24,10 @@ Before diving into a specific error, confirm:
 **Fix:**
 
 1. Install Freighter from the [Chrome Web Store](https://chromewebstore.google.com/detail/freighter/bjacdkcmnpnlddgplnaoknjhfdbimmbh) or [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/freighter/).
-2. After installation, reload the MindVault page so the `freighterApi` global becomes available.
+2. After installation, reload the ZentrixPay page so the `freighterApi` global becomes available.
 3. Click "Connect wallet" again.
 
-**Note:** MindVault plans to support other Stellar wallets (xBull, Albedo) via `@creit.tech/stellar-wallets-kit`. For now, Freighter is the primary supported browser wallet.
+**Note:** ZentrixPay plans to support other Stellar wallets (xBull, Albedo) via `@creit.tech/stellar-wallets-kit`. For now, Freighter is the primary supported browser wallet.
 
 ---
 
@@ -35,16 +35,16 @@ Before diving into a specific error, confirm:
 
 **Symptom:** Connection succeeds, but signing fails with _"Wrong network"_ or similar error when trying to register a resource or approve a transaction. The Freighter extension may also show a banner saying the app expects a different network.
 
-**Cause:** Freighter is set to **Mainnet** (Public Global Network) but MindVault runs on **Testnet**. The network passphrase baked into the transaction does not match what Freighter expects.
+**Cause:** Freighter is set to **Mainnet** (Public Global Network) but ZentrixPay runs on **Testnet**. The network passphrase baked into the transaction does not match what Freighter expects.
 
 **Fix:**
 
 1. Open the Freighter extension.
 2. Click the network dropdown in the top-left corner (it likely says "Public Global").
 3. Switch to **"Testnet"**.
-4. Retry the signing action in MindVault.
+4. Retry the signing action in ZentrixPay.
 
-To verify the correct network after switching, connect your wallet and check the address appears in MindVault's header. If you still see network errors, confirm the server's `NETWORK` env matches (see [server env docs](server-env.md)).
+To verify the correct network after switching, connect your wallet and check the address appears in ZentrixPay's header. If you still see network errors, confirm the server's `NETWORK` env matches (see [server env docs](server-env.md)).
 
 See also: [x402 payment troubleshooting — Wrong network](x402-payment-troubleshooting.md#wrong-network-testnet-vs-mainnet).
 
@@ -63,7 +63,7 @@ For the full browser buyer flow (catalog → 402 → sign → delivery), see [x4
 1. Click the action again (e.g. "Register on-chain") to re-trigger the signing flow.
 2. When Freighter opens, review the transaction details carefully.
 3. Click **"Approve"** (not "Reject" and not the browser's close button on the popup).
-4. If the popup is blocked by the browser, allow popups from the MindVault site (see [Browser permission issues](#popup-blocked-or-browser-permission-issues) below).
+4. If the popup is blocked by the browser, allow popups from the ZentrixPay site (see [Browser permission issues](#popup-blocked-or-browser-permission-issues) below).
 
 > **Tip:** If you accidentally reject, simply trigger the same action again. There is no penalty for rejection — the transaction is never submitted on-chain.
 
@@ -104,7 +104,7 @@ See also:
 **Fix:**
 
 1. Look for the popup-blocked icon in the address bar (🔇 or similar) and click it.
-2. Select **"Always allow popups from app.mindvault.app"** (or whichever MindVault domain you are on).
+2. Select **"Always allow popups from app.zentrixpay.app"** (or whichever ZentrixPay domain you are on).
 3. Click "Connect wallet" again.
 4. If the issue persists, check your browser's popup blocker settings:
    - **Chrome:** Settings → Privacy and security → Site Settings → Pop-ups and redirects → Allow.
@@ -117,7 +117,7 @@ Once popups are allowed, the Freighter prompt should appear on the next connect 
 
 ## Error reference
 
-This table summarises the error messages you may see in the MindVault web UI and what they mean.
+This table summarises the error messages you may see in the ZentrixPay web UI and what they mean.
 
 | UI error message | Scenario | Action |
 |---|---|---|
@@ -137,7 +137,7 @@ This table summarises the error messages you may see in the MindVault web UI and
 | Aspect | Browser (Freighter) | MCP / agent |
 |--------|---------------------|-------------|
 | Key storage | Freighter extension (encrypted) | In-memory only (lost on process exit) |
-| Trustline | User must add manually | Created automatically by `mindvault_setup_wallet` |
+| Trustline | User must add manually | Created automatically by `zentrixpay_setup_wallet` |
 | Network config | User sets in extension | Hardcoded to testnet |
 | Signing | User approves each transaction | Programmatic via secret key |
 | Popup required | Yes | No |

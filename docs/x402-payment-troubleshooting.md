@@ -1,12 +1,12 @@
 # x402 Payment Troubleshooting
 
-Payment and signing failures are the most common support issues in MindVault. This guide covers the top failure modes, how they differ between browser wallets and MCP agents, and how to inspect transactions on Stellar Explorer.
+Payment and signing failures are the most common support issues in ZentrixPay. This guide covers the top failure modes, how they differ between browser wallets and MCP agents, and how to inspect transactions on Stellar Explorer.
 
 ## Quick checklist
 
 Before diving into a specific error, confirm:
 
-1. **Network** — MindVault runs on **Stellar testnet** (`stellar:testnet`). Your wallet, MCP agent, and the server's `NETWORK` env must all match.
+1. **Network** — ZentrixPay runs on **Stellar testnet** (`stellar:testnet`). Your wallet, MCP agent, and the server's `NETWORK` env must all match.
 2. **USDC balance** — The payer needs enough USDC for the resource price **plus** a small reserve for fees.
 3. **USDC trustline** — Classic Stellar accounts must trust the testnet USDC issuer before they can hold or send USDC.
 4. **x402-aware client** — Plain `curl` without payment handling will stop at HTTP 402. Use an x402 client (`@x402/fetch`, the MCP server, or a wallet-integrated browser flow).
@@ -24,7 +24,7 @@ For a step-by-step browser buyer walkthrough, see [x402 browser payment walkthro
 **Fix:**
 
 - **Browser:** Use a wallet-connected flow that signs Soroban auth entries (Freighter via `@creit.tech/stellar-wallets-kit`).
-- **Agents / scripts:** Use `@x402/fetch` with an `x402Client` registered for `stellar:testnet`, or the MindVault MCP tools (`mindvault_buy`, `mindvault_publish`).
+- **Agents / scripts:** Use `@x402/fetch` with an `x402Client` registered for `stellar:testnet`, or the ZentrixPay MCP tools (`zentrixpay_buy`, `zentrixpay_publish`).
 - **Manual test:** Run `pnpm --filter server e2e` — it implements the full 402 → pay → retry cycle.
 
 ```bash
@@ -78,7 +78,7 @@ curl -i https://your-server/resources/<id>
 
 **Fix:**
 
-- **MCP agents:** Run `mindvault_setup_wallet` — the sponsored account service creates the account and trustline.
+- **MCP agents:** Run `zentrixpay_setup_wallet` — the sponsored account service creates the account and trustline.
 - **Manual wallets:** Add a trustline to testnet USDC (issuer from Circle's testnet docs) via Freighter or the Stellar Laboratory.
 - Verify on Explorer: open the account → **Balances** → confirm USDC appears.
 
@@ -130,22 +130,22 @@ curl -i https://your-server/resources/<id>
 
 | Aspect | Browser (web app) | MCP / agent |
 |--------|-------------------|-------------|
-| Wallet setup | User connects Freighter, xBull, Albedo, etc. via `@creit.tech/stellar-wallets-kit` | `mindvault_setup_wallet` creates a sponsored testnet account in memory |
+| Wallet setup | User connects Freighter, xBull, Albedo, etc. via `@creit.tech/stellar-wallets-kit` | `zentrixpay_setup_wallet` creates a sponsored testnet account in memory |
 | Signing | Wallet kit bridges to x402's `ClientStellarSigner`; user approves in extension | `createEd25519Signer(secretKey)` + `wrapFetchWithPayment` — fully programmatic |
-| Payment flow | Manual UI actions (register, buy) trigger signed retries | `mindvault_buy` / `mindvault_publish` handle 402 → sign → retry automatically |
+| Payment flow | Manual UI actions (register, buy) trigger signed retries | `zentrixpay_buy` / `zentrixpay_publish` handle 402 → sign → retry automatically |
 | Trustline | User must fund and trust USDC themselves | Sponsored account service establishes trustline |
 | Persistence | Wallet keys stay in the browser extension | Agent secret key is **in-memory only** — lost when MCP process exits |
-| Typical failures | User on wrong network in wallet; popup blocked; insufficient balance | Forgot `mindvault_setup_wallet`; stale in-memory wallet; insufficient USDC |
+| Typical failures | User on wrong network in wallet; popup blocked; insufficient balance | Forgot `zentrixpay_setup_wallet`; stale in-memory wallet; insufficient USDC |
 
 **Browser tip:** If Freighter shows "Wrong network", switch to Testnet in the extension before signing.
 
-**Agent tip:** Always run `mindvault_wallet_info` before `mindvault_buy` or `mindvault_publish` to confirm balance and address.
+**Agent tip:** Always run `zentrixpay_wallet_info` before `zentrixpay_buy` or `zentrixpay_publish` to confirm balance and address.
 
 ---
 
 ## Inspecting transactions on Stellar Explorer
 
-MindVault payments and registry operations are real on-chain activity on **Stellar testnet**.
+ZentrixPay payments and registry operations are real on-chain activity on **Stellar testnet**.
 
 ### Find an account
 

@@ -1,5 +1,5 @@
 /**
- * Mainnet readiness guardrails for the MindVault MCP server.
+ * Mainnet readiness guardrails for the ZentrixPay MCP server.
  *
  * When STELLAR_NETWORK / x402 targets mainnet, mutating tools and buys require
  * an explicit confirmation so agents cannot spend real USDC or mutate mainnet
@@ -7,7 +7,7 @@
  *
  * Confirmation sources (any one is enough):
  *   1. Tool argument `confirmMainnet: true`
- *   2. Env `MINDVAULT_ALLOW_MAINNET=1` (or `true` / `yes`)
+ *   2. Env `ZENTRIXPAY_ALLOW_MAINNET=1` (or `true` / `yes`)
  *
  * Errors are deterministic and agent-safe (no secrets, no stack traces).
  *
@@ -20,7 +20,7 @@
  *   - unset / empty / `0` / `false` / `no` / `off` ⇒ `per-call-confirm`
  *     (unset and empty behaved this way before; the explicit denials are new
  *     spellings of the same default, so an operator can write intent, and so
- *     a template variable like `$MINDVAULT_ALLOW_MAINNET` left unexpanded
+ *     a template variable like `$ZENTRIXPAY_ALLOW_MAINNET` left unexpanded
  *     cannot unlock anything)
  *   - any other value — including ones a future contributor might consider
  *     "obviously truthy" — stays on the safe default. A typo in a safety
@@ -38,24 +38,27 @@
 
 /** Tools that mutate state or spend funds — gated on mainnet. */
 export const MAINNET_GATED_TOOLS = [
-  "mindvault_setup_wallet",
-  "mindvault_repair_sponsored_account",
-  "mindvault_register",
-  "mindvault_publish",
-  "mindvault_publish_batch",
-  "mindvault_buy",
-  "mindvault_buy_lease",
-  "mindvault_register_onchain",
-  "mindvault_reset",
-  "mindvault_update_metadata",
-  "mindvault_set_price",
-  "mindvault_transfer_ownership",
-  "mindvault_accept_transfer",
-  "mindvault_cancel_transfer",
-  "mindvault_set_listed",
-  "mindvault_freeze",
-  "mindvault_royalty",
-  "mindvault_set_tags",
+  "zentrixpay_call",
+  "zentrixpay_register_api",
+  "zentrixpay_update_api",
+  "zentrixpay_setup_wallet",
+  "zentrixpay_repair_sponsored_account",
+  "zentrixpay_register",
+  "zentrixpay_publish",
+  "zentrixpay_publish_batch",
+  "zentrixpay_buy",
+  "zentrixpay_buy_lease",
+  "zentrixpay_register_onchain",
+  "zentrixpay_reset",
+  "zentrixpay_update_metadata",
+  "zentrixpay_set_price",
+  "zentrixpay_transfer_ownership",
+  "zentrixpay_accept_transfer",
+  "zentrixpay_cancel_transfer",
+  "zentrixpay_set_listed",
+  "zentrixpay_freeze",
+  "zentrixpay_royalty",
+  "zentrixpay_set_tags",
 ] as const;
 
 export type MainnetGatedTool = (typeof MAINNET_GATED_TOOLS)[number];
@@ -87,7 +90,7 @@ export function isTruthyConfirm(value: unknown): boolean {
 }
 
 /**
- * The default mainnet mutation policy, when `MINDVAULT_ALLOW_MAINNET` says
+ * The default mainnet mutation policy, when `ZENTRIXPAY_ALLOW_MAINNET` says
  * nothing (or nothing usable): every gated tool needs `confirmMainnet: true`
  * on the call. Exported so diagnostics and generated references can state the
  * default without restating the logic.
@@ -100,7 +103,7 @@ export const DEFAULT_MAINNET_MUTATION_POLICY = "per-call-confirm" as const;
  * - `per-call-confirm` — the safe default: every gated tool call must carry
  *   `confirmMainnet: true`.
  * - `allow-all` — the operator opted this process out of per-call
- *   confirmation with `MINDVAULT_ALLOW_MAINNET=1` (or `true` / `yes`). Still
+ *   confirmation with `ZENTRIXPAY_ALLOW_MAINNET=1` (or `true` / `yes`). Still
  *   narrower than it sounds: the paid-operation policy and the auto-pay
  *   ceiling continue to apply on top of it.
  */
@@ -117,13 +120,13 @@ export type MainnetMutationPolicy = "per-call-confirm" | "allow-all";
 export function mainnetMutationPolicyFromEnv(
   env: NodeJS.ProcessEnv = process.env,
 ): MainnetMutationPolicy {
-  return unsafeMainnetAllow(env.MINDVAULT_ALLOW_MAINNET)
+  return unsafeMainnetAllow(env.ZENTRIXPAY_ALLOW_MAINNET)
     ? "allow-all"
     : DEFAULT_MAINNET_MUTATION_POLICY;
 }
 
 /**
- * Whether one raw `MINDVAULT_ALLOW_MAINNET` value, on its own, would widen
+ * Whether one raw `ZENTRIXPAY_ALLOW_MAINNET` value, on its own, would widen
  * the policy to `allow-all`.
  *
  * Kept separate from {@link mainnetMutationPolicyFromEnv} so the diagnostics
@@ -137,13 +140,13 @@ export function unsafeMainnetAllow(raw: unknown): boolean {
 }
 
 /**
- * Whether a raw `MINDVAULT_ALLOW_MAINNET` value explicitly re-affirms the
+ * Whether a raw `ZENTRIXPAY_ALLOW_MAINNET` value explicitly re-affirms the
  * safe default (`0` / `false` / `no` / `off`).
  *
  * These are recognized denials, not typos: an operator (or a deployment
  * template) writing one has stated intent, and the resulting behaviour is
  * exactly the documented default. Startup diagnostics stay quiet about them —
- * unlike an unrecognized value such as `$MINDVAULT_ALLOW_MAINNET` or `on`,
+ * unlike an unrecognized value such as `$ZENTRIXPAY_ALLOW_MAINNET` or `on`,
  * which unlocks nothing and is almost certainly a mistake worth flagging.
  */
 export function isExplicitMainnetDenial(raw: unknown): boolean {
@@ -171,7 +174,7 @@ export function mainnetConfirmationRequiredError(toolName: string): Error {
       `Mainnet guardrail: "${toolName}" is blocked on mainnet without explicit confirmation.`,
       "This tool mutates state or spends funds on the public Stellar network.",
       "To proceed, pass confirmMainnet: true on this tool call,",
-      "or set MINDVAULT_ALLOW_MAINNET=1 on the MCP server process.",
+      "or set ZENTRIXPAY_ALLOW_MAINNET=1 on the MCP server process.",
       "Read-only tools (browse, search, preview, registry_lookup, registry_list, tx_status, …) are unrestricted.",
     ].join(" "),
   );
@@ -207,7 +210,7 @@ export function formatMainnetDiagnostics(input: {
     `Registry: ${input.registryContractId || "(unset — required on mainnet)"}`,
     `Mainnet mutations: ${
       input.allowMainnetEnv
-        ? "allowed via MINDVAULT_ALLOW_MAINNET"
+        ? "allowed via ZENTRIXPAY_ALLOW_MAINNET"
         : "require confirmMainnet: true per call"
     }`,
   ];
@@ -217,7 +220,7 @@ export function formatMainnetDiagnostics(input: {
 /**
  * Session-level banner explaining the active network and exactly how to
  * confirm a mainnet mutation — meant to be read once at the start of an agent
- * session (see mindvault_mainnet_banner in index.ts, which layers the
+ * session (see zentrixpay_mainnet_banner in index.ts, which layers the
  * paid-operation confirmation policy from paidOperations.ts on top of this),
  * not repeated on every diagnostic call the way formatMainnetDiagnostics is.
  */
@@ -231,7 +234,7 @@ export function formatMainnetBanner(input: {
 
   if (!isMainnetNetwork(input.stellarNetwork)) {
     return [
-      `MindVault MCP session — network: ${input.stellarNetwork} (${input.x402Network}).`,
+      `ZentrixPay MCP session — network: ${input.stellarNetwork} (${input.x402Network}).`,
       "This is a test network: USDC balances and on-chain writes here are not real funds, and no gas fee is real money.",
       `Registry contract: ${input.registryContractId || "(unset)"}.`,
       `Paid and destructive tools (${gatedList}) still run their full flow end-to-end here, at no financial risk, so testnet is safe to explore freely.`,
@@ -239,13 +242,13 @@ export function formatMainnetBanner(input: {
   }
 
   return [
-    `⚠ MindVault MCP session — network: ${input.stellarNetwork} (${input.x402Network}). THIS IS MAINNET.`,
+    `⚠ ZentrixPay MCP session — network: ${input.stellarNetwork} (${input.x402Network}). THIS IS MAINNET.`,
     "Every purchase, publish, and on-chain write below spends real USDC and/or a real Stellar network transaction fee. There is no undo.",
     `Registry contract: ${input.registryContractId || "(unset — required before any on-chain call will work)"}.`,
     "",
     `Before any paid or destructive operation (${gatedList}), you must confirm explicitly — one of:`,
     "  • pass confirmMainnet: true on that specific tool call, or",
-    "  • set MINDVAULT_ALLOW_MAINNET=1 on the MCP server process, which skips per-call confirmation for the rest of this session.",
+    "  • set ZENTRIXPAY_ALLOW_MAINNET=1 on the MCP server process, which skips per-call confirmation for the rest of this session.",
     "",
     "Read-only tools (browse, search, preview, registry_lookup, registry_list, tx_status, registry_health, network_profile, …) are never gated and never cost anything.",
   ].join("\n");

@@ -1,7 +1,7 @@
 /**
- * Tests for the mindvault_batch_catalog_lookup tool (#608).
+ * Tests for the zentrixpay_batch_catalog_lookup tool (#608).
  *
- * Bootstrap follows index.test.ts rather than the MINDVAULT_MOCK harness:
+ * Bootstrap follows index.test.ts rather than the ZENTRIXPAY_MOCK harness:
  * catalog reads go through `globalThis.fetch`, which is replaced per test, so
  * the real transport path — argument validation, dedup, per-id misses, and
  * the offline snapshot fallback (#556 semantics) — is exercised without a
@@ -16,7 +16,7 @@ import type { IntegrationHarness } from "./integrationHarness.js";
 // Isolate state persistence from the developer machine and pin the network
 // preset before index.js loads (same as the other tool tests).
 process.env.STELLAR_NETWORK = "testnet";
-const harnessHome = mkdtempSync(join(tmpdir(), "mindvault-mcp-batch-"));
+const harnessHome = mkdtempSync(join(tmpdir(), "zentrixpay-mcp-batch-"));
 process.env.HOME = harnessHome;
 process.env.USERPROFILE = harnessHome;
 
@@ -69,7 +69,7 @@ async function callBatchStructured(
 ): Promise<BatchStructured> {
   const args: Record<string, unknown> = { resourceIds };
   if (refetch) args.refetch = true;
-  const result = await harness.callTool("mindvault_batch_catalog_lookup", args);
+  const result = await harness.callTool("zentrixpay_batch_catalog_lookup", args);
   expect(result.isError).toBeUndefined();
   const structured = result.structuredContent as BatchStructured | undefined;
   expect(structured).toBeDefined();
@@ -86,7 +86,7 @@ const CATALOG_ITEM = {
   accessUrl: "https://example.com/res-001",
 };
 
-describe("mindvault_batch_catalog_lookup", () => {
+describe("zentrixpay_batch_catalog_lookup", () => {
   let harness: IntegrationHarness;
 
   beforeAll(async () => {
@@ -109,7 +109,7 @@ describe("mindvault_batch_catalog_lookup", () => {
 
   it("is advertised with a read-only annotation and an output schema", async () => {
     const { tools } = await harness.listTools();
-    const tool = tools.find((t) => t.name === "mindvault_batch_catalog_lookup") as {
+    const tool = tools.find((t) => t.name === "zentrixpay_batch_catalog_lookup") as {
       annotations?: { readOnlyHint?: boolean };
       outputSchema?: unknown;
     };
@@ -155,7 +155,7 @@ describe("mindvault_batch_catalog_lookup", () => {
     });
 
     it("returns a readable text block alongside the structured payload", async () => {
-      const result = await harness.callTool("mindvault_batch_catalog_lookup", {
+      const result = await harness.callTool("zentrixpay_batch_catalog_lookup", {
         resourceIds: ["res-001"],
       });
       expect(result.isError).toBeUndefined();
@@ -206,19 +206,19 @@ describe("mindvault_batch_catalog_lookup", () => {
       Promise.resolve(mockResponse(CATALOG_ITEM)),
     );
     const ids = Array.from({ length: 26 }, (_, i) => `res-${i}`);
-    const result = await harness.callTool("mindvault_batch_catalog_lookup", { resourceIds: ids });
+    const result = await harness.callTool("zentrixpay_batch_catalog_lookup", { resourceIds: ids });
     expect(result.isError).toBe(true);
     expect(resultText(result)).toMatch(/at most 25/);
   });
 
   it("rejects an empty id list", async () => {
-    const result = await harness.callTool("mindvault_batch_catalog_lookup", { resourceIds: [] });
+    const result = await harness.callTool("zentrixpay_batch_catalog_lookup", { resourceIds: [] });
     expect(result.isError).toBe(true);
     expect(resultText(result)).toMatch(/at least 1/);
   });
 
   it("rejects entries that are not resource ids", async () => {
-    const result = await harness.callTool("mindvault_batch_catalog_lookup", {
+    const result = await harness.callTool("zentrixpay_batch_catalog_lookup", {
       resourceIds: ["res-001", "not ok!"],
     });
     expect(result.isError).toBe(true);
@@ -257,7 +257,7 @@ describe("mindvault_batch_catalog_lookup", () => {
     });
 
     it("fails with a classified error when offline with no snapshot at all", async () => {
-      const result = await harness.callTool("mindvault_batch_catalog_lookup", {
+      const result = await harness.callTool("zentrixpay_batch_catalog_lookup", {
         resourceIds: ["never-cached-id"],
       });
       expect(result.isError).toBe(true);
@@ -266,12 +266,12 @@ describe("mindvault_batch_catalog_lookup", () => {
 
     it("refetch: true refuses to serve cache when the API is down", async () => {
       recordPreviewSnapshot("cached-1", cachedItem);
-      const result = await harness.callTool("mindvault_batch_catalog_lookup", {
+      const result = await harness.callTool("zentrixpay_batch_catalog_lookup", {
         resourceIds: ["cached-1"],
         refetch: true,
       });
       expect(result.isError).toBe(true);
-      expect(resultText(result)).toMatch(/MindVault API request failed/i);
+      expect(resultText(result)).toMatch(/ZentrixPay API request failed/i);
     });
   });
 });

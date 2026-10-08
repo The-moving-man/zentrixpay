@@ -3,7 +3,7 @@
 Issue [#586](https://github.com/mind-vault-1/mindvault/issues/586).
 
 A published tarball says what it is — `name`, `version` — and nothing about
-where it came from. Anyone who installs `@mindvault/mcp` and wants to know
+where it came from. Anyone who installs `@zentrixpay/mcp` and wants to know
 which commit produced it, whether it was built in CI or on somebody's laptop,
 or whether the `dist/` they received matches this repository at that commit,
 has no way to find out.
@@ -19,7 +19,7 @@ via the `files` allowlist.
 ```json
 {
   "schemaVersion": "1.0.0",
-  "name": "@mindvault/mcp",
+  "name": "@zentrixpay/mcp",
   "version": "1.0.0",
   "buildTime": "2026-08-29T12:00:00Z",
   "source": {
@@ -30,7 +30,7 @@ via the `files` allowlist.
   },
   "builder": {
     "type": "github-actions",
-    "id": "mind-vault-1/mindvault/actions/runs/42",
+    "id": "mind-vault-1/zentrixpay/actions/runs/42",
     "nodeVersion": "v20.11.0",
     "platform": "linux-x64"
   },
@@ -51,9 +51,9 @@ via the `files` allowlist.
 ## Generating it
 
 ```
-pnpm --filter @mindvault/mcp build
-pnpm --filter @mindvault/mcp provenance
-pnpm --filter @mindvault/mcp prepublish:check
+pnpm --filter @zentrixpay/mcp build
+pnpm --filter @zentrixpay/mcp provenance
+pnpm --filter @zentrixpay/mcp prepublish:check
 ```
 
 Order matters. The record digests `dist/`, so generating it before the build
@@ -81,9 +81,9 @@ list was edited by hand no longer matches its own digest.
 ## Verifying an installed package
 
 ```
-$ cat node_modules/@mindvault/mcp/provenance.json | jq -r '.source.commit'
-$ git -C /path/to/mindvault rev-parse HEAD    # should match
-$ sha256sum node_modules/@mindvault/mcp/dist/index.js
+$ cat node_modules/@zentrixpay/mcp/provenance.json | jq -r '.source.commit'
+$ git -C /path/to/zentrixpay rev-parse HEAD    # should match
+$ sha256sum node_modules/@zentrixpay/mcp/dist/index.js
 ```
 
 Compare the last value against the matching `artifacts[].sha256`. A mismatch

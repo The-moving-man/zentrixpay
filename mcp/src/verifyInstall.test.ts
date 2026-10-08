@@ -10,7 +10,7 @@
  *   - MCP SDK below minimum                  → ok: false
  *   - MCP SDK at or above minimum            → ok: true
  *   - unrecognised STELLAR_NETWORK           → ok: false
- *   - malformed MINDVAULT_URL                → ok: false
+ *   - malformed ZENTRIXPAY_URL                → ok: false
  *   - malformed SPONSORED_ACCOUNT_URL        → ok: false
  *   - malformed HORIZON_URL                  → ok: false
  *   - malformed SOROBAN_RPC_URL              → ok: false
@@ -151,29 +151,29 @@ describe("verifyInstall", () => {
     expect(check.detail).toMatch(/defaults to testnet/);
   });
 
-  it("fails when MINDVAULT_URL is not a valid URL", () => {
-    const result = verifyInstall({ MINDVAULT_URL: "not-a-url" }, NODE_OK, SDK_OK);
+  it("fails when ZENTRIXPAY_URL is not a valid URL", () => {
+    const result = verifyInstall({ ZENTRIXPAY_URL: "not-a-url" }, NODE_OK, SDK_OK);
     expect(result.ok).toBe(false);
-    const check = result.checks.find((c) => c.name === "MINDVAULT_URL")!;
+    const check = result.checks.find((c) => c.name === "ZENTRIXPAY_URL")!;
     expect(check.ok).toBe(false);
     expect(check.detail).toMatch(/not a valid URL/i);
   });
 
-  it("fails when MINDVAULT_URL uses a non-http scheme", () => {
-    const result = verifyInstall({ MINDVAULT_URL: "ftp://example.com" }, NODE_OK, SDK_OK);
+  it("fails when ZENTRIXPAY_URL uses a non-http scheme", () => {
+    const result = verifyInstall({ ZENTRIXPAY_URL: "ftp://example.com" }, NODE_OK, SDK_OK);
     expect(result.ok).toBe(false);
-    const check = result.checks.find((c) => c.name === "MINDVAULT_URL")!;
+    const check = result.checks.find((c) => c.name === "ZENTRIXPAY_URL")!;
     expect(check.ok).toBe(false);
     expect(check.detail).toMatch(/http\(s\)/);
   });
 
-  it("accepts a valid custom MINDVAULT_URL", () => {
+  it("accepts a valid custom ZENTRIXPAY_URL", () => {
     const result = verifyInstall(
-      { MINDVAULT_URL: "https://my-mindvault.example.com" },
+      { ZENTRIXPAY_URL: "https://my-zentrixpay.example.com" },
       NODE_OK,
       SDK_OK,
     );
-    const check = result.checks.find((c) => c.name === "MINDVAULT_URL")!;
+    const check = result.checks.find((c) => c.name === "ZENTRIXPAY_URL")!;
     expect(check.ok).toBe(true);
     expect(check.detail).toMatch(/custom/);
   });
@@ -242,19 +242,19 @@ describe("verifyInstall", () => {
   });
 
   it("does not warn about secrets when none are present", () => {
-    const result = verifyInstall({ MINDVAULT_URL: "https://example.com" }, NODE_OK, SDK_OK);
+    const result = verifyInstall({ ZENTRIXPAY_URL: "https://example.com" }, NODE_OK, SDK_OK);
     const check = result.checks.find((c) => c.name === "no_plaintext_secrets")!;
     expect(check.ok).toBe(true);
   });
 
   it("summary starts with ✓ on a clean install", () => {
     const result = verifyInstall(CLEAN_ENV, NODE_OK, SDK_OK);
-    expect(result.summary).toMatch(/^✓ MindVault MCP install OK\./);
+    expect(result.summary).toMatch(/^✓ ZentrixPay MCP install OK\./);
   });
 
   it("summary starts with ✗ when checks fail", () => {
     const result = verifyInstall(CLEAN_ENV, "v16.0.0", SDK_OK);
-    expect(result.summary).toMatch(/^✗ MindVault MCP install has issues\./);
+    expect(result.summary).toMatch(/^✗ ZentrixPay MCP install has issues\./);
   });
 
   it("summary includes a fix hint when there are failures", () => {

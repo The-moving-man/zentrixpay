@@ -1,6 +1,6 @@
 .PHONY: setup setup-usdc dev dev-server dev-web test install migrate wallets seed validate
 
-# MindVault local development entrypoints.
+# ZentrixPay local development entrypoints.
 # Prerequisites: Node.js 20+, pnpm, and a configured server/.env (see server/.env.example).
 
 install:
@@ -16,7 +16,7 @@ wallets:
 	@echo "Run 'make wallets' again if you need separate platform + agent wallets."
 
 setup-usdc:
-	pnpm --filter @mindvault/server setup-usdc
+	pnpm --filter @zentrixpay/server setup-usdc
 
 # First-time setup after copying server/.env.example -> server/.env and filling credentials.
 setup: install migrate wallets
@@ -31,13 +31,13 @@ dev-server:
 	pnpm dev:server
 
 dev-web:
-	pnpm --filter @mindvault/web dev
+	pnpm --filter @zentrixpay/web dev
 
 # Run API (:4021) and web app (:5173) together.
 dev:
 	@trap 'kill 0' INT TERM; \
 	pnpm dev:server & \
-	pnpm --filter @mindvault/web dev & \
+	pnpm --filter @zentrixpay/web dev & \
 	wait
 
 test:
@@ -51,10 +51,10 @@ validate:
 	@echo "==> Building registry client..."
 	pnpm run build:registry-client
 	@echo "==> Building server..."
-	pnpm --filter @mindvault/server build
+	pnpm --filter @zentrixpay/server build
 	@echo "==> Running tests..."
-	pnpm --filter @mindvault/server test
-	pnpm --filter @mindvault/web test 2>/dev/null || true
+	pnpm --filter @zentrixpay/server test
+	pnpm --filter @zentrixpay/web test 2>/dev/null || true
 	@echo "==> Checking formatting..."
 	pnpm run format:check
 	@echo "==> Linting..."

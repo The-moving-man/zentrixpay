@@ -1,4 +1,4 @@
-import { networks, resolveStellarNetwork } from "@mindvault/registry-client";
+import { networks, resolveStellarNetwork } from "@zentrixpay/registry-client";
 import { config } from "../config.js";
 
 const explorerNetwork = networks[resolveStellarNetwork(config.STELLAR_NETWORK)].explorerNetwork;
@@ -64,7 +64,7 @@ export function buildRegistrationFailureGuidance(params: {
     `Retry by calling ${retryEndpoint} again. The resource is still listed and purchasable while registration is retried.`,
   );
   nextSteps.push(
-    "If retries keep failing, contact a MindVault operator with the resource ID" +
+    "If retries keep failing, contact a ZentrixPay operator with the resource ID" +
       (hasHash ? " and transaction hash above." : "."),
   );
 

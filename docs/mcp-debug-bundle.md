@@ -1,6 +1,6 @@
-# Debug Bundle Export (`mindvault_debug_bundle`)
+# Debug Bundle Export (`zentrixpay_debug_bundle`)
 
-`mindvault_debug_bundle` produces one document an agent or operator can attach
+`zentrixpay_debug_bundle` produces one document an agent or operator can attach
 to a bug report or support ticket without first scrubbing it by hand. It
 gathers what a maintainer asks for first (resolved configuration, startup
 diagnostics, install checks, profiles, state-file mode, metrics, catalog cache
@@ -11,15 +11,15 @@ Source: [`mcp/src/debugBundle.ts`](../mcp/src/debugBundle.ts).
 
 The tool is local and read-only: no network calls, no wallet required, no
 state changes. It is the natural next call after
-[`mindvault_verify_install`](mcp-verify-install.md) reports a problem you
+[`zentrixpay_verify_install`](mcp-verify-install.md) reports a problem you
 cannot explain from the summary alone.
 
 ## Arguments
 
 | Argument             | Type    | Meaning                                                                                          |
 | -------------------- | ------- | ------------------------------------------------------------------------------------------------ |
-| `auditLogLines`      | integer | Entries to include from the end of `MINDVAULT_AUDIT_LOG_FILE` (0 to 500, default 50); 0 omits it |
-| `includeEnvironment` | boolean | Include the MindVault-related environment variables (masked). Default `true`                     |
+| `auditLogLines`      | integer | Entries to include from the end of `ZENTRIXPAY_AUDIT_LOG_FILE` (0 to 500, default 50); 0 omits it |
+| `includeEnvironment` | boolean | Include the ZentrixPay-related environment variables (masked). Default `true`                     |
 
 ## What is removed, and what is kept
 
@@ -28,7 +28,7 @@ Sanitisation is by construction, not by pattern matching alone:
 - Wallet secret keys and publisher API keys are never read into the bundle.
   Profiles are reported as `name`, `active`, `hasWallet`, `publicKey`,
   `hasApiKey`.
-- Only environment variables the server reads are listed: the `MINDVAULT_`,
+- Only environment variables the server reads are listed: the `ZENTRIXPAY_`,
   `STELLAR_`, `SOROBAN_`, `HORIZON_` and `VAULT_REGISTRY_` prefixes plus
   `NETWORK`, `SPONSORED_ACCOUNT_URL`, `USDC_CONTRACT_ID` and `NODE_ENV`. An
   unrelated credential in the parent shell is not reported even in masked form.
@@ -52,10 +52,10 @@ find.
 
 ```json
 {
-  "schema": "mindvault.debug-bundle/v1",
+  "schema": "zentrixpay.debug-bundle/v1",
   "generatedAt": "2026-09-25T12:00:00.000Z",
   "sanitized": {
-    "maskedEnvironment": ["MINDVAULT_AGENT_SECRET"],
+    "maskedEnvironment": ["ZENTRIXPAY_AGENT_SECRET"],
     "rules": ["Wallet secret keys and publisher API keys are never read into the bundle; ..."]
   },
   "runtime": {
@@ -76,7 +76,7 @@ find.
     "horizonUrl": "https://horizon-testnet.stellar.org",
     "sorobanRpcUrl": "https://soroban-testnet.stellar.org"
   },
-  "environment": { "STELLAR_NETWORK": "testnet", "MINDVAULT_AGENT_SECRET": "[REDACTED]" },
+  "environment": { "STELLAR_NETWORK": "testnet", "ZENTRIXPAY_AGENT_SECRET": "[REDACTED]" },
   "diagnostics": [],
   "install": { "ok": true, "checks": [{ "name": "node_version", "ok": true, "detail": "…" }] },
   "profiles": {
@@ -92,8 +92,8 @@ find.
     ]
   },
   "state": {
-    "dir": "/home/agent/.mindvault",
-    "file": "/home/agent/.mindvault/state.json",
+    "dir": "/home/agent/.zentrixpay",
+    "file": "/home/agent/.zentrixpay/state.json",
     "permissions": {
       "exists": true,
       "mode": "0600",
@@ -117,7 +117,7 @@ find.
   },
   "auditLog": {
     "enabled": true,
-    "filePath": "/var/log/mindvault/audit.jsonl",
+    "filePath": "/var/log/zentrixpay/audit.jsonl",
     "exists": true,
     "requested": 50,
     "entries": []
@@ -126,12 +126,12 @@ find.
 ```
 
 The tool advertises an `outputSchema`, so the same object also arrives as MCP
-`structuredContent`. `metrics` is the `mindvault_metrics` snapshot and reports
-`enabled: false` when `MINDVAULT_METRICS` is off.
+`structuredContent`. `metrics` is the `zentrixpay_metrics` snapshot and reports
+`enabled: false` when `ZENTRIXPAY_METRICS` is off.
 
 ## Filing a report
 
-1. Call `mindvault_debug_bundle` (raise `auditLogLines` if the failure is a few
+1. Call `zentrixpay_debug_bundle` (raise `auditLogLines` if the failure is a few
    calls back).
 2. Skim `sanitized.maskedEnvironment` and `profiles`; if you still see
    something you do not want to share, pass `includeEnvironment: false`.

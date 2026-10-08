@@ -33,11 +33,11 @@
 /** Environment variables controlling failover. */
 export const RPC_FAILOVER_ENV_VARS = {
   /** Comma-separated endpoint list, highest priority first. */
-  endpoints: "MINDVAULT_SOROBAN_RPC_URLS",
+  endpoints: "ZENTRIXPAY_SOROBAN_RPC_URLS",
   /** How long a failed endpoint is skipped, in milliseconds. */
-  cooldownMs: "MINDVAULT_RPC_FAILOVER_COOLDOWN_MS",
+  cooldownMs: "ZENTRIXPAY_RPC_FAILOVER_COOLDOWN_MS",
   /** Cap on endpoints tried for a single call. */
-  maxAttempts: "MINDVAULT_RPC_FAILOVER_MAX_ATTEMPTS",
+  maxAttempts: "ZENTRIXPAY_RPC_FAILOVER_MAX_ATTEMPTS",
 } as const;
 
 /** 30s: long enough to ride out a deploy, short enough to recover promptly. */
@@ -119,7 +119,7 @@ function parseNonNegativeInt(raw: string | undefined, fallback: number): number 
 /**
  * Resolve the failover configuration.
  *
- * `MINDVAULT_SOROBAN_RPC_URLS` wins when set; otherwise the single
+ * `ZENTRIXPAY_SOROBAN_RPC_URLS` wins when set; otherwise the single
  * `SOROBAN_RPC_URL` (or the network preset behind it) is used as a
  * one-endpoint list, so an operator who has configured nothing gets exactly
  * today's behaviour.

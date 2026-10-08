@@ -1,7 +1,7 @@
 /**
- * Contributor-friendly mock mode for the MindVault MCP server.
+ * Contributor-friendly mock mode for the ZentrixPay MCP server.
  *
- * Enabled with MINDVAULT_MOCK=1, this replaces every outbound HTTP call and the
+ * Enabled with ZENTRIXPAY_MOCK=1, this replaces every outbound HTTP call and the
  * on-chain registry lookup with deterministic, in-memory responses, so a
  * contributor can run and exercise the server — browse, preview, wallet setup,
  * publish/buy, registry lookups — with no live backend, no funded wallet, and no
@@ -19,9 +19,9 @@ import { stroopsToUsdc } from "./usdcAmount.js";
 
 const TRUTHY = new Set(["1", "true", "yes", "on"]);
 
-/** Mock mode is opt-in: enabled only when MINDVAULT_MOCK is a truthy string. */
+/** Mock mode is opt-in: enabled only when ZENTRIXPAY_MOCK is a truthy string. */
 export function mockEnabledFromEnv(env: NodeJS.ProcessEnv): boolean {
-  const raw = env.MINDVAULT_MOCK;
+  const raw = env.ZENTRIXPAY_MOCK;
   return typeof raw === "string" && TRUTHY.has(raw.trim().toLowerCase());
 }
 

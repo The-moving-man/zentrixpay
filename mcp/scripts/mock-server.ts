@@ -1,5 +1,5 @@
 /**
- * Deterministic mock of the external services the MindVault MCP server talks to,
+ * Deterministic mock of the external services the ZentrixPay MCP server talks to,
  * used by the smoke test's `--target mock` mode so it can run with no live
  * backend, no funded wallet, and no network access.
  *

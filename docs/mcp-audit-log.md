@@ -1,6 +1,6 @@
 # MCP Audit Log
 
-`MINDVAULT_AUDIT_LOG=1` records every tool call, network request, payment and
+`ZENTRIXPAY_AUDIT_LOG=1` records every tool call, network request, payment and
 on-chain submission the server makes, with secrets redacted. Entries go to
 stderr, and optionally to a rotating JSONL file
 ([#592](https://github.com/mind-vault-1/mindvault/issues/592)).
@@ -9,27 +9,27 @@ stderr, and optionally to a rotating JSONL file
 
 | Variable                        | Default   | Description                                    |
 | ------------------------------- | --------- | ---------------------------------------------- |
-| `MINDVAULT_AUDIT_LOG`           | unset     | Set `1` to enable audit logging                |
-| `MINDVAULT_AUDIT_LOG_FILE`      | unset     | Path to a JSONL file. Unset = stderr only      |
-| `MINDVAULT_AUDIT_LOG_MAX_BYTES` | `5242880` | Rotate once the live file would exceed this    |
-| `MINDVAULT_AUDIT_LOG_MAX_FILES` | `4`       | Rotated generations kept besides the live file |
+| `ZENTRIXPAY_AUDIT_LOG`           | unset     | Set `1` to enable audit logging                |
+| `ZENTRIXPAY_AUDIT_LOG_FILE`      | unset     | Path to a JSONL file. Unset = stderr only      |
+| `ZENTRIXPAY_AUDIT_LOG_MAX_BYTES` | `5242880` | Rotate once the live file would exceed this    |
+| `ZENTRIXPAY_AUDIT_LOG_MAX_FILES` | `4`       | Rotated generations kept besides the live file |
 
 ```json
 {
   "mcpServers": {
-    "mindvault": {
+    "zentrixpay": {
       "command": "node",
-      "args": ["/absolute/path/to/mindvault/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/zentrixpay/mcp/dist/index.js"],
       "env": {
-        "MINDVAULT_AUDIT_LOG": "1",
-        "MINDVAULT_AUDIT_LOG_FILE": "/var/log/mindvault/audit.jsonl"
+        "ZENTRIXPAY_AUDIT_LOG": "1",
+        "ZENTRIXPAY_AUDIT_LOG_FILE": "/var/log/zentrixpay/audit.jsonl"
       }
     }
   }
 }
 ```
 
-The file sink is opt-in. Without `MINDVAULT_AUDIT_LOG_FILE` nothing changes:
+The file sink is opt-in. Without `ZENTRIXPAY_AUDIT_LOG_FILE` nothing changes:
 entries go to stderr and whoever runs the server captures them or does not.
 
 ## Why a file, and why JSONL
@@ -69,11 +69,11 @@ It is obvious from a directory listing which file is newest, and it needs no
 index or manifest that could disagree with what is on disk.
 
 - Rotation happens **before** a write that would exceed the limit, so
-  `MINDVAULT_AUDIT_LOG_MAX_BYTES` is a real ceiling rather than a threshold the
+  `ZENTRIXPAY_AUDIT_LOG_MAX_BYTES` is a real ceiling rather than a threshold the
   file is allowed to pass.
 - A single entry larger than the whole budget is still written. Truncating an
   audit record would be worse than briefly exceeding a size target.
-- `MINDVAULT_AUDIT_LOG_MAX_FILES=0` keeps no history: the live file is
+- `ZENTRIXPAY_AUDIT_LOG_MAX_FILES=0` keeps no history: the live file is
   discarded on rotation.
 - Restarting the server **appends** to an existing log rather than truncating
   it, so a restart does not destroy the previous session's trail.

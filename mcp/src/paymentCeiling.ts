@@ -18,11 +18,11 @@ export const DEFAULT_MAX_AUTO_FEE_STROOPS = "100000";
 const toStroops = (value: string): bigint | null => usdcToStroops(value);
 
 function configuredCeiling(env: NodeJS.ProcessEnv): { value: string; stroops: bigint } {
-  const value = env.MINDVAULT_MAX_AUTO_PAY_USDC ?? DEFAULT_MAX_AUTO_PAY_USDC;
+  const value = env.ZENTRIXPAY_MAX_AUTO_PAY_USDC ?? DEFAULT_MAX_AUTO_PAY_USDC;
   const stroops = toStroops(value);
   if (stroops === null) {
     throw new Error(
-      "MINDVAULT_MAX_AUTO_PAY_USDC must be a non-negative USDC decimal with at most 7 decimal places.",
+      "ZENTRIXPAY_MAX_AUTO_PAY_USDC must be a non-negative USDC decimal with at most 7 decimal places.",
     );
   }
   return { value, stroops };
@@ -59,7 +59,7 @@ export function assertAutoPaymentWithinCeiling(input: {
 
   throw new Error(
     `Purchase requires ${requiredAmount} USDC, which exceeds the automatic payment ceiling of ${ceiling.value} USDC. ` +
-      `To authorize this purchase, call mindvault_buy with maxAutoPayUsdc: "${requiredAmount}" (or a higher amount).`,
+      `To authorize this purchase, call zentrixpay_buy with maxAutoPayUsdc: "${requiredAmount}" (or a higher amount).`,
   );
 }
 
@@ -69,11 +69,11 @@ export function assertTransactionFeeWithinCeiling(input: {
   env?: NodeJS.ProcessEnv;
 }): void {
   const raw =
-    input.env?.MINDVAULT_MAX_AUTO_FEE_STROOPS ??
-    process.env.MINDVAULT_MAX_AUTO_FEE_STROOPS ??
+    input.env?.ZENTRIXPAY_MAX_AUTO_FEE_STROOPS ??
+    process.env.ZENTRIXPAY_MAX_AUTO_FEE_STROOPS ??
     DEFAULT_MAX_AUTO_FEE_STROOPS;
   if (!/^\d+$/.test(raw))
-    throw new Error("MINDVAULT_MAX_AUTO_FEE_STROOPS must be a non-negative integer.");
+    throw new Error("ZENTRIXPAY_MAX_AUTO_FEE_STROOPS must be a non-negative integer.");
   const fee = BigInt(String(input.feeStroops));
   const ceiling = BigInt(raw);
   if (fee > ceiling) {

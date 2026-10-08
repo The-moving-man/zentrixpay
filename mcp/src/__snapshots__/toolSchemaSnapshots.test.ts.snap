@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`tool schema snapshots > mindvault_accept_transfer > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_accept_transfer > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -9,11 +9,11 @@ exports[`tool schema snapshots > mindvault_accept_transfer > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_accept_transfer > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_accept_transfer > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
       "type": "boolean",
     },
     "resourceId": {
@@ -32,7 +32,7 @@ exports[`tool schema snapshots > mindvault_accept_transfer > input schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_accept_transfer > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_accept_transfer > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -121,7 +121,7 @@ exports[`tool schema snapshots > mindvault_accept_transfer > output schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_agent_status > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_agent_status > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -130,7 +130,7 @@ exports[`tool schema snapshots > mindvault_agent_status > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_agent_status > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_agent_status > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -138,14 +138,14 @@ exports[`tool schema snapshots > mindvault_agent_status > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_agent_status > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_agent_status > output schema 1`] = `
 {
   "additionalProperties": true,
   "type": "object",
 }
 `;
 
-exports[`tool schema snapshots > mindvault_backup_state > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_backup_state > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -154,7 +154,7 @@ exports[`tool schema snapshots > mindvault_backup_state > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_backup_state > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_backup_state > input schema 1`] = `
 {
   "properties": {
     "confirm": {
@@ -173,9 +173,9 @@ exports[`tool schema snapshots > mindvault_backup_state > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_backup_state > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_backup_state > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_browse > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_browse > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -184,7 +184,7 @@ exports[`tool schema snapshots > mindvault_browse > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_browse > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_browse > input schema 1`] = `
 {
   "properties": {
     "limit": {
@@ -198,7 +198,7 @@ exports[`tool schema snapshots > mindvault_browse > input schema 1`] = `
       "type": "integer",
     },
     "listed": {
-      "description": "Filter by listing state. The public catalog is listed=true only; listed=false yields no public catalog matches (use mindvault_registry_lookup for a specific resource).",
+      "description": "Filter by listing state. The public catalog is listed=true only; listed=false yields no public catalog matches (use zentrixpay_registry_lookup for a specific resource).",
       "examples": [
         true,
         false,
@@ -304,7 +304,7 @@ exports[`tool schema snapshots > mindvault_browse > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_browse > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_browse > output schema 1`] = `
 {
   "properties": {
     "items": {
@@ -379,7 +379,7 @@ exports[`tool schema snapshots > mindvault_browse > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_buy > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_buy > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -388,15 +388,15 @@ exports[`tool schema snapshots > mindvault_buy > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_buy > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_buy > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "dryRun": {
@@ -414,14 +414,14 @@ exports[`tool schema snapshots > mindvault_buy > input schema 1`] = `
       "type": "integer",
     },
     "maxAutoPayUsdc": {
-      "description": "Explicit per-call maximum automatic payment in USDC. Required when this resource costs more than MINDVAULT_MAX_AUTO_PAY_USDC; must be at least the advertised price.",
+      "description": "Explicit per-call maximum automatic payment in USDC. Required when this resource costs more than ZENTRIXPAY_MAX_AUTO_PAY_USDC; must be at least the advertised price.",
       "examples": [
         "25.00",
       ],
       "type": "string",
     },
     "resourceId": {
-      "description": "The resource ID to buy, from mindvault_browse or mindvault_search. Letters, digits, dot, dash, or underscore.",
+      "description": "The resource ID to buy, from zentrixpay_browse or zentrixpay_search. Letters, digits, dot, dash, or underscore.",
       "examples": [
         "cm7x8y9z",
         "swcn98besxpp6t1u8e77fqz3",
@@ -451,11 +451,11 @@ exports[`tool schema snapshots > mindvault_buy > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_buy > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_buy > output schema 1`] = `
 {
   "oneOf": [
     {
-      "description": "mindvault_buy result: the purchase diff plus a settlement-confirmation block describing how far the payment transaction got before returning.",
+      "description": "zentrixpay_buy result: the purchase diff plus a settlement-confirmation block describing how far the payment transaction got before returning.",
       "properties": {
         "after": {},
         "before": {},
@@ -588,7 +588,7 @@ exports[`tool schema snapshots > mindvault_buy > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_batch_catalog_lookup > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_batch_catalog_lookup > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -597,7 +597,7 @@ exports[`tool schema snapshots > mindvault_batch_catalog_lookup > annotations 1`
 }
 `;
 
-exports[`tool schema snapshots > mindvault_batch_catalog_lookup > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_batch_catalog_lookup > input schema 1`] = `
 {
   "properties": {
     "refetch": {
@@ -605,7 +605,7 @@ exports[`tool schema snapshots > mindvault_batch_catalog_lookup > input schema 1
       "type": "boolean",
     },
     "resourceIds": {
-      "description": "1–25 resource ids, from mindvault_browse or mindvault_search. A comma-separated string is also accepted. Duplicates are looked up once each.",
+      "description": "1–25 resource ids, from zentrixpay_browse or zentrixpay_search. A comma-separated string is also accepted. Duplicates are looked up once each.",
       "examples": [
         [
           "cm7x8y9z",
@@ -627,7 +627,7 @@ exports[`tool schema snapshots > mindvault_batch_catalog_lookup > input schema 1
 }
 `;
 
-exports[`tool schema snapshots > mindvault_batch_catalog_lookup > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_batch_catalog_lookup > output schema 1`] = `
 {
   "properties": {
     "foundCount": {
@@ -718,7 +718,7 @@ exports[`tool schema snapshots > mindvault_batch_catalog_lookup > output schema 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_preview_metadata_hash > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_preview_metadata_hash > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -727,11 +727,11 @@ exports[`tool schema snapshots > mindvault_preview_metadata_hash > annotations 1
 }
 `;
 
-exports[`tool schema snapshots > mindvault_preview_metadata_hash > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_preview_metadata_hash > input schema 1`] = `
 {
   "properties": {
     "resourceId": {
-      "description": "The on-chain resource id to read (from mindvault_browse, mindvault_registry_list, or mindvault_publish). Letters, digits, dot, dash, or underscore.",
+      "description": "The on-chain resource id to read (from zentrixpay_browse, zentrixpay_registry_list, or zentrixpay_publish). Letters, digits, dot, dash, or underscore.",
       "examples": [
         "cm7x8y9z",
         "res-001",
@@ -746,7 +746,7 @@ exports[`tool schema snapshots > mindvault_preview_metadata_hash > input schema 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_preview_metadata_hash > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_preview_metadata_hash > output schema 1`] = `
 {
   "properties": {
     "pointer": {
@@ -816,7 +816,7 @@ exports[`tool schema snapshots > mindvault_preview_metadata_hash > output schema
 }
 `;
 
-exports[`tool schema snapshots > mindvault_check_bindings > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_check_bindings > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -825,7 +825,7 @@ exports[`tool schema snapshots > mindvault_check_bindings > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_check_bindings > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_check_bindings > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -833,9 +833,9 @@ exports[`tool schema snapshots > mindvault_check_bindings > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_check_bindings > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_check_bindings > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_check_consistency > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_check_consistency > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -844,7 +844,7 @@ exports[`tool schema snapshots > mindvault_check_consistency > annotations 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_check_consistency > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_check_consistency > input schema 1`] = `
 {
   "properties": {
     "expectedMetadataHash": {
@@ -867,7 +867,7 @@ exports[`tool schema snapshots > mindvault_check_consistency > input schema 1`] 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_check_consistency > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_check_consistency > output schema 1`] = `
 {
   "properties": {
     "apiFound": {
@@ -916,7 +916,7 @@ exports[`tool schema snapshots > mindvault_check_consistency > output schema 1`]
 }
 `;
 
-exports[`tool schema snapshots > mindvault_check_state_permissions > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_check_state_permissions > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -925,7 +925,7 @@ exports[`tool schema snapshots > mindvault_check_state_permissions > annotations
 }
 `;
 
-exports[`tool schema snapshots > mindvault_check_state_permissions > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_check_state_permissions > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -933,9 +933,9 @@ exports[`tool schema snapshots > mindvault_check_state_permissions > input schem
 }
 `;
 
-exports[`tool schema snapshots > mindvault_check_state_permissions > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_check_state_permissions > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_debug_bundle > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_debug_bundle > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -944,11 +944,11 @@ exports[`tool schema snapshots > mindvault_debug_bundle > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_debug_bundle > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_debug_bundle > input schema 1`] = `
 {
   "properties": {
     "auditLogLines": {
-      "description": "Audit-log entries to include from the end of MINDVAULT_AUDIT_LOG_FILE (0–500, default 50). 0 omits the section.",
+      "description": "Audit-log entries to include from the end of ZENTRIXPAY_AUDIT_LOG_FILE (0–500, default 50). 0 omits the section.",
       "examples": [
         50,
         200,
@@ -958,7 +958,7 @@ exports[`tool schema snapshots > mindvault_debug_bundle > input schema 1`] = `
       "type": "integer",
     },
     "includeEnvironment": {
-      "description": "Include the MindVault-related environment variables with credential-like values masked. Default true; pass false to omit the section entirely.",
+      "description": "Include the ZentrixPay-related environment variables with credential-like values masked. Default true; pass false to omit the section entirely.",
       "examples": [
         true,
         false,
@@ -971,7 +971,7 @@ exports[`tool schema snapshots > mindvault_debug_bundle > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_debug_bundle > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_debug_bundle > output schema 1`] = `
 {
   "properties": {
     "auditLog": {
@@ -1121,7 +1121,7 @@ exports[`tool schema snapshots > mindvault_debug_bundle > output schema 1`] = `
       "additionalProperties": {
         "type": "string",
       },
-      "description": "MindVault-related environment variables; credential-like names carry "[REDACTED]". Null when includeEnvironment is false.",
+      "description": "ZentrixPay-related environment variables; credential-like names carry "[REDACTED]". Null when includeEnvironment is false.",
       "type": [
         "object",
         "null",
@@ -1166,7 +1166,7 @@ exports[`tool schema snapshots > mindvault_debug_bundle > output schema 1`] = `
       "type": "object",
     },
     "metrics": {
-      "description": "The mindvault_metrics snapshot; enabled=false when metrics are off.",
+      "description": "The zentrixpay_metrics snapshot; enabled=false when metrics are off.",
       "type": "object",
     },
     "profiles": {
@@ -1268,7 +1268,7 @@ exports[`tool schema snapshots > mindvault_debug_bundle > output schema 1`] = `
       "type": "object",
     },
     "schema": {
-      "const": "mindvault.debug-bundle/v1",
+      "const": "zentrixpay.debug-bundle/v1",
       "type": "string",
     },
     "state": {
@@ -1337,7 +1337,7 @@ exports[`tool schema snapshots > mindvault_debug_bundle > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_export_receipts > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_export_receipts > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -1346,7 +1346,7 @@ exports[`tool schema snapshots > mindvault_export_receipts > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_export_receipts > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_export_receipts > input schema 1`] = `
 {
   "properties": {
     "format": {
@@ -1421,7 +1421,7 @@ exports[`tool schema snapshots > mindvault_export_receipts > input schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_export_receipts > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_export_receipts > output schema 1`] = `
 {
   "properties": {
     "count": {
@@ -1566,7 +1566,7 @@ exports[`tool schema snapshots > mindvault_export_receipts > output schema 1`] =
       "type": "array",
     },
     "schema": {
-      "const": "mindvault.receipt-export/v1",
+      "const": "zentrixpay.receipt-export/v1",
       "type": "string",
     },
     "totalAmount": {
@@ -1588,7 +1588,7 @@ exports[`tool schema snapshots > mindvault_export_receipts > output schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_fee_config > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_fee_config > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -1597,7 +1597,7 @@ exports[`tool schema snapshots > mindvault_fee_config > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_fee_config > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_fee_config > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -1605,7 +1605,7 @@ exports[`tool schema snapshots > mindvault_fee_config > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_fee_config > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_fee_config > output schema 1`] = `
 {
   "properties": {
     "configured": {
@@ -1651,7 +1651,7 @@ exports[`tool schema snapshots > mindvault_fee_config > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_freeze > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_freeze > annotations 1`] = `
 {
   "destructiveHint": true,
   "idempotentHint": true,
@@ -1660,7 +1660,7 @@ exports[`tool schema snapshots > mindvault_freeze > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_freeze > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_freeze > input schema 1`] = `
 {
   "properties": {
     "confirm": {
@@ -1671,11 +1671,11 @@ exports[`tool schema snapshots > mindvault_freeze > input schema 1`] = `
       "type": "string",
     },
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "resourceId": {
@@ -1695,7 +1695,7 @@ exports[`tool schema snapshots > mindvault_freeze > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_freeze > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_freeze > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -1784,7 +1784,7 @@ exports[`tool schema snapshots > mindvault_freeze > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_import_wallet > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_import_wallet > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -1793,11 +1793,11 @@ exports[`tool schema snapshots > mindvault_import_wallet > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_import_wallet > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_import_wallet > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
       "type": "boolean",
     },
     "persist": {
@@ -1817,7 +1817,7 @@ exports[`tool schema snapshots > mindvault_import_wallet > input schema 1`] = `
       "type": "string",
     },
     "secretKey": {
-      "description": "Stellar secret key (S… , 56 chars) to import. If omitted, reads from MINDVAULT_AGENT_SECRET env var.",
+      "description": "Stellar secret key (S… , 56 chars) to import. If omitted, reads from ZENTRIXPAY_AGENT_SECRET env var.",
       "examples": [
         "SCHZPJ...",
       ],
@@ -1829,7 +1829,7 @@ exports[`tool schema snapshots > mindvault_import_wallet > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_import_wallet > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_import_wallet > output schema 1`] = `
 {
   "properties": {
     "address": {
@@ -1851,7 +1851,7 @@ exports[`tool schema snapshots > mindvault_import_wallet > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_list_profiles > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_list_profiles > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -1860,7 +1860,7 @@ exports[`tool schema snapshots > mindvault_list_profiles > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_list_profiles > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_list_profiles > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -1868,7 +1868,7 @@ exports[`tool schema snapshots > mindvault_list_profiles > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_list_profiles > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_list_profiles > output schema 1`] = `
 {
   "properties": {
     "active": {
@@ -1912,7 +1912,7 @@ exports[`tool schema snapshots > mindvault_list_profiles > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_mainnet_banner > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_mainnet_banner > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -1921,7 +1921,7 @@ exports[`tool schema snapshots > mindvault_mainnet_banner > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_mainnet_banner > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_mainnet_banner > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -1929,9 +1929,9 @@ exports[`tool schema snapshots > mindvault_mainnet_banner > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_mainnet_banner > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_mainnet_banner > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_metrics > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_metrics > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -1940,7 +1940,7 @@ exports[`tool schema snapshots > mindvault_metrics > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_metrics > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_metrics > input schema 1`] = `
 {
   "properties": {
     "format": {
@@ -1970,7 +1970,7 @@ exports[`tool schema snapshots > mindvault_metrics > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_metrics > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_metrics > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -2020,7 +2020,7 @@ exports[`tool schema snapshots > mindvault_metrics > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_network_profile > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_network_profile > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -2029,7 +2029,7 @@ exports[`tool schema snapshots > mindvault_network_profile > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_network_profile > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_network_profile > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -2037,7 +2037,7 @@ exports[`tool schema snapshots > mindvault_network_profile > input schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_network_profile > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_network_profile > output schema 1`] = `
 {
   "properties": {
     "horizonUrl": {
@@ -2078,7 +2078,7 @@ exports[`tool schema snapshots > mindvault_network_profile > output schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_pending_transfer > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_pending_transfer > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -2087,7 +2087,7 @@ exports[`tool schema snapshots > mindvault_pending_transfer > annotations 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_pending_transfer > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_pending_transfer > input schema 1`] = `
 {
   "properties": {
     "resourceId": {
@@ -2106,7 +2106,7 @@ exports[`tool schema snapshots > mindvault_pending_transfer > input schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_pending_transfer > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_pending_transfer > output schema 1`] = `
 {
   "properties": {
     "contract": {
@@ -2148,7 +2148,7 @@ exports[`tool schema snapshots > mindvault_pending_transfer > output schema 1`] 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_preview > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_preview > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -2157,11 +2157,11 @@ exports[`tool schema snapshots > mindvault_preview > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_preview > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_preview > input schema 1`] = `
 {
   "properties": {
     "resourceId": {
-      "description": "The unique resource identifier from mindvault_browse or mindvault_search. Example: 'cm7x8y9z'",
+      "description": "The unique resource identifier from zentrixpay_browse or zentrixpay_search. Example: 'cm7x8y9z'",
       "examples": [
         "cm7x8y9z",
         "res-001",
@@ -2177,7 +2177,7 @@ exports[`tool schema snapshots > mindvault_preview > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_preview > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_preview > output schema 1`] = `
 {
   "properties": {
     "accessUrl": {},
@@ -2204,7 +2204,7 @@ exports[`tool schema snapshots > mindvault_preview > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_prewarm_catalog > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_prewarm_catalog > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -2213,7 +2213,7 @@ exports[`tool schema snapshots > mindvault_prewarm_catalog > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_prewarm_catalog > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_prewarm_catalog > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -2221,9 +2221,9 @@ exports[`tool schema snapshots > mindvault_prewarm_catalog > input schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_prewarm_catalog > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_prewarm_catalog > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_publish > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -2232,15 +2232,15 @@ exports[`tool schema snapshots > mindvault_publish > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "description": {
@@ -2289,7 +2289,7 @@ exports[`tool schema snapshots > mindvault_publish > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -2375,7 +2375,7 @@ exports[`tool schema snapshots > mindvault_publish > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish_batch > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish_batch > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -2384,15 +2384,15 @@ exports[`tool schema snapshots > mindvault_publish_batch > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish_batch > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish_batch > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "items": {
@@ -2447,7 +2447,7 @@ exports[`tool schema snapshots > mindvault_publish_batch > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish_batch > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish_batch > output schema 1`] = `
 {
   "properties": {
     "errored": {
@@ -2535,7 +2535,7 @@ exports[`tool schema snapshots > mindvault_publish_batch > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -2621,7 +2621,7 @@ exports[`tool schema snapshots > mindvault_publish > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish_status > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish_status > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -2630,7 +2630,7 @@ exports[`tool schema snapshots > mindvault_publish_status > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish_status > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish_status > input schema 1`] = `
 {
   "properties": {
     "intervalMs": {
@@ -2643,7 +2643,7 @@ exports[`tool schema snapshots > mindvault_publish_status > input schema 1`] = `
       "type": "number",
     },
     "resourceId": {
-      "description": "The resource ID from mindvault_publish (or browse/search). Example: 'cm7x8y9z'",
+      "description": "The resource ID from zentrixpay_publish (or browse/search). Example: 'cm7x8y9z'",
       "examples": [
         "cm7x8y9z",
         "res-001",
@@ -2672,7 +2672,7 @@ exports[`tool schema snapshots > mindvault_publish_status > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish_status > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish_status > output schema 1`] = `
 {
   "properties": {
     "accessUrl": {
@@ -2759,7 +2759,7 @@ exports[`tool schema snapshots > mindvault_publish_status > output schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish_template > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish_template > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -2768,7 +2768,7 @@ exports[`tool schema snapshots > mindvault_publish_template > annotations 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish_template > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish_template > input schema 1`] = `
 {
   "properties": {
     "metadataPointer": {
@@ -2834,7 +2834,7 @@ exports[`tool schema snapshots > mindvault_publish_template > input schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_publish_template > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_publish_template > output schema 1`] = `
 {
   "properties": {
     "description": {
@@ -2884,7 +2884,7 @@ exports[`tool schema snapshots > mindvault_publish_template > output schema 1`] 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_purchase_history > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_purchase_history > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -2893,7 +2893,7 @@ exports[`tool schema snapshots > mindvault_purchase_history > annotations 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_purchase_history > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_purchase_history > input schema 1`] = `
 {
   "properties": {
     "network": {
@@ -2926,7 +2926,7 @@ exports[`tool schema snapshots > mindvault_purchase_history > input schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_purchase_history > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_purchase_history > output schema 1`] = `
 {
   "properties": {
     "count": {
@@ -2947,7 +2947,7 @@ exports[`tool schema snapshots > mindvault_purchase_history > output schema 1`] 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_recover_catalog_cache > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_recover_catalog_cache > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -2956,7 +2956,7 @@ exports[`tool schema snapshots > mindvault_recover_catalog_cache > annotations 1
 }
 `;
 
-exports[`tool schema snapshots > mindvault_recover_catalog_cache > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_recover_catalog_cache > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -2964,7 +2964,7 @@ exports[`tool schema snapshots > mindvault_recover_catalog_cache > input schema 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_recover_catalog_cache > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_recover_catalog_cache > output schema 1`] = `
 {
   "properties": {
     "action": {
@@ -2986,7 +2986,7 @@ exports[`tool schema snapshots > mindvault_recover_catalog_cache > output schema
 }
 `;
 
-exports[`tool schema snapshots > mindvault_register > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_register > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -2995,11 +2995,11 @@ exports[`tool schema snapshots > mindvault_register > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_register > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_register > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
     "email": {
@@ -3033,9 +3033,9 @@ exports[`tool schema snapshots > mindvault_register > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_register > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_register > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_register_onchain > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_register_onchain > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -3044,19 +3044,19 @@ exports[`tool schema snapshots > mindvault_register_onchain > annotations 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_register_onchain > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_register_onchain > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "resourceId": {
-      "description": "The resource ID to register on-chain (from mindvault_publish output). Must be verified and not already registered. Example: 'cm7x8y9z'",
+      "description": "The resource ID to register on-chain (from zentrixpay_publish output). Must be verified and not already registered. Example: 'cm7x8y9z'",
       "examples": [
         "cm7x8y9z",
         "res-001",
@@ -3072,7 +3072,7 @@ exports[`tool schema snapshots > mindvault_register_onchain > input schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_register_onchain > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_register_onchain > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -3158,7 +3158,7 @@ exports[`tool schema snapshots > mindvault_register_onchain > output schema 1`] 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_count > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_count > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3167,7 +3167,7 @@ exports[`tool schema snapshots > mindvault_registry_count > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_count > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_count > input schema 1`] = `
 {
   "properties": {
     "creator": {
@@ -3183,7 +3183,7 @@ exports[`tool schema snapshots > mindvault_registry_count > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_count > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_count > output schema 1`] = `
 {
   "properties": {
     "contract": {},
@@ -3215,7 +3215,7 @@ exports[`tool schema snapshots > mindvault_registry_count > output schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_health > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_health > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3224,7 +3224,7 @@ exports[`tool schema snapshots > mindvault_registry_health > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_health > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_health > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -3232,9 +3232,9 @@ exports[`tool schema snapshots > mindvault_registry_health > input schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_health > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_registry_health > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_registry_info > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_info > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3243,7 +3243,7 @@ exports[`tool schema snapshots > mindvault_registry_info > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_info > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_info > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -3251,7 +3251,7 @@ exports[`tool schema snapshots > mindvault_registry_info > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_info > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_info > output schema 1`] = `
 {
   "properties": {
     "contractId": {
@@ -3292,7 +3292,7 @@ exports[`tool schema snapshots > mindvault_registry_info > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_list > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_list > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3301,7 +3301,7 @@ exports[`tool schema snapshots > mindvault_registry_list > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_list > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_list > input schema 1`] = `
 {
   "properties": {
     "limit": {
@@ -3329,7 +3329,7 @@ exports[`tool schema snapshots > mindvault_registry_list > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_list > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_list > output schema 1`] = `
 {
   "properties": {
     "contract": {},
@@ -3366,7 +3366,7 @@ exports[`tool schema snapshots > mindvault_registry_list > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_lookup > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_lookup > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3375,7 +3375,7 @@ exports[`tool schema snapshots > mindvault_registry_lookup > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_lookup > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_lookup > input schema 1`] = `
 {
   "properties": {
     "resourceId": {
@@ -3395,7 +3395,7 @@ exports[`tool schema snapshots > mindvault_registry_lookup > input schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_registry_lookup > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_registry_lookup > output schema 1`] = `
 {
   "properties": {
     "contract": {},
@@ -3432,7 +3432,7 @@ exports[`tool schema snapshots > mindvault_registry_lookup > output schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_repair_sponsored_account > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_repair_sponsored_account > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3441,11 +3441,11 @@ exports[`tool schema snapshots > mindvault_repair_sponsored_account > annotation
 }
 `;
 
-exports[`tool schema snapshots > mindvault_repair_sponsored_account > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_repair_sponsored_account > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm restoring credentials for the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm restoring credentials for the public Stellar network.",
       "type": "boolean",
     },
     "profile": {
@@ -3468,9 +3468,9 @@ exports[`tool schema snapshots > mindvault_repair_sponsored_account > input sche
 }
 `;
 
-exports[`tool schema snapshots > mindvault_repair_sponsored_account > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_repair_sponsored_account > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_reset > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_reset > annotations 1`] = `
 {
   "destructiveHint": true,
   "idempotentHint": true,
@@ -3479,7 +3479,7 @@ exports[`tool schema snapshots > mindvault_reset > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_reset > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_reset > input schema 1`] = `
 {
   "properties": {
     "all": {
@@ -3499,7 +3499,7 @@ exports[`tool schema snapshots > mindvault_reset > input schema 1`] = `
       "type": "boolean",
     },
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
   },
@@ -3508,9 +3508,9 @@ exports[`tool schema snapshots > mindvault_reset > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_reset > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_reset > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_resource_change_log > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_resource_change_log > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3519,7 +3519,7 @@ exports[`tool schema snapshots > mindvault_resource_change_log > annotations 1`]
 }
 `;
 
-exports[`tool schema snapshots > mindvault_resource_change_log > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_resource_change_log > input schema 1`] = `
 {
   "properties": {
     "resourceId": {
@@ -3534,9 +3534,9 @@ exports[`tool schema snapshots > mindvault_resource_change_log > input schema 1`
 }
 `;
 
-exports[`tool schema snapshots > mindvault_resource_change_log > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_resource_change_log > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_resource_provenance > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_resource_provenance > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3545,7 +3545,7 @@ exports[`tool schema snapshots > mindvault_resource_provenance > annotations 1`]
 }
 `;
 
-exports[`tool schema snapshots > mindvault_resource_provenance > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_resource_provenance > input schema 1`] = `
 {
   "properties": {
     "resourceId": {
@@ -3560,9 +3560,9 @@ exports[`tool schema snapshots > mindvault_resource_provenance > input schema 1`
 }
 `;
 
-exports[`tool schema snapshots > mindvault_resource_provenance > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_resource_provenance > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_restore_state > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_restore_state > annotations 1`] = `
 {
   "destructiveHint": true,
   "idempotentHint": false,
@@ -3571,11 +3571,11 @@ exports[`tool schema snapshots > mindvault_restore_state > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_restore_state > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_restore_state > input schema 1`] = `
 {
   "properties": {
     "blob": {
-      "description": "Encrypted backup blob from mindvault_backup_state (v1:… format).",
+      "description": "Encrypted backup blob from zentrixpay_backup_state (v1:… format).",
       "type": "string",
     },
     "passphrase": {
@@ -3591,9 +3591,9 @@ exports[`tool schema snapshots > mindvault_restore_state > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_restore_state > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_restore_state > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_rotate_publisher_key > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_rotate_publisher_key > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -3602,11 +3602,11 @@ exports[`tool schema snapshots > mindvault_rotate_publisher_key > annotations 1`
 }
 `;
 
-exports[`tool schema snapshots > mindvault_rotate_publisher_key > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_rotate_publisher_key > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
       "type": "boolean",
     },
     "profile": {
@@ -3623,9 +3623,9 @@ exports[`tool schema snapshots > mindvault_rotate_publisher_key > input schema 1
 }
 `;
 
-exports[`tool schema snapshots > mindvault_rotate_publisher_key > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_rotate_publisher_key > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_royalty > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_royalty > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3634,7 +3634,7 @@ exports[`tool schema snapshots > mindvault_royalty > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_royalty > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_royalty > input schema 1`] = `
 {
   "properties": {
     "clear": {
@@ -3642,11 +3642,11 @@ exports[`tool schema snapshots > mindvault_royalty > input schema 1`] = `
       "type": "boolean",
     },
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "resourceId": {
@@ -3672,7 +3672,7 @@ exports[`tool schema snapshots > mindvault_royalty > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_royalty > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_royalty > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -3761,7 +3761,7 @@ exports[`tool schema snapshots > mindvault_royalty > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_search > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_search > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3770,7 +3770,7 @@ exports[`tool schema snapshots > mindvault_search > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_search > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_search > input schema 1`] = `
 {
   "properties": {
     "limit": {
@@ -3784,7 +3784,7 @@ exports[`tool schema snapshots > mindvault_search > input schema 1`] = `
       "type": "integer",
     },
     "listed": {
-      "description": "Filter by listing state. The public catalog is listed=true only; listed=false yields no public catalog matches (use mindvault_registry_lookup for a specific resource).",
+      "description": "Filter by listing state. The public catalog is listed=true only; listed=false yields no public catalog matches (use zentrixpay_registry_lookup for a specific resource).",
       "examples": [
         true,
         false,
@@ -3890,7 +3890,7 @@ exports[`tool schema snapshots > mindvault_search > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_search > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_search > output schema 1`] = `
 {
   "properties": {
     "items": {
@@ -3965,7 +3965,7 @@ exports[`tool schema snapshots > mindvault_search > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_server_endpoints > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_server_endpoints > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -3974,7 +3974,7 @@ exports[`tool schema snapshots > mindvault_server_endpoints > annotations 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_server_endpoints > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_server_endpoints > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -3982,7 +3982,7 @@ exports[`tool schema snapshots > mindvault_server_endpoints > input schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_server_endpoints > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_server_endpoints > output schema 1`] = `
 {
   "properties": {
     "baseUrl": {
@@ -4069,7 +4069,7 @@ exports[`tool schema snapshots > mindvault_server_endpoints > output schema 1`] 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_set_listed > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_set_listed > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -4078,15 +4078,15 @@ exports[`tool schema snapshots > mindvault_set_listed > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_set_listed > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_set_listed > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "listed": {
@@ -4114,7 +4114,7 @@ exports[`tool schema snapshots > mindvault_set_listed > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_set_listed > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_set_listed > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -4203,7 +4203,7 @@ exports[`tool schema snapshots > mindvault_set_listed > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_set_price > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_set_price > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -4212,15 +4212,15 @@ exports[`tool schema snapshots > mindvault_set_price > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_set_price > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_set_price > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "price": {
@@ -4249,7 +4249,7 @@ exports[`tool schema snapshots > mindvault_set_price > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_set_price > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_set_price > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -4338,7 +4338,7 @@ exports[`tool schema snapshots > mindvault_set_price > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_set_tags > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_set_tags > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -4347,19 +4347,19 @@ exports[`tool schema snapshots > mindvault_set_tags > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_set_tags > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_set_tags > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "resourceId": {
-      "description": "The on-chain resource ID to update tags for (from mindvault_publish or mindvault_browse).",
+      "description": "The on-chain resource ID to update tags for (from zentrixpay_publish or zentrixpay_browse).",
       "examples": [
         "cm7x8y9z",
         "res-001",
@@ -4393,9 +4393,9 @@ exports[`tool schema snapshots > mindvault_set_tags > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_set_tags > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_set_tags > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_setup_wallet > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_setup_wallet > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -4404,11 +4404,11 @@ exports[`tool schema snapshots > mindvault_setup_wallet > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_setup_wallet > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_setup_wallet > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
     "profile": {
@@ -4426,7 +4426,7 @@ exports[`tool schema snapshots > mindvault_setup_wallet > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_setup_wallet > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_setup_wallet > output schema 1`] = `
 {
   "properties": {
     "address": {
@@ -4448,7 +4448,7 @@ exports[`tool schema snapshots > mindvault_setup_wallet > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_switch_network_profile > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_switch_network_profile > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -4457,7 +4457,7 @@ exports[`tool schema snapshots > mindvault_switch_network_profile > annotations 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_switch_network_profile > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_switch_network_profile > input schema 1`] = `
 {
   "properties": {
     "name": {
@@ -4481,9 +4481,9 @@ exports[`tool schema snapshots > mindvault_switch_network_profile > input schema
 }
 `;
 
-exports[`tool schema snapshots > mindvault_switch_network_profile > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_switch_network_profile > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_transfer_ownership > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_transfer_ownership > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": false,
@@ -4492,15 +4492,15 @@ exports[`tool schema snapshots > mindvault_transfer_ownership > annotations 1`] 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_transfer_ownership > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_transfer_ownership > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "newCreator": {
@@ -4527,7 +4527,7 @@ exports[`tool schema snapshots > mindvault_transfer_ownership > input schema 1`]
 }
 `;
 
-exports[`tool schema snapshots > mindvault_transfer_ownership > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_transfer_ownership > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -4616,7 +4616,7 @@ exports[`tool schema snapshots > mindvault_transfer_ownership > output schema 1`
 }
 `;
 
-exports[`tool schema snapshots > mindvault_tx_status > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_tx_status > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -4625,11 +4625,11 @@ exports[`tool schema snapshots > mindvault_tx_status > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_tx_status > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_tx_status > input schema 1`] = `
 {
   "properties": {
     "txHash": {
-      "description": "The 64-character hex transaction hash from Stellar (a sha256 digest; case-insensitive, 'sha256:' prefix accepted). From mindvault_register_onchain or mindvault_publish output.",
+      "description": "The 64-character hex transaction hash from Stellar (a sha256 digest; case-insensitive, 'sha256:' prefix accepted). From zentrixpay_register_onchain or zentrixpay_publish output.",
       "examples": [
         "f47ac10b58cc4372a5670e02b2c3d479c3e5d0a1b2c3d4e5f6a7b8c9d0e1f2a3",
         "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278",
@@ -4644,7 +4644,7 @@ exports[`tool schema snapshots > mindvault_tx_status > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_tx_status > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_tx_status > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -4700,7 +4700,7 @@ exports[`tool schema snapshots > mindvault_tx_status > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_update_metadata > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_update_metadata > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -4709,15 +4709,15 @@ exports[`tool schema snapshots > mindvault_update_metadata > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_update_metadata > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_update_metadata > input schema 1`] = `
 {
   "properties": {
     "confirmMainnet": {
-      "description": "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+      "description": "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
       "type": "boolean",
     },
     "confirmPaid": {
-      "description": "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+      "description": "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
       "type": "boolean",
     },
     "metadata": {
@@ -4729,7 +4729,7 @@ exports[`tool schema snapshots > mindvault_update_metadata > input schema 1`] = 
       "type": "string",
     },
     "resourceId": {
-      "description": "The on-chain resource ID to update (from mindvault_publish or mindvault_browse). Letters, digits, dot, dash, or underscore.",
+      "description": "The on-chain resource ID to update (from zentrixpay_publish or zentrixpay_browse). Letters, digits, dot, dash, or underscore.",
       "examples": [
         "cm7x8y9z",
         "res-001",
@@ -4745,7 +4745,7 @@ exports[`tool schema snapshots > mindvault_update_metadata > input schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_update_metadata > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_update_metadata > output schema 1`] = `
 {
   "oneOf": [
     {
@@ -4834,7 +4834,7 @@ exports[`tool schema snapshots > mindvault_update_metadata > output schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_use_profile > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_use_profile > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -4843,7 +4843,7 @@ exports[`tool schema snapshots > mindvault_use_profile > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_use_profile > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_use_profile > input schema 1`] = `
 {
   "properties": {
     "name": {
@@ -4863,7 +4863,7 @@ exports[`tool schema snapshots > mindvault_use_profile > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_use_profile > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_use_profile > output schema 1`] = `
 {
   "properties": {
     "address": {
@@ -4891,7 +4891,7 @@ exports[`tool schema snapshots > mindvault_use_profile > output schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_verify_attestation > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_verify_attestation > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -4900,7 +4900,7 @@ exports[`tool schema snapshots > mindvault_verify_attestation > annotations 1`] 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_verify_attestation > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_verify_attestation > input schema 1`] = `
 {
   "properties": {
     "attestationHash": {
@@ -4931,7 +4931,7 @@ exports[`tool schema snapshots > mindvault_verify_attestation > input schema 1`]
 }
 `;
 
-exports[`tool schema snapshots > mindvault_verify_attestation > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_verify_attestation > output schema 1`] = `
 {
   "properties": {
     "contract": {
@@ -4988,7 +4988,7 @@ exports[`tool schema snapshots > mindvault_verify_attestation > output schema 1`
 }
 `;
 
-exports[`tool schema snapshots > mindvault_verify_install > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_verify_install > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -4997,7 +4997,7 @@ exports[`tool schema snapshots > mindvault_verify_install > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_verify_install > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_verify_install > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -5005,9 +5005,9 @@ exports[`tool schema snapshots > mindvault_verify_install > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_verify_install > output schema 1`] = `null`;
+exports[`tool schema snapshots > zentrixpay_verify_install > output schema 1`] = `null`;
 
-exports[`tool schema snapshots > mindvault_wallet_balances > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_wallet_balances > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -5016,7 +5016,7 @@ exports[`tool schema snapshots > mindvault_wallet_balances > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_wallet_balances > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_wallet_balances > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -5024,7 +5024,7 @@ exports[`tool schema snapshots > mindvault_wallet_balances > input schema 1`] = 
 }
 `;
 
-exports[`tool schema snapshots > mindvault_wallet_balances > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_wallet_balances > output schema 1`] = `
 {
   "properties": {
     "agents": {
@@ -5226,7 +5226,7 @@ exports[`tool schema snapshots > mindvault_wallet_balances > output schema 1`] =
 }
 `;
 
-exports[`tool schema snapshots > mindvault_wallet_info > annotations 1`] = `
+exports[`tool schema snapshots > zentrixpay_wallet_info > annotations 1`] = `
 {
   "destructiveHint": false,
   "idempotentHint": true,
@@ -5235,7 +5235,7 @@ exports[`tool schema snapshots > mindvault_wallet_info > annotations 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_wallet_info > input schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_wallet_info > input schema 1`] = `
 {
   "properties": {},
   "required": [],
@@ -5243,7 +5243,7 @@ exports[`tool schema snapshots > mindvault_wallet_info > input schema 1`] = `
 }
 `;
 
-exports[`tool schema snapshots > mindvault_wallet_info > output schema 1`] = `
+exports[`tool schema snapshots > zentrixpay_wallet_info > output schema 1`] = `
 {
   "properties": {
     "address": {
@@ -5294,63 +5294,63 @@ exports[`tool schema snapshots > mindvault_wallet_info > output schema 1`] = `
 
 exports[`tool schema snapshots > the covered tool names are pinned 1`] = `
 [
-  "mindvault_accept_transfer",
-  "mindvault_agent_status",
-  "mindvault_backup_state",
-  "mindvault_batch_catalog_lookup",
-  "mindvault_browse",
-  "mindvault_buy",
-  "mindvault_cancel_transfer",
-  "mindvault_check_bindings",
-  "mindvault_check_consistency",
-  "mindvault_check_state_permissions",
-  "mindvault_debug_bundle",
-  "mindvault_export_receipts",
-  "mindvault_fee_config",
-  "mindvault_freeze",
-  "mindvault_import_wallet",
-  "mindvault_list_profiles",
-  "mindvault_mainnet_banner",
-  "mindvault_metrics",
-  "mindvault_network_profile",
-  "mindvault_pending_transfer",
-  "mindvault_preview",
-  "mindvault_preview_metadata_hash",
-  "mindvault_prewarm_catalog",
-  "mindvault_publish",
-  "mindvault_publish_batch",
-  "mindvault_publish_status",
-  "mindvault_publish_template",
-  "mindvault_purchase_history",
-  "mindvault_recover_catalog_cache",
-  "mindvault_register",
-  "mindvault_register_onchain",
-  "mindvault_registry_count",
-  "mindvault_registry_health",
-  "mindvault_registry_info",
-  "mindvault_registry_list",
-  "mindvault_registry_lookup",
-  "mindvault_repair_sponsored_account",
-  "mindvault_reset",
-  "mindvault_resource_change_log",
-  "mindvault_resource_provenance",
-  "mindvault_restore_state",
-  "mindvault_rotate_publisher_key",
-  "mindvault_royalty",
-  "mindvault_search",
-  "mindvault_server_endpoints",
-  "mindvault_set_listed",
-  "mindvault_set_price",
-  "mindvault_set_tags",
-  "mindvault_setup_wallet",
-  "mindvault_switch_network_profile",
-  "mindvault_transfer_ownership",
-  "mindvault_tx_status",
-  "mindvault_update_metadata",
-  "mindvault_use_profile",
-  "mindvault_verify_attestation",
-  "mindvault_verify_install",
-  "mindvault_wallet_balances",
-  "mindvault_wallet_info",
+  "zentrixpay_accept_transfer",
+  "zentrixpay_agent_status",
+  "zentrixpay_backup_state",
+  "zentrixpay_batch_catalog_lookup",
+  "zentrixpay_browse",
+  "zentrixpay_buy",
+  "zentrixpay_cancel_transfer",
+  "zentrixpay_check_bindings",
+  "zentrixpay_check_consistency",
+  "zentrixpay_check_state_permissions",
+  "zentrixpay_debug_bundle",
+  "zentrixpay_export_receipts",
+  "zentrixpay_fee_config",
+  "zentrixpay_freeze",
+  "zentrixpay_import_wallet",
+  "zentrixpay_list_profiles",
+  "zentrixpay_mainnet_banner",
+  "zentrixpay_metrics",
+  "zentrixpay_network_profile",
+  "zentrixpay_pending_transfer",
+  "zentrixpay_preview",
+  "zentrixpay_preview_metadata_hash",
+  "zentrixpay_prewarm_catalog",
+  "zentrixpay_publish",
+  "zentrixpay_publish_batch",
+  "zentrixpay_publish_status",
+  "zentrixpay_publish_template",
+  "zentrixpay_purchase_history",
+  "zentrixpay_recover_catalog_cache",
+  "zentrixpay_register",
+  "zentrixpay_register_onchain",
+  "zentrixpay_registry_count",
+  "zentrixpay_registry_health",
+  "zentrixpay_registry_info",
+  "zentrixpay_registry_list",
+  "zentrixpay_registry_lookup",
+  "zentrixpay_repair_sponsored_account",
+  "zentrixpay_reset",
+  "zentrixpay_resource_change_log",
+  "zentrixpay_resource_provenance",
+  "zentrixpay_restore_state",
+  "zentrixpay_rotate_publisher_key",
+  "zentrixpay_royalty",
+  "zentrixpay_search",
+  "zentrixpay_server_endpoints",
+  "zentrixpay_set_listed",
+  "zentrixpay_set_price",
+  "zentrixpay_set_tags",
+  "zentrixpay_setup_wallet",
+  "zentrixpay_switch_network_profile",
+  "zentrixpay_transfer_ownership",
+  "zentrixpay_tx_status",
+  "zentrixpay_update_metadata",
+  "zentrixpay_use_profile",
+  "zentrixpay_verify_attestation",
+  "zentrixpay_verify_install",
+  "zentrixpay_wallet_balances",
+  "zentrixpay_wallet_info",
 ]
 `;

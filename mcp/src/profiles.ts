@@ -1,5 +1,5 @@
 /**
- * Multi-wallet profile state for the MindVault MCP server.
+ * Multi-wallet profile state for the ZentrixPay MCP server.
  *
  * Agents can keep several named wallet profiles (e.g. `testnet`, `mainnet`,
  * `publisher`, `buyer`) and switch the active one. This module holds the pure,

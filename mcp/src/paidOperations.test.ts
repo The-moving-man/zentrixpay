@@ -42,9 +42,9 @@ import {
 } from "./integrationHarness.js";
 import type { IntegrationHarness } from "./integrationHarness.js";
 
-process.env.MINDVAULT_MOCK = "1";
+process.env.ZENTRIXPAY_MOCK = "1";
 process.env.STELLAR_NETWORK = "testnet";
-const home = mkdtempSync(join(tmpdir(), "mindvault-mcp-paid-"));
+const home = mkdtempSync(join(tmpdir(), "zentrixpay-mcp-paid-"));
 process.env.HOME = home;
 process.env.USERPROFILE = home;
 
@@ -89,7 +89,7 @@ describe("resolvePaidConfirmationPolicy", () => {
   });
 
   it("reads an empty value as unset", () => {
-    // What a shell leaves behind for `export MINDVAULT_CONFIRM_PAID_OPERATIONS=`.
+    // What a shell leaves behind for `export ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=`.
     expect(resolvePaidConfirmationPolicy(envWith(""))).toBe("off");
     expect(resolvePaidConfirmationPolicy(envWith("   "))).toBe("off");
   });
@@ -118,9 +118,9 @@ describe("paidOperationClass", () => {
       expect(paidOperationClass(name), name).toBe("usdc");
     }
     expect(USDC_SPENDING_TOOLS).toEqual([
-      "mindvault_publish",
-      "mindvault_publish_batch",
-      "mindvault_buy",
+      "zentrixpay_publish",
+      "zentrixpay_publish_batch",
+      "zentrixpay_buy",
     ]);
   });
 
@@ -132,12 +132,12 @@ describe("paidOperationClass", () => {
 
   it("classifies tools that cost nothing as null", () => {
     for (const name of [
-      "mindvault_browse",
-      "mindvault_search",
-      "mindvault_preview",
-      "mindvault_wallet_info",
-      "mindvault_reset",
-      "mindvault_registry_lookup",
+      "zentrixpay_browse",
+      "zentrixpay_search",
+      "zentrixpay_preview",
+      "zentrixpay_wallet_info",
+      "zentrixpay_reset",
+      "zentrixpay_registry_lookup",
     ]) {
       expect(paidOperationClass(name), name).toBeNull();
     }
@@ -147,13 +147,13 @@ describe("paidOperationClass", () => {
     // Account creation goes through the sponsored-account service; the agent's
     // own wallet funds nothing, so requiring a spend confirmation would be a
     // lie about what the call costs.
-    expect(paidOperationClass("mindvault_setup_wallet")).toBeNull();
+    expect(paidOperationClass("zentrixpay_setup_wallet")).toBeNull();
   });
 
   it("treats an unknown name as costing nothing", () => {
     // Failing open is right here: this classifier must not become a second,
     // accidental allowlist for tool names. The dispatcher rejects unknown tools.
-    expect(paidOperationClass("mindvault_not_a_tool")).toBeNull();
+    expect(paidOperationClass("zentrixpay_not_a_tool")).toBeNull();
   });
 
   it("lists every gated tool once, sorted", () => {
@@ -195,7 +195,7 @@ describe("requiresPaidConfirmation", () => {
 
   it("never requires confirmation for a tool that costs nothing", () => {
     for (const policy of ["off", "usdc", "all"] as const) {
-      expect(requiresPaidConfirmation("mindvault_browse", policy), policy).toBe(false);
+      expect(requiresPaidConfirmation("zentrixpay_browse", policy), policy).toBe(false);
     }
   });
 });
@@ -211,14 +211,14 @@ describe("assertPaidOperationConfirmed", () => {
 
   it("blocks an unconfirmed spend under usdc", () => {
     expect(() =>
-      assertPaidOperationConfirmed({ toolName: "mindvault_buy", args: {}, env: envWith("usdc") }),
+      assertPaidOperationConfirmed({ toolName: "zentrixpay_buy", args: {}, env: envWith("usdc") }),
     ).toThrow(/Paid-operation guardrail/);
   });
 
   it("allows a confirmed spend", () => {
     expect(() =>
       assertPaidOperationConfirmed({
-        toolName: "mindvault_buy",
+        toolName: "zentrixpay_buy",
         args: { [PAID_CONFIRMATION_ARG]: true },
         env: envWith("usdc"),
       }),
@@ -230,7 +230,7 @@ describe("assertPaidOperationConfirmed", () => {
     // rather than one per guardrail.
     expect(() =>
       assertPaidOperationConfirmed({
-        toolName: "mindvault_buy",
+        toolName: "zentrixpay_buy",
         args: { [PAID_CONFIRMATION_ARG]: value },
         env: envWith("usdc"),
       }),
@@ -242,7 +242,7 @@ describe("assertPaidOperationConfirmed", () => {
     (value) => {
       expect(() =>
         assertPaidOperationConfirmed({
-          toolName: "mindvault_buy",
+          toolName: "zentrixpay_buy",
           args: { [PAID_CONFIRMATION_ARG]: value },
           env: envWith("usdc"),
         }),
@@ -255,7 +255,7 @@ describe("assertPaidOperationConfirmed", () => {
     // order to find out what the spend would be.
     expect(() =>
       assertPaidOperationConfirmed({
-        toolName: "mindvault_buy",
+        toolName: "zentrixpay_buy",
         args: {},
         dryRun: true,
         env: envWith("all"),
@@ -266,7 +266,7 @@ describe("assertPaidOperationConfirmed", () => {
   it("tolerates missing arguments", () => {
     expect(() =>
       assertPaidOperationConfirmed({
-        toolName: "mindvault_buy",
+        toolName: "zentrixpay_buy",
         args: undefined,
         env: envWith("usdc"),
       }),
@@ -275,29 +275,29 @@ describe("assertPaidOperationConfirmed", () => {
 
   it("surfaces a misconfigured policy rather than skipping the check", () => {
     expect(() =>
-      assertPaidOperationConfirmed({ toolName: "mindvault_buy", args: {}, env: envWith("on") }),
+      assertPaidOperationConfirmed({ toolName: "zentrixpay_buy", args: {}, env: envWith("on") }),
     ).toThrow(/must be one of/);
   });
 });
 
 describe("paidConfirmationRequiredError", () => {
-  const message = paidConfirmationRequiredError("mindvault_buy", "usdc").message;
+  const message = paidConfirmationRequiredError("zentrixpay_buy", "usdc").message;
 
   it("names the tool, the policy, and the argument that satisfies it", () => {
-    expect(message).toContain("mindvault_buy");
+    expect(message).toContain("zentrixpay_buy");
     expect(message).toContain(PAID_CONFIRMATION_ENV_VAR);
     expect(message).toContain(PAID_CONFIRMATION_ARG);
   });
 
   it("says what the call would cost", () => {
     expect(message).toMatch(/spends USDC/);
-    expect(paidConfirmationRequiredError("mindvault_set_price", "all").message).toMatch(
+    expect(paidConfirmationRequiredError("zentrixpay_set_price", "all").message).toMatch(
       /network fees/,
     );
   });
 
   it("is deterministic and leaks nothing", () => {
-    expect(paidConfirmationRequiredError("mindvault_buy", "usdc").message).toBe(message);
+    expect(paidConfirmationRequiredError("zentrixpay_buy", "usdc").message).toBe(message);
     expect(message).not.toMatch(/\/(home|Users|tmp)\//);
     expect(message).not.toContain("at ");
   });
@@ -310,8 +310,8 @@ describe("formatPaidConfirmationDiagnostics", () => {
   });
 
   it("names the gated tools under each active policy", () => {
-    expect(formatPaidConfirmationDiagnostics(envWith("usdc"))).toContain("mindvault_buy");
-    expect(formatPaidConfirmationDiagnostics(envWith("all"))).toContain("mindvault_set_price");
+    expect(formatPaidConfirmationDiagnostics(envWith("usdc"))).toContain("zentrixpay_buy");
+    expect(formatPaidConfirmationDiagnostics(envWith("all"))).toContain("zentrixpay_set_price");
   });
 
   it("reports a misconfiguration instead of throwing", () => {
@@ -345,7 +345,7 @@ describe("the paid-operation policy through the MCP server", () => {
 
   it("blocks an unconfirmed buy under usdc", async () => {
     process.env[PAID_CONFIRMATION_ENV_VAR] = "usdc";
-    const result = await harness.callTool("mindvault_buy", { resourceId: "mock-1" });
+    const result = await harness.callTool("zentrixpay_buy", { resourceId: "mock-1" });
 
     expect(harnessIsToolError(result)).toBe(true);
     expect(harnessResultText(result)).toContain("Paid-operation guardrail");
@@ -356,13 +356,13 @@ describe("the paid-operation policy through the MCP server", () => {
     // The call still fails — there is no wallet in this profile — but it fails
     // *inside the tool*, which is what proves the guardrail let it through.
     await expect(
-      dispatchTool("mindvault_buy", { resourceId: "mock-1", confirmPaid: true }),
+      dispatchTool("zentrixpay_buy", { resourceId: "mock-1", confirmPaid: true }),
     ).rejects.toThrow(/No wallet in profile/);
   });
 
   it("lets a dry run past without confirmation", async () => {
     process.env[PAID_CONFIRMATION_ENV_VAR] = "all";
-    const result = await harness.callTool("mindvault_buy", {
+    const result = await harness.callTool("zentrixpay_buy", {
       resourceId: "mock-1",
       dryRun: true,
     });
@@ -375,18 +375,18 @@ describe("the paid-operation policy through the MCP server", () => {
     const args = { resourceId: "mock-1", price: "1.00" };
 
     process.env[PAID_CONFIRMATION_ENV_VAR] = "usdc";
-    expect(await dispatchFailure("mindvault_set_price", args)).not.toMatch(
+    expect(await dispatchFailure("zentrixpay_set_price", args)).not.toMatch(
       /Paid-operation guardrail/,
     );
 
     process.env[PAID_CONFIRMATION_ENV_VAR] = "all";
-    expect(await dispatchFailure("mindvault_set_price", args)).toMatch(/Paid-operation guardrail/);
+    expect(await dispatchFailure("zentrixpay_set_price", args)).toMatch(/Paid-operation guardrail/);
   });
 
   it("does not gate read-only tools under any policy", async () => {
     for (const policy of ["usdc", "all"]) {
       process.env[PAID_CONFIRMATION_ENV_VAR] = policy;
-      const result = await harness.callTool("mindvault_browse", {});
+      const result = await harness.callTool("zentrixpay_browse", {});
       expect(harnessIsToolError(result), policy).toBe(false);
     }
   });
@@ -394,14 +394,14 @@ describe("the paid-operation policy through the MCP server", () => {
   it("changes nothing when the policy is off", async () => {
     // The upgrade-safety property: an existing deployment that never sets the
     // variable must behave exactly as it did before this guardrail existed.
-    await expect(dispatchTool("mindvault_buy", { resourceId: "mock-1" })).rejects.toThrow(
+    await expect(dispatchTool("zentrixpay_buy", { resourceId: "mock-1" })).rejects.toThrow(
       /No wallet in profile/,
     );
   });
 
   it("accepts confirmPaid as a validated argument on every gated tool", async () => {
     // A guardrail whose own argument the validator rejects is unusable — the
-    // shape of the mindvault_reset.confirm bug in #596.
+    // shape of the zentrixpay_reset.confirm bug in #596.
     process.env[PAID_CONFIRMATION_ENV_VAR] = "all";
     for (const name of paidOperationToolNames()) {
       const failure = await dispatchFailure(name, { confirmPaid: true });
@@ -416,7 +416,7 @@ describe("the paid-operation policy through the MCP server", () => {
 
   it("reports a misconfigured policy as a tool error, not a crash", async () => {
     process.env[PAID_CONFIRMATION_ENV_VAR] = "loud";
-    const result = await harness.callTool("mindvault_buy", { resourceId: "mock-1" });
+    const result = await harness.callTool("zentrixpay_buy", { resourceId: "mock-1" });
 
     expect(harnessIsToolError(result)).toBe(true);
     expect(harnessResultText(result)).toContain("must be one of");
@@ -434,14 +434,14 @@ describe("composition with the other guardrails", () => {
     // decision with a separate flag.
     const { assertMainnetMutationAllowed } = await import("./mainnetGuardrails.js");
     expect(() =>
-      assertMainnetMutationAllowed("mainnet", "mindvault_buy", { confirmPaid: true }, {}),
+      assertMainnetMutationAllowed("mainnet", "zentrixpay_buy", { confirmPaid: true }, {}),
     ).toThrow(/Mainnet guardrail/);
   });
 
   it("does not let confirmMainnet stand in for confirmPaid", () => {
     expect(() =>
       assertPaidOperationConfirmed({
-        toolName: "mindvault_buy",
+        toolName: "zentrixpay_buy",
         args: { confirmMainnet: true },
         env: envWith("usdc"),
       }),
@@ -452,9 +452,9 @@ describe("composition with the other guardrails", () => {
     const { assertMainnetMutationAllowed } = await import("./mainnetGuardrails.js");
     const args = { confirmMainnet: true, confirmPaid: true };
 
-    expect(() => assertMainnetMutationAllowed("mainnet", "mindvault_buy", args, {})).not.toThrow();
+    expect(() => assertMainnetMutationAllowed("mainnet", "zentrixpay_buy", args, {})).not.toThrow();
     expect(() =>
-      assertPaidOperationConfirmed({ toolName: "mindvault_buy", args, env: envWith("usdc") }),
+      assertPaidOperationConfirmed({ toolName: "zentrixpay_buy", args, env: envWith("usdc") }),
     ).not.toThrow();
   });
 });

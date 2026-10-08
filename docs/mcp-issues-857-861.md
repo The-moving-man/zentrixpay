@@ -2,7 +2,7 @@
 
 ## Sponsored mutation ceilings
 
-`mindvault_buy` continues to enforce `MINDVAULT_MAX_AUTO_PAY_USDC`. Registry registration also checks the unsigned transaction fee against `MINDVAULT_MAX_AUTO_FEE_STROOPS` (default `100000`) before signing. A rejected fee is never signed or submitted.
+`zentrixpay_buy` continues to enforce `ZENTRIXPAY_MAX_AUTO_PAY_USDC`. Registry registration also checks the unsigned transaction fee against `ZENTRIXPAY_MAX_AUTO_FEE_STROOPS` (default `100000`) before signing. A rejected fee is never signed or submitted.
 
 ## Deterministic upstream errors
 
@@ -10,7 +10,7 @@ HTTP 5xx responses preserve their upstream source in the stable `Source · Categ
 
 ## Large receipt exports
 
-`mindvault_export_receipts` participates in `MINDVAULT_TOOL_TIMEOUTS`, for example `export_receipts=120000`. The override is resolved through the same `timeoutForTool` path as publish and registration.
+`zentrixpay_export_receipts` participates in `ZENTRIXPAY_TOOL_TIMEOUTS`, for example `export_receipts=120000`. The override is resolved through the same `timeoutForTool` path as publish and registration.
 
 ## Network-bound state restores
 

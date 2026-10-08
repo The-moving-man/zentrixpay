@@ -1,12 +1,12 @@
 /**
  * MCP integration test harness.
  *
- * Wires the real MindVault MCP `Server` to an SDK `Client` over an in-memory
+ * Wires the real ZentrixPay MCP `Server` to an SDK `Client` over an in-memory
  * transport so tests exercise `listTools` / `callTool` through the request
  * interface — not by calling helper functions directly.
  *
  * External HTTP and registry lookups are expected to be mocked by the caller
- * (typically `MINDVAULT_MOCK=1` before importing `./index.js`, which activates
+ * (typically `ZENTRIXPAY_MOCK=1` before importing `./index.js`, which activates
  * the in-process fixtures in `mock.ts`).
  *
  * Error handling contract (deterministic, agent-safe):
@@ -76,13 +76,13 @@ export interface IntegrationHarness {
 }
 
 /**
- * Connect a linked in-memory client/server pair to the given MindVault MCP
+ * Connect a linked in-memory client/server pair to the given ZentrixPay MCP
  * server instance (already wired with ListTools / CallTool handlers).
  */
 export async function startIntegrationHarness(server: Server): Promise<IntegrationHarness> {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   const client = new Client(
-    { name: "mindvault-integration", version: "1.0.0" },
+    { name: "zentrixpay-integration", version: "1.0.0" },
     { capabilities: {} },
   );
 

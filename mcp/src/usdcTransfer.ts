@@ -1,6 +1,6 @@
 /**
  * Direct USDC transfer from the agent wallet to a creator, used to pay for a
- * time-limited access lease (`mindvault_buy_lease`).
+ * time-limited access lease (`zentrixpay_buy_lease`).
  *
  * Per-request purchases settle through x402, where the server issues a 402
  * and the facilitator moves the funds. A lease is bought against the

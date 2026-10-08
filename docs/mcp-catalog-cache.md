@@ -1,6 +1,6 @@
 # MCP Offline Catalog Cache
 
-`browse`, `search` and `preview` depend on the MindVault catalog API. When that
+`browse`, `search` and `preview` depend on the ZentrixPay catalog API. When that
 service is unreachable — DNS failure, refused connection, timeout — they fall
 back to the last snapshot captured from a successful read, labelled with its
 age. Mutating and payment tools never consult the cache.
@@ -12,18 +12,18 @@ The lifetime of those snapshots is configurable
 
 | Variable                             | Default          | Description                                                 |
 | ------------------------------------ | ---------------- | ----------------------------------------------------------- |
-| `MINDVAULT_CATALOG_CACHE_TTL_MS`     | `86400000` (24h) | Age at which a snapshot starts carrying a staleness warning |
-| `MINDVAULT_CATALOG_CACHE_MAX_AGE_MS` | `0` (unlimited)  | Age past which a snapshot is not served at all              |
+| `ZENTRIXPAY_CATALOG_CACHE_TTL_MS`     | `86400000` (24h) | Age at which a snapshot starts carrying a staleness warning |
+| `ZENTRIXPAY_CATALOG_CACHE_MAX_AGE_MS` | `0` (unlimited)  | Age past which a snapshot is not served at all              |
 
 ```json
 {
   "mcpServers": {
-    "mindvault": {
+    "zentrixpay": {
       "command": "node",
-      "args": ["/absolute/path/to/mindvault/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/zentrixpay/mcp/dist/index.js"],
       "env": {
-        "MINDVAULT_CATALOG_CACHE_TTL_MS": "3600000",
-        "MINDVAULT_CATALOG_CACHE_MAX_AGE_MS": "86400000"
+        "ZENTRIXPAY_CATALOG_CACHE_TTL_MS": "3600000",
+        "ZENTRIXPAY_CATALOG_CACHE_MAX_AGE_MS": "86400000"
       }
     }
   }
@@ -39,7 +39,7 @@ hours, never withhold.
 
 ```
 ⚠ Offline catalog snapshot served (cached 2 day ago) — stale; results may be
-outdated. Confirm a specific resource on-chain with mindvault_registry_lookup
+outdated. Confirm a specific resource on-chain with zentrixpay_registry_lookup
 when freshness matters.
 ```
 
@@ -51,17 +51,17 @@ no cache existed. That is what an operator wants when acting on outdated
 pricing is worse than failing — an expired snapshot is dropped rather than
 merely hidden, so the memory is released and a later call cannot resurrect it.
 
-`MINDVAULT_CATALOG_CACHE_MAX_AGE_MS=0` disables the second limit, which is the
+`ZENTRIXPAY_CATALOG_CACHE_MAX_AGE_MS=0` disables the second limit, which is the
 default.
 
 ## Choosing values
 
 - **Fast-moving catalog, agent can retry** — lower the TTL so the warning
-  appears sooner: `MINDVAULT_CATALOG_CACHE_TTL_MS=900000` (15 min).
+  appears sooner: `ZENTRIXPAY_CATALOG_CACHE_TTL_MS=900000` (15 min).
 - **Payments driven off catalog prices** — set a max age. A stale price is a
   wrong price, and a warning the model may ignore is not a control.
 - **Long offline sessions** — raise the TTL so a genuinely useful snapshot is
-  not labelled alarming: `MINDVAULT_CATALOG_CACHE_TTL_MS=604800000` (7 days).
+  not labelled alarming: `ZENTRIXPAY_CATALOG_CACHE_TTL_MS=604800000` (7 days).
 
 Setting a max age **below** the TTL would make the TTL unreachable — the
 snapshot would vanish before it was ever labelled stale. The stricter intent

@@ -61,13 +61,13 @@ afterEach(() => {
 });
 
 describe("catalogResourceUri / parseCatalogResourceUri", () => {
-  it("builds a stable mindvault://resource/<id> URI", () => {
-    expect(catalogResourceUri("res-001")).toBe("mindvault://resource/res-001");
-    expect(catalogResourceUri("cm7x8y9z")).toBe("mindvault://resource/cm7x8y9z");
+  it("builds a stable zentrixpay://resource/<id> URI", () => {
+    expect(catalogResourceUri("res-001")).toBe("zentrixpay://resource/res-001");
+    expect(catalogResourceUri("cm7x8y9z")).toBe("zentrixpay://resource/cm7x8y9z");
   });
 
   it("round-trips a valid URI back to its resource id", () => {
-    const parsed = parseCatalogResourceUri("mindvault://resource/res-001");
+    const parsed = parseCatalogResourceUri("zentrixpay://resource/res-001");
     expect(parsed).toEqual({ ok: true, resourceId: "res-001" });
   });
 
@@ -90,10 +90,10 @@ describe("catalogResourceUri / parseCatalogResourceUri", () => {
   it("rejects URIs with the wrong scheme or host", () => {
     for (const bad of [
       "https://example.com/resource/res-001",
-      "mindvault://other/res-001",
-      "mindvault://resource",
+      "zentrixpay://other/res-001",
+      "zentrixpay://resource",
       "not-a-uri",
-      "mindvault://resource/",
+      "zentrixpay://resource/",
     ]) {
       const parsed = parseCatalogResourceUri(bad);
       expect(parsed.ok).toBe(false, `expected ${JSON.stringify(bad)} to be rejected`);
@@ -106,14 +106,14 @@ describe("catalogResourceUri / parseCatalogResourceUri", () => {
   it("mentions the expected URI shape in the rejection reason", () => {
     const parsed = parseCatalogResourceUri("https://example.com/x");
     expect(parsed.ok).toBe(false);
-    if (!parsed.ok) expect(parsed.reason).toContain("mindvault://resource/");
+    if (!parsed.ok) expect(parsed.reason).toContain("zentrixpay://resource/");
   });
 });
 
 describe("toCatalogResource", () => {
   it("maps a catalog entry to a resource with a stable URI and title", () => {
     const resource = toCatalogResource(sampleResources[0]);
-    expect(resource.uri).toBe("mindvault://resource/res-001");
+    expect(resource.uri).toBe("zentrixpay://resource/res-001");
     expect(resource.name).toBe("Introduction to Stellar");
     expect(resource.description).toBe("A beginner's guide to Stellar blockchain");
     expect(resource.mimeType).toBe("application/json");
@@ -127,7 +127,7 @@ describe("toCatalogResource", () => {
 
   it("handles entries without any string fields", () => {
     const resource = toCatalogResource({ id: 7, title: 42 });
-    expect(resource.uri).toBe("mindvault://resource/7");
+    expect(resource.uri).toBe("zentrixpay://resource/7");
     expect(resource.name).toBe("7");
   });
 });
@@ -135,7 +135,7 @@ describe("toCatalogResource", () => {
 describe("catalogResourceContents", () => {
   it("exposes only public metadata — never gated content", () => {
     const contents = catalogResourceContents(singleResourceMeta, catalogResourceUri("res-001"));
-    expect(contents.uri).toBe("mindvault://resource/res-001");
+    expect(contents.uri).toBe("zentrixpay://resource/res-001");
     expect(contents.mimeType).toBe("application/json");
 
     const parsed = JSON.parse(contents.text);
@@ -161,9 +161,9 @@ describe("listCatalogResources", () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(sampleResources));
     const resources = await listCatalogResources();
     expect(resources).toHaveLength(2);
-    expect(resources[0].uri).toBe("mindvault://resource/res-001");
+    expect(resources[0].uri).toBe("zentrixpay://resource/res-001");
     expect(resources[0].name).toBe("Introduction to Stellar");
-    expect(resources[1].uri).toBe("mindvault://resource/res-002");
+    expect(resources[1].uri).toBe("zentrixpay://resource/res-002");
     expect(resources[1].name).toBe("Advanced Soroban");
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/resources"),
@@ -195,8 +195,8 @@ describe("readCatalogResource", () => {
   });
 
   it("returns public metadata for a valid URI", async () => {
-    const contents = await readCatalogResource("mindvault://resource/res-001");
-    expect(contents.uri).toBe("mindvault://resource/res-001");
+    const contents = await readCatalogResource("zentrixpay://resource/res-001");
+    expect(contents.uri).toBe("zentrixpay://resource/res-001");
     const parsed = JSON.parse(contents.text);
     expect(parsed.id).toBe("res-001");
     expect(parsed.title).toBe("Introduction to Stellar");
@@ -205,7 +205,7 @@ describe("readCatalogResource", () => {
   });
 
   it("fetches the public meta endpoint, never the paid access endpoint", async () => {
-    await readCatalogResource("mindvault://resource/res-001");
+    await readCatalogResource("zentrixpay://resource/res-001");
     expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining("/resources/res-001/meta"),
       expect.anything(),
@@ -213,7 +213,7 @@ describe("readCatalogResource", () => {
   });
 
   it("throws a deterministic invalid-params error for an unknown URI", async () => {
-    for (const bad of ["https://example.com/resource/x", "mindvault://other/x", 42]) {
+    for (const bad of ["https://example.com/resource/x", "zentrixpay://other/x", 42]) {
       await expect(readCatalogResource(bad)).rejects.toThrow(McpError);
     }
     try {
@@ -221,7 +221,7 @@ describe("readCatalogResource", () => {
     } catch (err) {
       expect(err).toBeInstanceOf(McpError);
       expect((err as McpError).code).toBe(ErrorCode.InvalidParams);
-      expect((err as McpError).message).toContain("mindvault://resource/");
+      expect((err as McpError).message).toContain("zentrixpay://resource/");
     }
   });
 
@@ -230,7 +230,7 @@ describe("readCatalogResource", () => {
       mockResponse({ error: "not found" }, false, 404),
     );
     try {
-      await readCatalogResource("mindvault://resource/missing");
+      await readCatalogResource("zentrixpay://resource/missing");
     } catch (err) {
       expect(err).toBeInstanceOf(McpError);
       expect((err as McpError).code).toBe(ErrorCode.InvalidParams);
@@ -242,13 +242,13 @@ describe("readCatalogResource", () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       mockResponse({ error: "Internal server error" }, false, 500),
     );
-    await expect(readCatalogResource("mindvault://resource/res-001")).rejects.toThrow(
+    await expect(readCatalogResource("zentrixpay://resource/res-001")).rejects.toThrow(
       "Read catalog resource failed",
     );
   });
 
   it("throws deterministically on a transport failure", async () => {
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("ECONNREFUSED: Connection refused"));
-    await expect(readCatalogResource("mindvault://resource/res-001")).rejects.toThrow();
+    await expect(readCatalogResource("zentrixpay://resource/res-001")).rejects.toThrow();
   });
 });

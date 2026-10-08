@@ -1,6 +1,6 @@
 # Deployment Runbook — Testnet to Mainnet
 
-This runbook covers deploying the full MindVault stack to a **new** Stellar network (testnet or mainnet). A new maintainer should be able to follow these steps sequentially and end up with a working deployment.
+This runbook covers deploying the full ZentrixPay stack to a **new** Stellar network (testnet or mainnet). A new maintainer should be able to follow these steps sequentially and end up with a working deployment.
 
 ## Prerequisites
 
@@ -123,7 +123,7 @@ This outputs a public key and secret key. Save the secret key as `AGENT_SECRET_K
 For testnet USDC (Soroban SAC):
 
 ```bash
-pnpm --filter @mindvault/server setup-usdc
+pnpm --filter @zentrixpay/server setup-usdc
 ```
 
 For mainnet, replace the USDC contract ID with the mainnet SAC ID:
@@ -204,8 +204,8 @@ returns HTTP 200. Failed smoke checks fail the deploy.
 
 **Render / Railway / Fly.io (manual):**
 
-- Build command: `pnpm install && pnpm build:registry-client && pnpm --filter @mindvault/server build`
-- Start command: `pnpm --filter @mindvault/server start`
+- Build command: `pnpm install && pnpm build:registry-client && pnpm --filter @zentrixpay/server build`
+- Start command: `pnpm --filter @zentrixpay/server start`
 - Set all env vars from `server/.env` in the platform dashboard
 
 **Docker (optional):**
@@ -216,8 +216,8 @@ RUN npm install -g pnpm
 WORKDIR /app
 COPY . .
 RUN pnpm install
-RUN pnpm build:registry-client && pnpm --filter @mindvault/server build
-CMD ["pnpm", "--filter", "@mindvault/server", "start"]
+RUN pnpm build:registry-client && pnpm --filter @zentrixpay/server build
+CMD ["pnpm", "--filter", "@zentrixpay/server", "start"]
 ```
 
 ### 3.5 Verify the server is healthy
@@ -286,7 +286,7 @@ cd mcp
 Create or update `mcp/.env` (see `mcp/.env.example`):
 
 ```bash
-MINDVAULT_URL=$BASE_URL
+ZENTRIXPAY_URL=$BASE_URL
 STELLAR_NETWORK=testnet
 VAULT_REGISTRY_CONTRACT_ID=$CONTRACT_ID
 SPONSORED_ACCOUNT_URL=https://stellar-sponsored-agent-account.onrender.com
@@ -304,10 +304,10 @@ pnpm install && pnpm build
 
 ```bash
 # Claude Code
-claude mcp add mindvault node /path/to/mcp/dist/index.js
+claude mcp add zentrixpay node /path/to/mcp/dist/index.js
 
 # Codex
-codex mcp add mindvault -- node /path/to/mcp/dist/index.js
+codex mcp add zentrixpay -- node /path/to/mcp/dist/index.js
 ```
 
 ---
@@ -324,12 +324,12 @@ curl -i $BASE_URL/health/ready
 curl $BASE_URL/resources
 
 # 3. MCP flow (requires an MCP client)
-#    - mindvault_setup_wallet
-#    - mindvault_wallet_info
-#    - mindvault_browse
-#    - mindvault_register
-#    - mindvault_publish
-#    - mindvault_buy
+#    - zentrixpay_setup_wallet
+#    - zentrixpay_wallet_info
+#    - zentrixpay_browse
+#    - zentrixpay_register
+#    - zentrixpay_publish
+#    - zentrixpay_buy
 
 # 4. Verify on-chain registration
 pnpm reconcile

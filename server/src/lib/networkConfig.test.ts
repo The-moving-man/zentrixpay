@@ -6,7 +6,7 @@ import {
   inferNetworkFromRpcUrl,
   inferNetworkFromX402,
   applyNetworkEnvDefaults,
-} from "@mindvault/registry-client";
+} from "@zentrixpay/registry-client";
 
 describe("network presets", () => {
   it("defines testnet and mainnet with distinct RPC and USDC contract ids", () => {

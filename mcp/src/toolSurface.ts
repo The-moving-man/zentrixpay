@@ -7,16 +7,16 @@
  * ListTools handler in `index.ts` carried its own ~490-line literal copy of the
  * list, and the two drifted apart in every direction at once —
  *
- *   - Six implemented, documented, validated tools (`mindvault_update_metadata`,
- *     `mindvault_set_price`, `mindvault_transfer_ownership`,
- *     `mindvault_set_listed`, `mindvault_export_receipts`,
- *     `mindvault_recover_catalog_cache`) were missing from the copy, so no
+ *   - Six implemented, documented, validated tools (`zentrixpay_update_metadata`,
+ *     `zentrixpay_set_price`, `zentrixpay_transfer_ownership`,
+ *     `zentrixpay_set_listed`, `zentrixpay_export_receipts`,
+ *     `zentrixpay_recover_catalog_cache`) were missing from the copy, so no
  *     agent could discover them.
- *   - `mindvault_publish_status` and `mindvault_purchase_history` existed only
+ *   - `zentrixpay_publish_status` and `zentrixpay_purchase_history` existed only
  *     in the copy, so the generated reference page never mentioned them.
- *   - The copy's schemas for `mindvault_register`, `mindvault_publish`,
- *     `mindvault_buy` and others had lost their per-field descriptions and
- *     examples, and `mindvault_publish`/`mindvault_buy` no longer advertised
+ *   - The copy's schemas for `zentrixpay_register`, `zentrixpay_publish`,
+ *     `zentrixpay_buy` and others had lost their per-field descriptions and
+ *     examples, and `zentrixpay_publish`/`zentrixpay_buy` no longer advertised
  *     `dryRun` or `maxAutoPayUsdc` at all.
  *
  * Deriving the surface here makes the promise structural instead of

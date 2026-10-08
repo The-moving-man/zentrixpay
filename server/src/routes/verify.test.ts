@@ -199,7 +199,7 @@ describe("GET /agent/status — public agent stats endpoint", () => {
     expect(res.body).toHaveProperty("recentActivity");
 
     expect(res.body.agent).toMatchObject({
-      name: "MindVault Verification Agent",
+      name: "ZentrixPay Verification Agent",
       walletAddress: "GTEST123456789",
       network: "testnet",
       endpoint: "http://localhost:4021/verify-content",

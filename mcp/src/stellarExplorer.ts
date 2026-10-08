@@ -17,7 +17,7 @@ import {
   networks as registryNetworks,
   resolveStellarNetwork,
   type ExplorerNetwork,
-} from "@mindvault/registry-client";
+} from "@zentrixpay/registry-client";
 
 /** Explorer segment for the network this server is configured for. */
 export function resolveExplorerNetwork(env: NodeJS.ProcessEnv = process.env): ExplorerNetwork {

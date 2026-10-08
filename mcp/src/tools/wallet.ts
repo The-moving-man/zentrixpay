@@ -126,7 +126,7 @@ async function stellarDerivePublicKey(): Promise<DerivePublicKey> {
 
 export async function setupWallet(profileArg?: string): Promise<string> {
   const target = resolveProfileName(profileArg);
-  const operation = "mindvault_setup_wallet failed to create wallet";
+  const operation = "zentrixpay_setup_wallet failed to create wallet";
 
   let res: Awaited<ReturnType<typeof jsonFetch>>;
   try {
@@ -226,7 +226,7 @@ export async function publishStatus(
   const resourceId = (args.resourceId ?? "").trim();
   if (!resourceId) {
     throw new Error(
-      "resourceId is required. Pass the id returned by mindvault_publish (e.g. 'cm7x8y9z').",
+      "resourceId is required. Pass the id returned by zentrixpay_publish (e.g. 'cm7x8y9z').",
     );
   }
 

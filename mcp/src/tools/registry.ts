@@ -3,7 +3,7 @@ import {
   Errors as RegistryErrors,
   listResources,
   type Resource,
-} from "@mindvault/registry-client";
+} from "@zentrixpay/registry-client";
 import {
   BASE_URL,
   HORIZON_URL,
@@ -296,7 +296,7 @@ export async function registryList(start: number, limit: number): Promise<string
     const message =
       start === 0
         ? "No resources registered on-chain yet."
-        : `No on-chain resources in range [${start}, ${start + limit}). Try a lower start index or call mindvault_registry_info for contract context.`;
+        : `No on-chain resources in range [${start}, ${start + limit}). Try a lower start index or call zentrixpay_registry_info for contract context.`;
     return JSON.stringify(
       {
         source: "on-chain",
@@ -614,7 +614,7 @@ export async function pendingTransfer(resourceId: string): Promise<string> {
         resourceId,
         found: false,
         proposedNewOwner: null,
-        message: `Resource "${resourceId}" is not registered on-chain. Confirm the id from mindvault_browse or mindvault_publish.`,
+        message: `Resource "${resourceId}" is not registered on-chain. Confirm the id from zentrixpay_browse or zentrixpay_publish.`,
         contract: REGISTRY_CONTRACT_ID,
         network: REGISTRY_NETWORK_PASSPHRASE,
         rpc: SOROBAN_RPC_URL,
@@ -699,7 +699,7 @@ export async function pendingTransfer(resourceId: string): Promise<string> {
         resourceId,
         found: false,
         proposedNewOwner: null,
-        message: `No pending ownership transfer exists for resource "${resourceId}". Use mindvault_transfer_ownership to propose one.`,
+        message: `No pending ownership transfer exists for resource "${resourceId}". Use zentrixpay_transfer_ownership to propose one.`,
         contract: REGISTRY_CONTRACT_ID,
         network: REGISTRY_NETWORK_PASSPHRASE,
         rpc: SOROBAN_RPC_URL,
@@ -715,7 +715,7 @@ export async function pendingTransfer(resourceId: string): Promise<string> {
       resourceId,
       found: true,
       proposedNewOwner,
-      message: `A pending ownership transfer exists for resource "${resourceId}". The proposed new owner must call mindvault_accept_transfer to complete it.`,
+      message: `A pending ownership transfer exists for resource "${resourceId}". The proposed new owner must call zentrixpay_accept_transfer to complete it.`,
       contract: REGISTRY_CONTRACT_ID,
       network: REGISTRY_NETWORK_PASSPHRASE,
       rpc: SOROBAN_RPC_URL,

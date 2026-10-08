@@ -149,6 +149,6 @@ describe("unownedWalletNote", () => {
     const note = unownedWalletNote(failure);
     expect(note).toContain("does not own this address");
     expect(note).toContain("NOT spendable");
-    expect(note).toContain("mindvault_import_wallet");
+    expect(note).toContain("zentrixpay_import_wallet");
   });
 });

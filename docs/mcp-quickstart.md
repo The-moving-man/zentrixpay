@@ -2,7 +2,7 @@
 
 This walkthrough takes you from a fresh MCP install to a working agent-to-agent flow on Stellar **testnet**: one agent sets up a wallet, registers as a publisher, publishes a resource (paying for verification via x402), and a second agent browses the catalog and buys the resource.
 
-Everything below uses the tools exposed by the MindVault MCP server (`mcp/`). The server defaults to the hosted backend at `https://mindvault-hyr3.onrender.com` and the testnet vault-registry contract — no env vars required for the happy path.
+Everything below uses the tools exposed by the ZentrixPay MCP server (`mcp/`). The server defaults to the hosted backend at `https://mindvault-hyr3.onrender.com` and the testnet vault-registry contract — no env vars required for the happy path.
 
 ## Prerequisites
 
@@ -21,7 +21,7 @@ Call this Agent A (the publisher) and Agent B (the buyer). In practice they're t
 
 ## Agent A — Publish a resource
 
-### 1. `mindvault_setup_wallet`
+### 1. `zentrixpay_setup_wallet`
 
 Creates a sponsored Stellar testnet account. The sponsor covers the ~1.5 XLM reserve and USDC trustline, so the agent starts with a usable wallet at zero upfront cost.
 
@@ -33,7 +33,7 @@ Creates a sponsored Stellar testnet account. The sponsor covers the ~1.5 XLM res
 Wallet created.
 Profile: default
 Address: GAGENT...XYZ
-Wallet persisted to ~/.mindvault/state.json (mode 0600).
+Wallet persisted to ~/.zentrixpay/state.json (mode 0600).
 ```
 
 `structuredContent` carries `{ profile, address, persisted }` so the agent can
@@ -49,7 +49,7 @@ The wallet has an XLM reserve and a USDC trustline but **no USDC**. To pay the v
 
 Confirm the balance landed:
 
-### 3. `mindvault_wallet_info`
+### 3. `zentrixpay_wallet_info`
 
 **Input:** _(none)_
 
@@ -60,9 +60,9 @@ Address: GAGENT...XYZ
 USDC Balance: 10.0000000
 ```
 
-> Troubleshooting: if `USDC Balance` is still `0`, the faucet payment hasn't settled yet — wait ~10 seconds and re-run. If it stays at `0`, the trustline may be missing; re-run `mindvault_setup_wallet` to recreate the sponsored account.
+> Troubleshooting: if `USDC Balance` is still `0`, the faucet payment hasn't settled yet — wait ~10 seconds and re-run. If it stays at `0`, the trustline may be missing; re-run `zentrixpay_setup_wallet` to recreate the sponsored account.
 
-### 4. `mindvault_register`
+### 4. `zentrixpay_register`
 
 Registers a publisher record bound to the agent's wallet. Returns an API key that the MCP server holds in memory for subsequent `publish` calls.
 
@@ -79,7 +79,7 @@ Registers a publisher record bound to the agent's wallet. Returns an API key tha
 
 **Example output:** a confirmation string with the publisher ID and a stored API key.
 
-### 5. `mindvault_publish`
+### 5. `zentrixpay_publish`
 
 Publishes a link resource. The MCP server signs the x402 verification payment using the agent wallet, so the publisher's USDC pays for verification.
 
@@ -96,9 +96,9 @@ Publishes a link resource. The MCP server signs the x402 verification payment us
 
 **Example output:** a confirmation with the new `resourceId`, verification status, and the paywalled `accessUrl`.
 
-> Troubleshooting: if `publish` returns an x402 verification error, the wallet is most likely under-funded. The required verification fee is small (well under $1) — re-check `mindvault_wallet_info` and re-fund if needed. For deeper x402 sign/pay debugging see [docs/x402-payment-troubleshooting.md](x402-payment-troubleshooting.md).
+> Troubleshooting: if `publish` returns an x402 verification error, the wallet is most likely under-funded. The required verification fee is small (well under $1) — re-check `zentrixpay_wallet_info` and re-fund if needed. For deeper x402 sign/pay debugging see [docs/x402-payment-troubleshooting.md](x402-payment-troubleshooting.md).
 
-### 5b. `mindvault_publish_status` _(optional)_
+### 5b. `zentrixpay_publish_status` _(optional)_
 
 Poll verification and on-chain sync after publish. Returns `verificationStatus` (`pending` | `verified` | `rejected` | `skipped`), `listed`, `onchainStatus`, and `onchainTxHash`. Pass `wait: true` to poll until verification settles (or `timeoutMs` elapses).
 
@@ -120,7 +120,7 @@ Poll verification and on-chain sync after publish. Returns `verificationStatus` 
 
 Start a second MCP session (or a separate agent). It needs its own wallet and its own USDC to pay for the resource.
 
-### 6. `mindvault_setup_wallet` (Agent B)
+### 6. `zentrixpay_setup_wallet` (Agent B)
 
 Same as step 1 — gives Agent B its own sponsored testnet wallet.
 
@@ -128,9 +128,9 @@ Same as step 1 — gives Agent B its own sponsored testnet wallet.
 
 Same flow as step 2 — send testnet USDC to Agent B's address. The amount needs to cover the resource price plus a tiny x402 fee buffer.
 
-### 8. `mindvault_browse`
+### 8. `zentrixpay_browse`
 
-Lists resources in the catalog with their IDs, titles, prices, and access URLs. Accepts the same optional filters as `mindvault_search` / `GET /resources` (keyword, price range, verification status, resource type, owner, sort, pagination, tags, listed).
+Lists resources in the catalog with their IDs, titles, prices, and access URLs. Accepts the same optional filters as `zentrixpay_search` / `GET /resources` (keyword, price range, verification status, resource type, owner, sort, pagination, tags, listed).
 
 **Input:** _(none required; filters optional)_
 
@@ -155,7 +155,7 @@ The same resources also arrive as MCP `structuredContent` (`items` with `id`,
 `title`, `price`, `accessUrl`) so an agent does not have to parse the list.
 See [mcp-structured-output.md](mcp-structured-output.md).
 
-### 9. `mindvault_search` (optional)
+### 9. `zentrixpay_search` (optional)
 
 Search the catalog by keyword plus filters. Server-supported filters are forwarded to `GET /resources`; `tags` and `listed` are applied client-side for parity with catalog/meta fields.
 
@@ -189,10 +189,10 @@ Search the catalog by keyword plus filters. Server-supported filters are forward
 
 The MCP server also advertises the `resources` capability, so clients can discover catalog entries without invoking a tool. `resources/list` returns every catalog entry with a stable URI, and `resources/read` returns its **public metadata only** — never gated content.
 
-- URI scheme: `mindvault://resource/<id>` (e.g. `mindvault://resource/abc123`)
+- URI scheme: `zentrixpay://resource/<id>` (e.g. `zentrixpay://resource/abc123`)
 - `resources/list` → entries with `name` (the title), `description`, and `mimeType: application/json`
 - `resources/read` on a known URI → `{ id, title, description, price, resourceType, verificationStatus, accessUrl }`
-- Unknown URIs and unknown resource ids return deterministic errors, so agents can correct the URI or fall back to `mindvault_browse` / `mindvault_search`
+- Unknown URIs and unknown resource ids return deterministic errors, so agents can correct the URI or fall back to `zentrixpay_browse` / `zentrixpay_search`
 
 If no resource matches, the error message includes the applied filters, for example:
 
@@ -202,7 +202,7 @@ No resources match query "forecast", min $0.01, max $1.00, status verified, type
 
 Invalid filter values (bad price range, unknown enums, etc.) return a deterministic error string without calling the API.
 
-### 10. `mindvault_preview` (optional)
+### 10. `zentrixpay_preview` (optional)
 
 Show full metadata and verification status before paying. The JSON text and
 `structuredContent` share `{ id, title, description, price, type, verificationStatus, accessUrl }`.
@@ -213,7 +213,7 @@ Show full metadata and verification status before paying. The JSON text and
 { "resourceId": "abc123" }
 ```
 
-### 11. `mindvault_buy`
+### 11. `zentrixpay_buy`
 
 Pays the resource price in USDC via x402 and returns the protected content.
 
@@ -226,13 +226,13 @@ Pays the resource price in USDC via x402 and returns the protected content.
 **Example output:** a JSON summary (`before` / `after` / `txHash`) as both text
 and `structuredContent`. The protected content is in the `after` object.
 
-> Troubleshooting: a `402 Payment Required` after `buy` means the payment didn't settle — usually insufficient USDC. Run `mindvault_wallet_info` to check the balance.
+> Troubleshooting: a `402 Payment Required` after `buy` means the payment didn't settle — usually insufficient USDC. Run `zentrixpay_wallet_info` to check the balance.
 
-Successful buys also append a local receipt under `~/.mindvault/purchases.json` for later inspection via `mindvault_purchase_history`.
+Successful buys also append a local receipt under `~/.zentrixpay/purchases.json` for later inspection via `zentrixpay_purchase_history`.
 
 ---
 
-### 12. `mindvault_purchase_history`
+### 12. `zentrixpay_purchase_history`
 
 Read-only list of locally persisted purchase receipts. Optional filters:
 
@@ -244,7 +244,7 @@ Returns `{ count, purchases }` (newest first). Empty history returns `count: 0` 
 
 ---
 
-### 12b. `mindvault_export_receipts`
+### 12b. `zentrixpay_export_receipts`
 
 Export those receipts as a schema-versioned document for reconciliation — JSON, or RFC 4180 CSV in the envelope's `csv` field. Optional `resourceId`, `network`, `since`, `until`, and `limit` filters.
 
@@ -252,16 +252,16 @@ Export those receipts as a schema-versioned document for reconciliation — JSON
 { "format": "csv", "since": "2026-08-01", "until": "2026-08-31" }
 ```
 
-Returns a `mindvault.receipt-export/v1` envelope with `count`, an exact `totalAmount`, an explicit `currency`, and one normalized row per purchase (including the Stellar Expert link). The tool advertises an `outputSchema`, so the same envelope also arrives as MCP `structuredContent`. See [mcp-receipt-export.md](mcp-receipt-export.md).
+Returns a `zentrixpay.receipt-export/v1` envelope with `count`, an exact `totalAmount`, an explicit `currency`, and one normalized row per purchase (including the Stellar Expert link). The tool advertises an `outputSchema`, so the same envelope also arrives as MCP `structuredContent`. See [mcp-receipt-export.md](mcp-receipt-export.md).
 
 ---
 
-### 13. `mindvault_register_onchain`
+### 13. `zentrixpay_register_onchain`
 
 Registers an already-published, verified resource on the vault-registry contract.
-`mindvault_publish` attempts this automatically, but if the on-chain step fails
+`zentrixpay_publish` attempts this automatically, but if the on-chain step fails
 the resource stays listed and purchasable while reporting
-`Retry with mindvault_register_onchain`. This tool is that retry path: it prepares
+`Retry with zentrixpay_register_onchain`. This tool is that retry path: it prepares
 the unsigned register transaction (owner-only), signs it with the agent wallet
 (the resource creator), submits it, and returns the registry status and tx hash.
 
@@ -286,7 +286,7 @@ On-chain tx: 5f3a...c9
 
 ---
 
-### 14. `mindvault_update_metadata`
+### 14. `zentrixpay_update_metadata`
 
 Updates the on-chain metadata pointer for a registered resource in the vault-registry contract. Validates pointer format and length (max 512 chars, must start with ipfs://, ar://, http(s)://, sha256:, sha-256:, or 0x) client-side before signing.
 
@@ -298,7 +298,7 @@ Updates the on-chain metadata pointer for a registered resource in the vault-reg
 
 ---
 
-### 15. `mindvault_set_price`
+### 15. `zentrixpay_set_price`
 
 Updates the on-chain price in USDC for a registered resource in the vault-registry contract.
 
@@ -310,7 +310,7 @@ Updates the on-chain price in USDC for a registered resource in the vault-regist
 
 ---
 
-### 16. `mindvault_transfer_ownership`
+### 16. `zentrixpay_transfer_ownership`
 
 Transfers ownership of a registered resource on the vault-registry contract to a new creator address.
 
@@ -322,7 +322,7 @@ Transfers ownership of a registered resource on the vault-registry contract to a
 
 ---
 
-### 17. `mindvault_set_listed`
+### 17. `zentrixpay_set_listed`
 
 Manages catalog availability by listing or delisting a resource on-chain.
 
@@ -347,11 +347,11 @@ If any step fails, the most common root causes are:
 
 | Symptom                                         | Likely cause                                      | Fix                                                          |
 | ----------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------ |
-| `USDC Balance: 0`                               | Faucet payment hasn't settled / trustline missing | Wait and re-check, or rerun `mindvault_setup_wallet`         |
+| `USDC Balance: 0`                               | Faucet payment hasn't settled / trustline missing | Wait and re-check, or rerun `zentrixpay_setup_wallet`         |
 | `publish` returns an x402 verification error    | Publisher wallet under-funded                     | Re-fund and retry                                            |
 | `buy` returns `402 Payment Required`            | Buyer wallet under-funded for resource price      | Re-fund and retry                                            |
-| `Not registered. Run mindvault_register first.` | API key was lost (e.g. server restart)            | Re-run `mindvault_register` in the same session              |
-| `No wallet. Run mindvault_setup_wallet first.`  | Wallet state cleared between sessions             | The wallet is in-memory only — re-create it for each session |
+| `Not registered. Run zentrixpay_register first.` | API key was lost (e.g. server restart)            | Re-run `zentrixpay_register` in the same session              |
+| `No wallet. Run zentrixpay_setup_wallet first.`  | Wallet state cleared between sessions             | The wallet is in-memory only — re-create it for each session |
 
 See also: [docs/x402-payment-troubleshooting.md](x402-payment-troubleshooting.md) for x402-specific sign/pay failures.
 

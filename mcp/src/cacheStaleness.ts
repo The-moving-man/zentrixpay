@@ -1,7 +1,7 @@
 /**
  * Cache-freshness evaluation for browse results.
  *
- * The MindVault catalog can be served through a cache, so browse output may lag
+ * The ZentrixPay catalog can be served through a cache, so browse output may lag
  * the authoritative on-chain registry. This module turns standard HTTP cache
  * headers (Age, Date, Cache-Control) into an agent-facing notice: a cache age
  * line when the data is fresh, or a stale warning (with a pointer to verify
@@ -75,7 +75,7 @@ export function evaluateCacheFreshness(
         maxAgeSeconds,
         notice:
           `⚠ Catalog may be stale: cache age ${ageSeconds}s exceeds max-age ${maxAgeSeconds}s. ` +
-          `Re-run mindvault_browse to refresh, or confirm a specific resource on-chain with mindvault_registry_lookup.`,
+          `Re-run zentrixpay_browse to refresh, or confirm a specific resource on-chain with zentrixpay_registry_lookup.`,
       };
     }
     return {
@@ -94,7 +94,7 @@ export function evaluateCacheFreshness(
       maxAgeSeconds,
       notice:
         "⚠ Catalog served with a no-cache/no-store policy; results may be stale. " +
-        "Confirm a specific resource on-chain with mindvault_registry_lookup if freshness matters.",
+        "Confirm a specific resource on-chain with zentrixpay_registry_lookup if freshness matters.",
     };
   }
 

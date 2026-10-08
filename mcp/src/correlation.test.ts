@@ -342,7 +342,7 @@ describe("audit log integration", () => {
     const captured = captureAuditEntries();
     setAuditLogEnabled(true);
 
-    runWithCorrelationId("mv-audit-0001", () => logToolStart("mindvault_browse"));
+    runWithCorrelationId("mv-audit-0001", () => logToolStart("zentrixpay_browse"));
 
     expect(captured.entries[0].correlationId).toBe("mv-audit-0001");
   });
@@ -352,9 +352,9 @@ describe("audit log integration", () => {
     setAuditLogEnabled(true);
 
     runWithCorrelationId("mv-audit-0002", () => {
-      logToolStart("mindvault_buy");
+      logToolStart("zentrixpay_buy");
       logNetworkRequest("GET", "https://example/resource", "api", 200, 12);
-      logToolSuccess("mindvault_buy", 34);
+      logToolSuccess("zentrixpay_buy", 34);
     });
 
     // The whole point: one grep finds every line belonging to the call.
@@ -366,7 +366,7 @@ describe("audit log integration", () => {
     const captured = captureAuditEntries();
     setAuditLogEnabled(true);
 
-    logToolStart("mindvault_browse");
+    logToolStart("zentrixpay_browse");
 
     expect(captured.entries[0]).not.toHaveProperty("correlationId");
   });
@@ -384,12 +384,12 @@ describe("audit log integration", () => {
     }
 
     await Promise.all([
-      call("mv-p-0001", "mindvault_browse", 20),
-      call("mv-q-0002", "mindvault_search", 1),
+      call("mv-p-0001", "zentrixpay_browse", 20),
+      call("mv-q-0002", "zentrixpay_search", 1),
     ]);
 
     for (const entry of captured.entries) {
-      const expected = entry.toolName === "mindvault_browse" ? "mv-p-0001" : "mv-q-0002";
+      const expected = entry.toolName === "zentrixpay_browse" ? "mv-p-0001" : "mv-q-0002";
       expect(entry.correlationId).toBe(expected);
     }
   });
@@ -399,11 +399,11 @@ describe("audit log integration", () => {
     setAuditLogEnabled(true);
 
     runWithCorrelationId("mv-audit-0003", () =>
-      logToolSuccess("mindvault_browse", 7, { network: "testnet" }),
+      logToolSuccess("zentrixpay_browse", 7, { network: "testnet" }),
     );
 
     expect(captured.entries[0]).toMatchObject({
-      toolName: "mindvault_browse",
+      toolName: "zentrixpay_browse",
       status: "success",
       duration: 7,
       network: "testnet",

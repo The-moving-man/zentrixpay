@@ -1,7 +1,7 @@
 /**
  * Tool-level test for streaming publish-verification progress (#571).
  *
- * Drives mindvault_publish_status's implementation against a stubbed backend
+ * Drives zentrixpay_publish_status's implementation against a stubbed backend
  * and asserts a progress notification is emitted for every poll, ending with a
  * terminal message once verification settles.
  */
@@ -45,7 +45,7 @@ function queueStatuses(statuses: string[]) {
   );
 }
 
-describe("mindvault_publish_status progress notifications", () => {
+describe("zentrixpay_publish_status progress notifications", () => {
   beforeEach(() => {
     jsonFetch.mockReset();
   });

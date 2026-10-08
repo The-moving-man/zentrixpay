@@ -1,5 +1,5 @@
 /**
- * Payment preflight estimator for the MindVault MCP server.
+ * Payment preflight estimator for the ZentrixPay MCP server.
  *
  * Before an agent signs a buy or verification payment, this estimates whether
  * the selected wallet is actually ready: it compares the wallet's USDC balance
@@ -68,7 +68,7 @@ export function buildPaymentPreflight(input: PaymentPreflightInput): PaymentPref
   let ready = true;
 
   if (!input.walletPublicKey) {
-    warnings.push("No wallet configured. Run mindvault_setup_wallet before paying.");
+    warnings.push("No wallet configured. Run zentrixpay_setup_wallet before paying.");
     ready = false;
   }
 

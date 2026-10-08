@@ -18,7 +18,7 @@ import {
 } from "./index.js";
 
 /**
- * Smoke tests for @mindvault/registry-client.
+ * Smoke tests for @zentrixpay/registry-client.
  *
  * These assert the package builds, exports the expected surface, and that the
  * generated Soroban bindings still match what consumers (server/, web/, mcp/)
@@ -373,7 +373,7 @@ describe("contract id configuration", () => {
 // ---------------------------------------------------------------------------
 // Integration tests — skipped by default so `pnpm test` never needs a live
 // Stellar RPC.  Run with:
-//   RUN_INTEGRATION=1 pnpm --filter @mindvault/registry-client test
+//   RUN_INTEGRATION=1 pnpm --filter @zentrixpay/registry-client test
 //
 // These tests exercise the generated bindings against the deployed testnet
 // contract.  Write operations use `simulate: true` so they never require a

@@ -1,6 +1,6 @@
 # MCP Package Publish Checklist
 
-What to verify before publishing `@mindvault/mcp` to a registry, and how to
+What to verify before publishing `@zentrixpay/mcp` to a registry, and how to
 check it automatically.
 
 Most of this is enforced by a script:
@@ -21,11 +21,11 @@ runner in [`mcp/scripts/prepublish-check.ts`](../mcp/scripts/prepublish-check.ts
 
 ## Known blocker
 
-> `@mindvault/mcp` depends on `@mindvault/registry-client` with a `workspace:*`
+> `@zentrixpay/mcp` depends on `@zentrixpay/registry-client` with a `workspace:*`
 > range, and that package is marked `"private": true`. `pnpm publish` rewrites
 > the range to a real version, but nobody outside this repo can install a
 > package that was never published. **The MCP package is not publishable until
-> this is resolved** — publish `@mindvault/registry-client` first, bundle it
+> this is resolved** — publish `@zentrixpay/registry-client` first, bundle it
 > into the MCP build, or inline what the server uses.
 
 `pnpm prepublish:check` reports this as `deps:resolvable` and fails. That is the
@@ -35,7 +35,7 @@ check working, not a bug in the script.
 
 ## 1. Tests
 
-- [ ] `pnpm --filter @mindvault/mcp test` is green
+- [ ] `pnpm --filter @zentrixpay/mcp test` is green
 - [ ] The suite ran against the code you are shipping (no uncommitted changes)
 
 Automated as the `tests` check. Skip with `--skip-tests` when you have just run
@@ -43,7 +43,7 @@ them.
 
 ## 2. Build
 
-- [ ] `pnpm --filter @mindvault/mcp build` completes with no TypeScript errors
+- [ ] `pnpm --filter @zentrixpay/mcp build` completes with no TypeScript errors
 - [ ] `dist/` contains compiled JS and `.d.ts` files
 - [ ] `dist/` is newer than every file in `src/` — a stale build ships old code
 - [ ] `dist/` contains no test files (the build runs against `tsconfig.build.json`,
@@ -78,9 +78,9 @@ Automated as the `bin:*` checks.
 Verify by hand after packing:
 
 ```bash
-npm pack                                  # writes mindvault-mcp-<version>.tgz
-npm install -g ./mindvault-mcp-1.0.0.tgz
-mindvault-mcp                             # should start and wait on stdio
+npm pack                                  # writes zentrixpay-mcp-<version>.tgz
+npm install -g ./zentrixpay-mcp-1.0.0.tgz
+zentrixpay-mcp                             # should start and wait on stdio
 ```
 
 ## 5. Package contents
@@ -110,7 +110,7 @@ Automated as the `deps:*` checks. See [known blocker](#known-blocker).
 
 ## 7. Smoke test
 
-- [ ] The offline smoke run passes: `MINDVAULT_MOCK=1 pnpm --filter @mindvault/mcp smoke`
+- [ ] The offline smoke run passes: `ZENTRIXPAY_MOCK=1 pnpm --filter @zentrixpay/mcp smoke`
 - [ ] The packed tarball starts as a real MCP server in a client
 
 The smoke driver boots the server and walks setup → register → publish →
@@ -123,7 +123,7 @@ actual run, with `--smoke`).
 
 ## 7b. Provenance
 
-- [ ] `pnpm --filter @mindvault/mcp provenance` has been run **after** the build
+- [ ] `pnpm --filter @zentrixpay/mcp provenance` has been run **after** the build
 - [ ] `provenance.json` records the version being published and a full commit SHA
 - [ ] The working tree was clean when it was generated
 - [ ] Publishing from CI, so `--provenance` can attest the tarball as well
@@ -140,9 +140,9 @@ complementary: the flag proves the tarball came from a CI run, this file says
 what that run was building.
 
 ```
-pnpm --filter @mindvault/mcp build
-pnpm --filter @mindvault/mcp provenance
-pnpm --filter @mindvault/mcp prepublish:check
+pnpm --filter @zentrixpay/mcp build
+pnpm --filter @zentrixpay/mcp provenance
+pnpm --filter @zentrixpay/mcp prepublish:check
 ```
 
 Order matters — the record digests `dist/`, so generating it before the build

@@ -475,14 +475,14 @@ When the contract interface changes, or when the contract is deployed to a new a
   ```
 - [ ] **Verify bindings against the deployed contract**
   ```bash
-  pnpm --filter @mindvault/registry-client test
+  pnpm --filter @zentrixpay/registry-client test
   ```
 - [ ] **Commit the updated bindings** file (`packages/registry-client/src/generated/index.ts`).
 
 ### Setup
 
 ```typescript
-import { Client as RegistryClient } from "@mindvault/registry-client";
+import { Client as RegistryClient } from "@zentrixpay/registry-client";
 
 const CONTRACT_ID = "CDQKUIADLO5S5WEHEUTTXX2M45WAHVRU2PBEBD6ZGDKMOP5A72FJ3OD4";
 const RPC_URL = "https://soroban-testnet.stellar.org";
@@ -821,6 +821,6 @@ assert_eq!(
 ## Resource ID rules
 
 `id` must be 1–24 lowercase letters or digits (`[a-z0-9]`), matching the
-cuid2 format used by the MindVault server. The following IDs are reserved and
+cuid2 format used by the ZentrixPay server. The following IDs are reserved and
 always rejected: `admin`, `null`, `registry`, `api`, `index`, `root`, `system`
 (case-insensitive).

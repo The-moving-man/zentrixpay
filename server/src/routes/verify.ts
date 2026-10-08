@@ -153,7 +153,7 @@ router.get("/agent/status", async (_req, res) => {
 
   res.json({
     agent: {
-      name: "MindVault Verification Agent",
+      name: "ZentrixPay Verification Agent",
       walletAddress: config.PAY_TO,
       network: config.NETWORK,
       endpoint: `${config.BASE_URL}/verify-content`,

@@ -38,7 +38,7 @@ vi.mock("@x402/fetch", () => ({
   }),
 }));
 
-vi.mock("@mindvault/registry-client", async (importOriginal) => {
+vi.mock("@zentrixpay/registry-client", async (importOriginal) => {
   const actual = (await importOriginal()) as any;
   return {
     ...actual,
@@ -51,7 +51,7 @@ vi.mock("@mindvault/registry-client", async (importOriginal) => {
 
 // Retry counts are read once at module load. VITEST already forces a zero base
 // delay, so these run without real sleeping.
-process.env.MINDVAULT_RETRY_ATTEMPTS = "3";
+process.env.ZENTRIXPAY_RETRY_ATTEMPTS = "3";
 
 const { browse, buy, walletInfo, txStatus, networkProfile, _setAgentWallet } =
   await import("./index.js");

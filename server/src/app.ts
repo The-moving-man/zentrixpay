@@ -15,6 +15,7 @@ import registryRouter from "./routes/registry.js";
 import resourceRouter from "./routes/resources.js";
 import verifyRouter from "./routes/verify.js";
 import paymentsRouter from "./routes/payments.js";
+import apisRouter from "./routes/apis.js";
 import docsRouter from "./routes/docs.js";
 import metricsRouter from "./routes/metrics.js";
 
@@ -26,7 +27,10 @@ export function createApp(): Express {
   app.use(corsMiddleware());
   app.use(requestContextMiddleware);
   app.use(inFlightMiddleware);
-  app.use(express.json({ limit: config.MAX_JSON_BODY_SIZE }));
+  // The pay-per-call proxy forwards request bodies byte-for-byte, so it reads
+  // them raw itself (routes/apis.ts) instead of going through the JSON parser.
+  const jsonParser = express.json({ limit: config.MAX_JSON_BODY_SIZE });
+  app.use((req, res, next) => (req.path.startsWith("/api/") ? next() : jsonParser(req, res, next)));
   app.use(requestTimeout(config.REQUEST_TIMEOUT_MS));
   app.use(requestDurationMiddleware);
 
@@ -37,6 +41,7 @@ export function createApp(): Express {
   app.use(resourceRouter);
   app.use(verifyRouter);
   app.use(paymentsRouter);
+  app.use(apisRouter);
   app.use(metricsRouter);
 
   // OpenAPI spec + Swagger UI (all envs; UI is CDN-based, no extra package needed)

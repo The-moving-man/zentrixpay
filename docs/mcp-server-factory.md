@@ -23,9 +23,9 @@ configured server, **connecting** it to a transport, and **shutting it down**.
 ## Building
 
 ```ts
-import { createMindVaultServer } from "./serverFactory.js";
+import { createZentrixPayServer } from "./serverFactory.js";
 
-const server = createMindVaultServer({
+const server = createZentrixPayServer({
   listTools: () => advertisedTools,
   dispatchTool: (name, args, onProgress) => dispatchTool(name, args, onProgress),
   listPrompts: () => promptSummaries,
@@ -91,7 +91,7 @@ const client = new Client({ name: "test", version: "1.0.0" }, { capabilities: {}
 
 await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
 
-const result = await client.callTool({ name: "mindvault_browse", arguments: {} });
+const result = await client.callTool({ name: "zentrixpay_browse", arguments: {} });
 ```
 
 A real session, no mocked SDK.

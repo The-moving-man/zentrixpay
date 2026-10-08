@@ -3,7 +3,7 @@
  *
  * Verifies that the tool list exposed to agent clients stays deterministic and
  * complete. Snapshots capture the shape of the most commonly used tools
- * (mindvault_search, mindvault_publish) to prevent regressions when updating
+ * (zentrixpay_search, zentrixpay_publish) to prevent regressions when updating
  * descriptions or examples.
  *
  * Full ListTools coverage through the SDK lives in `integration.test.ts`.
@@ -16,7 +16,7 @@ import { TEXT_ONLY_TOOLS } from "./outputSchemas.js";
 describe("MCP tool metadata", () => {
   it("all tools have required fields", () => {
     for (const tool of TOOL_DEFINITIONS) {
-      expect(tool.name).toMatch(/^mindvault_/);
+      expect(tool.name).toMatch(/^zentrixpay_/);
       expect(typeof tool.description).toBe("string");
       expect(tool.description.length).toBeGreaterThan(0);
       expect(tool.inputSchema.type).toBe("object");
@@ -49,7 +49,7 @@ describe("MCP tool metadata", () => {
   it("destructive tools are not marked read-only (#552)", () => {
     const destructiveTools = TOOL_DEFINITIONS.filter((tool) => tool.annotations.destructiveHint);
     expect(destructiveTools.map((t) => t.name)).toEqual(
-      expect.arrayContaining(["mindvault_reset", "mindvault_restore_state"]),
+      expect.arrayContaining(["zentrixpay_reset", "zentrixpay_restore_state"]),
     );
     for (const tool of destructiveTools) {
       expect(tool.annotations.readOnlyHint, `destructive tool ${tool.name} is not read-only`).toBe(
@@ -62,7 +62,7 @@ describe("MCP tool metadata", () => {
     expect(TOOL_DEFINITIONS.map((t) => t.name)).toMatchSnapshot();
   });
 
-  it("mindvault_search inputSchema", () => {
+  it("zentrixpay_search inputSchema", () => {
     const searchSchema = {
       type: "object",
       properties: { ...catalogFilterInputProperties },
@@ -82,10 +82,10 @@ describe("MCP tool metadata", () => {
     }
   });
 
-  it("mindvault_publish inputSchema", () => {
+  it("zentrixpay_publish inputSchema", () => {
     // Snapshot the definition itself, not a copy of it: a hand-written literal
     // drifts from the real schema and then snapshots its own drift.
-    const publish = TOOL_DEFINITIONS.find((t) => t.name === "mindvault_publish");
+    const publish = TOOL_DEFINITIONS.find((t) => t.name === "zentrixpay_publish");
     expect(publish?.inputSchema).toMatchSnapshot();
   });
 });

@@ -3,7 +3,7 @@
  *
  * An agent that only needs to *discover* what is in the vault should not be
  * one malformed plan away from spending USDC, rotating a publisher key, or
- * wiping `~/.mindvault/state.json`. The mainnet guardrail in
+ * wiping `~/.zentrixpay/state.json`. The mainnet guardrail in
  * `mainnetGuardrails.ts` is the wrong instrument for that: it is
  * network-scoped (testnet is wide open) and per-call (`confirmMainnet: true`
  * unlocks it from inside the very tool call you wanted to prevent).
@@ -11,13 +11,13 @@
  * Read-only mode is the operator-scoped complement. It is set once, on the
  * server process, and cannot be lifted by a tool argument:
  *
- *   MINDVAULT_READ_ONLY=1
+ *   ZENTRIXPAY_READ_ONLY=1
  *
  * With it on, the server is a catalog browser and nothing else. Two things
  * change, and they must change together:
  *
  *   1. **ListTools advertises only read-only tools.** An agent that cannot see
- *      `mindvault_buy` does not plan around it, so the common case never
+ *      `zentrixpay_buy` does not plan around it, so the common case never
  *      reaches a refusal at all.
  *   2. **Dispatch refuses the rest.** Advertisement is a hint; a client that
  *      cached an older tool list, or one that simply guesses a name, still
@@ -33,7 +33,7 @@
 import { TOOL_DEFINITIONS } from "./tools.js";
 
 /** Environment variable that puts the server into read-only mode. */
-export const READ_ONLY_ENV_VAR = "MINDVAULT_READ_ONLY";
+export const READ_ONLY_ENV_VAR = "ZENTRIXPAY_READ_ONLY";
 
 /**
  * Truthy forms accepted for {@link READ_ONLY_ENV_VAR}.

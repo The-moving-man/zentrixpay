@@ -1,6 +1,6 @@
 # MCP Receipt Export
 
-`mindvault_export_receipts` turns the receipts recorded by `mindvault_buy` into
+`zentrixpay_export_receipts` turns the receipts recorded by `zentrixpay_buy` into
 a **schema-versioned document** — JSON, or RFC 4180 CSV — that an agent can
 reconcile against, or a person can file.
 
@@ -8,13 +8,13 @@ Source: [`mcp/src/receipts.ts`](../mcp/src/receipts.ts).
 
 ## Export vs. history
 
-[`mindvault_purchase_history`](mcp-quickstart.md) lists what was bought; it is a
+[`zentrixpay_purchase_history`](mcp-quickstart.md) lists what was bought; it is a
 browsing aid. An export is a document other systems read, so it adds what a
 listing does not have:
 
-|                   | `mindvault_purchase_history` | `mindvault_export_receipts`           |
+|                   | `zentrixpay_purchase_history` | `zentrixpay_export_receipts`           |
 | ----------------- | ---------------------------- | ------------------------------------- |
-| Schema version    | —                            | `mindvault.receipt-export/v1`         |
+| Schema version    | —                            | `zentrixpay.receipt-export/v1`         |
 | Declared currency | —                            | `USDC`, on the envelope and every row |
 | Summed total      | —                            | `totalAmount`, exact to the stroop    |
 | Date range        | —                            | `since` / `until`                     |
@@ -22,8 +22,8 @@ listing does not have:
 | CSV               | —                            | fixed column order                    |
 | Structured result | text only                    | `structuredContent` + `outputSchema`  |
 
-Both read the same local store (`~/.mindvault/purchases.json`, or
-`MINDVAULT_PURCHASES_FILE`). Neither makes a network call.
+Both read the same local store (`~/.zentrixpay/purchases.json`, or
+`ZENTRIXPAY_PURCHASES_FILE`). Neither makes a network call.
 
 ## Arguments
 
@@ -44,7 +44,7 @@ limit outside the supported bounds.
 
 ```json
 {
-  "schema": "mindvault.receipt-export/v1",
+  "schema": "zentrixpay.receipt-export/v1",
   "generatedAt": "2026-08-25T12:00:00.000Z",
   "format": "json",
   "filters": { "resourceId": null, "network": null, "since": null, "until": null, "limit": null },
@@ -124,7 +124,7 @@ The tool advertises an `outputSchema`, and the server returns the envelope as
 ```json
 {
   "content": [{ "type": "text", "text": "{ … }" }],
-  "structuredContent": { "schema": "mindvault.receipt-export/v1", "count": 1, … }
+  "structuredContent": { "schema": "zentrixpay.receipt-export/v1", "count": 1, … }
 }
 ```
 

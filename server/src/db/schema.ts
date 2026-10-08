@@ -121,3 +121,62 @@ export const payments = pgTable(
     payerAddressIdx: index("idx_payments_payer_address").on(table.payerAddress),
   }),
 );
+
+// APIs — upstream HTTP APIs that providers sell per call through the proxy
+export const apis = pgTable(
+  "apis",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    publisherId: text("publisher_id")
+      .notNull()
+      .references(() => publishers.id),
+    name: text("name").notNull(),
+    description: text("description"),
+    // Never exposed publicly: callers must go through the paid proxy.
+    upstreamUrl: text("upstream_url").notNull(),
+    price: text("price").notNull(), // USDC per call
+    walletAddress: text("wallet_address").notNull(),
+    allowedMethods: jsonb("allowed_methods").$type<string[]>().notNull().default(["GET"]),
+    // Header the proxy adds to every upstream request, e.g. the provider's own
+    // API key. The value is AES-256-GCM encrypted (see utils/secretBox.ts).
+    upstreamHeaderName: text("upstream_header_name"),
+    upstreamHeaderValueEnc: text("upstream_header_value_enc"),
+    timeoutMs: integer("timeout_ms"),
+    ownershipToken: text("ownership_token").notNull(),
+    ownershipVerifiedAt: timestamp("ownership_verified_at"),
+    listed: boolean("listed").notNull().default(false),
+    tags: jsonb("tags").$type<string[]>().notNull().default([]),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    publisherIdx: index("idx_apis_publisher_id").on(table.publisherId),
+    catalogIdx: index("idx_apis_listed_created_at").on(table.listed, table.createdAt),
+  }),
+);
+
+// API calls — one row per proxied call, charged or not
+export const apiCalls = pgTable(
+  "api_calls",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    apiId: text("api_id")
+      .notNull()
+      .references(() => apis.id),
+    payerAddress: text("payer_address").notNull(),
+    amount: text("amount").notNull(), // USDC; only collected when charged
+    charged: boolean("charged").notNull(),
+    method: text("method").notNull(),
+    path: text("path").notNull(),
+    responseStatus: integer("response_status").notNull(),
+    durationMs: integer("duration_ms").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    apiCreatedIdx: index("idx_api_calls_api_id_created_at").on(table.apiId, table.createdAt),
+    payerIdx: index("idx_api_calls_payer_address").on(table.payerAddress),
+  }),
+);

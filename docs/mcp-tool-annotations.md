@@ -1,6 +1,6 @@
 # MCP Tool Annotations
 
-Every tool advertised by the MindVault MCP server (the `ListTools` response)
+Every tool advertised by the ZentrixPay MCP server (the `ListTools` response)
 carries MCP [tool annotations](https://modelcontextprotocol.io/specification)
 so agent clients can tell at a glance which calls are safe to repeat and which
 can destroy local state.
@@ -25,14 +25,14 @@ the advertised surface and the definition list cannot drift apart.
 
 ## What to expect
 
-- **Read-only tools** (`mindvault_browse`, `mindvault_search`,
-  `mindvault_preview`, `mindvault_wallet_info`, registry reads, verifications…)
+- **Read-only tools** (`zentrixpay_browse`, `zentrixpay_search`,
+  `zentrixpay_preview`, `zentrixpay_wallet_info`, registry reads, verifications…)
   set `readOnlyHint: true` and are never `destructiveHint`.
-- **Destructive tools** (`mindvault_reset`, `mindvault_restore_state`) set
+- **Destructive tools** (`zentrixpay_reset`, `zentrixpay_restore_state`) set
   `destructiveHint: true` and are never `readOnlyHint`.
 - **Mutating but non-destructive tools** (publish, buy, register, on-chain
   mutations…) are neither read-only nor destructive; many are not idempotent.
-- `mindvault_publish_status` and `mindvault_purchase_history` validate their
+- `zentrixpay_publish_status` and `zentrixpay_purchase_history` validate their
   arguments inside the handler, so their annotations are declared alongside the
   advertised surface in `index.ts` rather than in `TOOL_DEFINITIONS`.
 

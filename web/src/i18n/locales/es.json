@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "MindVault",
+    "title": "ZentrixPay",
     "tab_catalog": "Catálogo",
     "tab_purchases": "Compras",
     "tab_leaderboard": "Clasificación",
@@ -32,7 +32,7 @@
   },
   "agent": {
     "title": "Agente de Verificación",
-    "description": "Estadísticas en vivo y actividad del agente de verificación de originalidad de MindVault"
+    "description": "Estadísticas en vivo y actividad del agente de verificación de originalidad de ZentrixPay"
   },
   "error_boundary": {
     "title": "Algo salió mal",

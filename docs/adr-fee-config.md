@@ -11,7 +11,7 @@
 
 ## Context
 
-MindVault uses the x402 protocol for resource access payments. USDC flows
+ZentrixPay uses the x402 protocol for resource access payments. USDC flows
 directly from buyer to creator; the `vault-registry` contract is the on-chain
 source of truth for _what_ exists, _who_ owns it, and _what it costs_ — but it
 currently has no concept of a platform fee or creator royalty.

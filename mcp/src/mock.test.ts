@@ -10,17 +10,17 @@ import {
 
 describe("mockEnabledFromEnv", () => {
   it("returns true for truthy values", () => {
-    expect(mockEnabledFromEnv({ MINDVAULT_MOCK: "1" })).toBe(true);
-    expect(mockEnabledFromEnv({ MINDVAULT_MOCK: "true" })).toBe(true);
-    expect(mockEnabledFromEnv({ MINDVAULT_MOCK: "yes" })).toBe(true);
-    expect(mockEnabledFromEnv({ MINDVAULT_MOCK: "on" })).toBe(true);
+    expect(mockEnabledFromEnv({ ZENTRIXPAY_MOCK: "1" })).toBe(true);
+    expect(mockEnabledFromEnv({ ZENTRIXPAY_MOCK: "true" })).toBe(true);
+    expect(mockEnabledFromEnv({ ZENTRIXPAY_MOCK: "yes" })).toBe(true);
+    expect(mockEnabledFromEnv({ ZENTRIXPAY_MOCK: "on" })).toBe(true);
   });
 
   it("returns false for falsy or missing values", () => {
     expect(mockEnabledFromEnv({})).toBe(false);
-    expect(mockEnabledFromEnv({ MINDVAULT_MOCK: "0" })).toBe(false);
-    expect(mockEnabledFromEnv({ MINDVAULT_MOCK: "false" })).toBe(false);
-    expect(mockEnabledFromEnv({ MINDVAULT_MOCK: "" })).toBe(false);
+    expect(mockEnabledFromEnv({ ZENTRIXPAY_MOCK: "0" })).toBe(false);
+    expect(mockEnabledFromEnv({ ZENTRIXPAY_MOCK: "false" })).toBe(false);
+    expect(mockEnabledFromEnv({ ZENTRIXPAY_MOCK: "" })).toBe(false);
   });
 });
 

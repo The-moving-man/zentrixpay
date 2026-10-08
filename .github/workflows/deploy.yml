@@ -41,13 +41,13 @@ jobs:
 
       - run: pnpm run build:registry-client
 
-      - run: pnpm --filter @mindvault/server build
+      - run: pnpm --filter @zentrixpay/server build
 
       - name: Build web
         env:
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           VITE_STELLAR_NETWORK: ${{ vars.VITE_STELLAR_NETWORK || 'testnet' }}
-        run: pnpm --filter @mindvault/web build
+        run: pnpm --filter @zentrixpay/web build
 
       - name: Upload server artifact
         uses: actions/upload-artifact@v7

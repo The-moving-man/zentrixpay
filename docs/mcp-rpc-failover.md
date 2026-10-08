@@ -4,8 +4,8 @@ Issue [#588](https://github.com/mind-vault-1/mindvault/issues/588).
 
 `SOROBAN_RPC_URL` names exactly one endpoint. When that endpoint is down,
 rate-limiting, or slow enough to blow the request budget, every on-chain tool
-in the server fails — `mindvault_registry_lookup`, `mindvault_tx_status`,
-`mindvault_check_consistency` — even though other public providers are serving
+in the server fails — `zentrixpay_registry_lookup`, `zentrixpay_tx_status`,
+`zentrixpay_check_consistency` — even though other public providers are serving
 the same network perfectly well.
 
 Retries do not help here. The existing retry policy re-sends the same request to
@@ -16,18 +16,18 @@ times the latency and the same failure.
 
 | Variable                              | Default   | Description                                                      |
 | ------------------------------------- | --------- | ---------------------------------------------------------------- |
-| `MINDVAULT_SOROBAN_RPC_URLS`          | unset     | Comma- or whitespace-separated endpoints, highest priority first |
-| `MINDVAULT_RPC_FAILOVER_COOLDOWN_MS`  | `30000`   | How long a failed endpoint is skipped                            |
-| `MINDVAULT_RPC_FAILOVER_MAX_ATTEMPTS` | `0` (all) | Cap on endpoints tried for a single call                         |
+| `ZENTRIXPAY_SOROBAN_RPC_URLS`          | unset     | Comma- or whitespace-separated endpoints, highest priority first |
+| `ZENTRIXPAY_RPC_FAILOVER_COOLDOWN_MS`  | `30000`   | How long a failed endpoint is skipped                            |
+| `ZENTRIXPAY_RPC_FAILOVER_MAX_ATTEMPTS` | `0` (all) | Cap on endpoints tried for a single call                         |
 
 ```json
 {
   "mcpServers": {
-    "mindvault": {
+    "zentrixpay": {
       "command": "node",
-      "args": ["/absolute/path/to/mindvault/mcp/dist/index.js"],
+      "args": ["/absolute/path/to/zentrixpay/mcp/dist/index.js"],
       "env": {
-        "MINDVAULT_SOROBAN_RPC_URLS": "https://soroban-testnet.stellar.org,https://rpc.example.org"
+        "ZENTRIXPAY_SOROBAN_RPC_URLS": "https://soroban-testnet.stellar.org,https://rpc.example.org"
       }
     }
   }
@@ -48,7 +48,7 @@ This is the distinction the whole feature rests on.
 | Condition                                             | Behaviour               |
 | ----------------------------------------------------- | ----------------------- |
 | Connection refused / reset / DNS failure              | Try the next endpoint   |
-| Request timeout (`MINDVAULT_SOROBAN_TIMEOUT_MS`)      | Try the next endpoint   |
+| Request timeout (`ZENTRIXPAY_SOROBAN_TIMEOUT_MS`)      | Try the next endpoint   |
 | HTTP 408, 425, 429, 500, 502, 503, 504                | Try the next endpoint   |
 | HTTP 400, 401, 403, 404, 409, 422                     | **Return immediately**  |
 | A `SyntaxError`, `RangeError`, or other program error | **Rethrow immediately** |
@@ -61,7 +61,7 @@ produces the same 400 more slowly.
 
 A failed endpoint is parked, not blacklisted:
 
-- After a failure it is skipped for `MINDVAULT_RPC_FAILOVER_COOLDOWN_MS`.
+- After a failure it is skipped for `ZENTRIXPAY_RPC_FAILOVER_COOLDOWN_MS`.
 - After the cooldown it is quietly tried again, so a provider that recovers is
   used without restarting the server.
 - An endpoint that answers is un-parked immediately.
@@ -79,7 +79,7 @@ request happened to land on.
 
 ## Checking the active configuration
 
-`describeFailover` renders the chain for `mindvault_network_profile`:
+`describeFailover` renders the chain for `zentrixpay_network_profile`:
 
 ```
 https://rpc-a.example → https://rpc-b.example [cooling down] (cooldown=30000ms, maxAttempts=all)

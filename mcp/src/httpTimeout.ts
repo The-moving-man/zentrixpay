@@ -1,7 +1,7 @@
 /**
- * Request timeout controls for MindVault MCP outbound HTTP.
+ * Request timeout controls for ZentrixPay MCP outbound HTTP.
  *
- * Every outbound call the MCP server makes — the MindVault API, Horizon, Soroban
+ * Every outbound call the MCP server makes — the ZentrixPay API, Horizon, Soroban
  * RPC, the sponsored-account service, and x402 paid fetches — previously had no
  * deadline. A hung or black-holed connection left the tool call blocked forever,
  * which for a stdio MCP server means the agent waits indefinitely with no error
@@ -23,21 +23,21 @@
  * Environment variable that overrides the `User-Agent` header sent on every
  * outbound HTTP request from the MCP server.
  *
- * The default value is `mindvault-mcp/1.0.0`. Set this variable when you want
+ * The default value is `zentrixpay-mcp/1.0.0`. Set this variable when you want
  * to identify the specific agent or deployment making requests — useful for
  * distinguishing traffic in server logs or rate-limit buckets.
  *
- * @example MINDVAULT_USER_AGENT=my-bot/2.0 (mindvault-mcp)
+ * @example ZENTRIXPAY_USER_AGENT=my-bot/2.0 (zentrixpay-mcp)
  */
-export const USER_AGENT_ENV_VAR = "MINDVAULT_USER_AGENT";
+export const USER_AGENT_ENV_VAR = "ZENTRIXPAY_USER_AGENT";
 
-/** The fallback sent when `MINDVAULT_USER_AGENT` is not set. */
-export const DEFAULT_USER_AGENT = "mindvault-mcp/1.0.0";
+/** The fallback sent when `ZENTRIXPAY_USER_AGENT` is not set. */
+export const DEFAULT_USER_AGENT = "zentrixpay-mcp/1.0.0";
 
 /**
  * Resolve the `User-Agent` string from the environment.
  *
- * Returns the value of `MINDVAULT_USER_AGENT` when it is set to a non-empty
+ * Returns the value of `ZENTRIXPAY_USER_AGENT` when it is set to a non-empty
  * string, otherwise falls back to `DEFAULT_USER_AGENT`. Whitespace-only values
  * are treated as unset.
  */
@@ -56,7 +56,7 @@ export type TimeoutBudgets = Record<TimeoutService, number>;
 /**
  * Default deadlines in milliseconds.
  *
- * - `http` (15s) — MindVault API and the sponsored-account service.
+ * - `http` (15s) — ZentrixPay API and the sponsored-account service.
  * - `horizon` (15s) — Horizon account/balance reads.
  * - `soroban` (20s) — Soroban RPC; simulation can be slower than a REST read.
  * - `payment` (45s) — x402 paid fetches, which include on-chain settlement.
@@ -70,10 +70,10 @@ export const DEFAULT_TIMEOUTS: TimeoutBudgets = {
 
 /** Environment variable that overrides each service budget. */
 export const TIMEOUT_ENV_VARS: Record<TimeoutService, string> = {
-  http: "MINDVAULT_HTTP_TIMEOUT_MS",
-  horizon: "MINDVAULT_HORIZON_TIMEOUT_MS",
-  soroban: "MINDVAULT_SOROBAN_TIMEOUT_MS",
-  payment: "MINDVAULT_PAYMENT_TIMEOUT_MS",
+  http: "ZENTRIXPAY_HTTP_TIMEOUT_MS",
+  horizon: "ZENTRIXPAY_HORIZON_TIMEOUT_MS",
+  soroban: "ZENTRIXPAY_SOROBAN_TIMEOUT_MS",
+  payment: "ZENTRIXPAY_PAYMENT_TIMEOUT_MS",
 };
 
 /** Raised when a request exceeds its budget. Mapped to the `timeout` category. */

@@ -15,7 +15,7 @@ jobs:
       - uses: google-github-actions/release-please-action@v4
         with:
           release-type: node
-          package-name: mindvault
+          package-name: zentrixpay
           extra-files: |
             package.json
             server/package.json

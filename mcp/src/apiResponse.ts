@@ -1,5 +1,5 @@
 /**
- * Typed wrapper for MindVault API responses.
+ * Typed wrapper for ZentrixPay API responses.
  *
  * `jsonFetch` returns `ApiResponse<any>` for backwards compatibility with
  * existing callers that access `data` directly. Callers that want compile-time

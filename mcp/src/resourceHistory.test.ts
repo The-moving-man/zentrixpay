@@ -11,8 +11,8 @@ import {
 
 describe("resource history", () => {
   it("records and filters provenance and change events in chronological order", () => {
-    const path = join(mkdtempSync(join(tmpdir(), "mindvault-history-")), "audit.jsonl");
-    process.env.MINDVAULT_RESOURCE_HISTORY_FILE = path;
+    const path = join(mkdtempSync(join(tmpdir(), "zentrixpay-history-")), "audit.jsonl");
+    process.env.ZENTRIXPAY_RESOURCE_HISTORY_FILE = path;
     recordResourceHistory({
       resourceId: "res-1",
       kind: "price",
@@ -42,12 +42,12 @@ describe("resource history", () => {
     expect(JSON.parse(provenanceChain("res-1")).events).toHaveLength(2);
     expect(JSON.parse(resourceChangeLog("res-1")).changes).toHaveLength(1);
     expect(readFileSync(path, "utf8")).not.toContain("secretKey");
-    delete process.env.MINDVAULT_RESOURCE_HISTORY_FILE;
+    delete process.env.ZENTRIXPAY_RESOURCE_HISTORY_FILE;
   });
 
   it("returns empty histories when no audit file exists", () => {
-    process.env.MINDVAULT_RESOURCE_HISTORY_FILE = join(tmpdir(), `missing-${Date.now()}.jsonl`);
+    process.env.ZENTRIXPAY_RESOURCE_HISTORY_FILE = join(tmpdir(), `missing-${Date.now()}.jsonl`);
     expect(JSON.parse(provenanceChain("missing")).events).toEqual([]);
-    delete process.env.MINDVAULT_RESOURCE_HISTORY_FILE;
+    delete process.env.ZENTRIXPAY_RESOURCE_HISTORY_FILE;
   });
 });

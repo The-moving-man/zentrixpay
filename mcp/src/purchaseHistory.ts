@@ -1,8 +1,8 @@
 /**
- * Local purchase receipt store for the MindVault MCP server.
+ * Local purchase receipt store for the ZentrixPay MCP server.
  *
- * Successful buys can append receipts under ~/.mindvault/purchases.json.
- * The mindvault_purchase_history tool reads this store with optional filters
+ * Successful buys can append receipts under ~/.zentrixpay/purchases.json.
+ * The zentrixpay_purchase_history tool reads this store with optional filters
  * by resource id and network. Errors are deterministic and agent-safe.
  */
 
@@ -10,16 +10,16 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { homedir } from "os";
 import { explorerTxUrl, resolveExplorerNetwork } from "./stellarExplorer.js";
-import type { ExplorerNetwork } from "@mindvault/registry-client";
+import type { ExplorerNetwork } from "@zentrixpay/registry-client";
 
 export const PURCHASE_HISTORY_VERSION = 1 as const;
 
 /**
- * Identity of the state file the receipts belong to. `mindvault_reset` rewrites
+ * Identity of the state file the receipts belong to. `zentrixpay_reset` rewrites
  * the state file, so a backup restored over it would otherwise merge a different
  * wallet's receipts into this one (#846).
  */
-export const PURCHASE_HISTORY_EPOCH = process.env.MINDVAULT_PURCHASES_EPOCH ?? "";
+export const PURCHASE_HISTORY_EPOCH = process.env.ZENTRIXPAY_PURCHASES_EPOCH ?? "";
 
 /** One locally persisted purchase receipt. */
 export interface PurchaseReceipt {
@@ -81,7 +81,7 @@ export class PurchaseHistoryError extends Error {
   }
 }
 
-const DEFAULT_FILE = join(homedir(), ".mindvault", "purchases.json");
+const DEFAULT_FILE = join(homedir(), ".zentrixpay", "purchases.json");
 
 /** Override path for tests; null restores the default. */
 let purchasesFileOverride: string | null = null;
@@ -92,7 +92,7 @@ export function _setPurchasesFilePath(path: string | null): void {
 }
 
 export function purchasesFilePath(): string {
-  return purchasesFileOverride ?? process.env.MINDVAULT_PURCHASES_FILE ?? DEFAULT_FILE;
+  return purchasesFileOverride ?? process.env.ZENTRIXPAY_PURCHASES_FILE ?? DEFAULT_FILE;
 }
 
 function emptyStore(): PurchaseHistoryFile {
@@ -299,9 +299,9 @@ export function formatPurchaseHistory(
         ...r,
         // Convenience field: the Stellar Expert explorer URL for the settlement
         // transaction. Consumers no longer need to join txHash with
-        // mindvault_tx_status externally — the link is pre-resolved and always
+        // zentrixpay_tx_status externally — the link is pre-resolved and always
         // null when no hash was recorded (e.g. buy completed before hash was
-        // available). Use mindvault_tx_status to check live settlement status.
+        // available). Use zentrixpay_tx_status to check live settlement status.
         explorerUrl: explorerTxUrl(r.txHash, explorerNetwork),
       })),
     },

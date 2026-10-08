@@ -13,7 +13,7 @@
  *   2. HTTP 402 with an empty / missing body (facilitator returns no detail)
  *   3. Transport-level abort during payment (AbortError / timeout)
  *   4. Network error reaching the x402 facilitator (fetch failed)
- *   5. HTTP 402 from the MindVault API (resource-level payment required)
+ *   5. HTTP 402 from the ZentrixPay API (resource-level payment required)
  *   6. Soroban RPC error during payment settlement (contract-level failure)
  *   7. Registry not-found error (resource not registered, no payment path)
  *   8. x402 HTTP 500 during settlement (facilitator server error)
@@ -79,8 +79,8 @@ describe("payment failure error snapshots", () => {
     expect(text).toMatchSnapshot();
   });
 
-  // ── 5. HTTP 402 from the MindVault API ─────────────────────────────────────
-  it("MindVault API payment required (402)", () => {
+  // ── 5. HTTP 402 from the ZentrixPay API ─────────────────────────────────────
+  it("ZentrixPay API payment required (402)", () => {
     const text = formatMappedError(
       mapHttpError({
         operation: "Buy failed",
@@ -163,7 +163,7 @@ describe("payment failure error snapshots", () => {
     expect(lines[1]).toContain("HTTP 402");
     // Line 3: action advice
     expect(lines[2]).toMatch(/^Next: /);
-    expect(lines[2]).toContain("mindvault_wallet_info");
+    expect(lines[2]).toContain("zentrixpay_wallet_info");
     expect(lines).toHaveLength(3);
   });
 });

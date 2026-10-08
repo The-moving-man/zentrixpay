@@ -1,5 +1,5 @@
 /**
- * MCP prompts capability for MindVault.
+ * MCP prompts capability for ZentrixPay.
  *
  * Provides guided publish and buy workflows that agents can follow step-by-step.
  * Each prompt references only tools that exist in the current tool list.
@@ -21,7 +21,7 @@ export const PROMPT_DEFINITIONS: PromptDefinition[] = [
   {
     name: "publish",
     description:
-      "Guided workflow for publishing a resource to MindVault. Walks through wallet setup, publisher registration, and the publish flow with verification.",
+      "Guided workflow for publishing a resource to ZentrixPay. Walks through wallet setup, publisher registration, and the publish flow with verification.",
     arguments: [
       {
         name: "title",
@@ -48,11 +48,11 @@ export const PROMPT_DEFINITIONS: PromptDefinition[] = [
   {
     name: "buy",
     description:
-      "Guided workflow for purchasing a resource from MindVault. Walks through wallet setup, balance check, and the buy flow with x402 payment.",
+      "Guided workflow for purchasing a resource from ZentrixPay. Walks through wallet setup, balance check, and the buy flow with x402 payment.",
     arguments: [
       {
         name: "resourceId",
-        description: "The resource ID to buy (from mindvault_browse or mindvault_search).",
+        description: "The resource ID to buy (from zentrixpay_browse or zentrixpay_search).",
         required: true,
       },
     ],
@@ -79,14 +79,14 @@ export function getPrompt(
   switch (name) {
     case "publish":
       return {
-        description: "Guided publish workflow for MindVault",
+        description: "Guided publish workflow for ZentrixPay",
         messages: [
           {
             role: "user",
             content: {
               type: "text",
               text: [
-                `I want to publish a resource to MindVault.`,
+                `I want to publish a resource to ZentrixPay.`,
                 `Title: ${title}`,
                 `Price: ${price} USDC`,
                 `URL: ${externalUrl}`,
@@ -103,24 +103,24 @@ export function getPrompt(
             content: {
               type: "text",
               text: [
-                `I'll help you publish to MindVault. Here's the step-by-step process:`,
+                `I'll help you publish to ZentrixPay. Here's the step-by-step process:`,
                 ``,
                 `**Step 1: Set up a wallet**`,
                 `First, we need a Stellar wallet to receive payments. Run:`,
-                `\`mindvault_setup_wallet\``,
+                `\`zentrixpay_setup_wallet\``,
                 `This creates a sponsored Stellar account and persists it.`,
                 ``,
                 `**Step 2: Check wallet balance**`,
                 `Verify the wallet has USDC for the verification fee (~$0.10):`,
-                `\`mindvault_wallet_info\``,
+                `\`zentrixpay_wallet_info\``,
                 `If USDC balance is zero, fund the wallet address shown.`,
                 ``,
                 `**Step 3: Register as a publisher**`,
-                `\`mindvault_register\` with your name and email.`,
-                `This registers you on the MindVault API and stores the API key.`,
+                `\`zentrixpay_register\` with your name and email.`,
+                `This registers you on the ZentrixPay API and stores the API key.`,
                 ``,
                 `**Step 4: Publish the resource**`,
-                `\`mindvault_publish\` with:`,
+                `\`zentrixpay_publish\` with:`,
                 `  - title: "${title}"`,
                 `  - price: "${price}"`,
                 `  - externalUrl: "${externalUrl}"`,
@@ -133,11 +133,11 @@ export function getPrompt(
                 ``,
                 `**Step 5: Check publish status**`,
                 `After publishing, check verification and on-chain status:`,
-                `\`mindvault_publish_status\` with the resource ID from step 4.`,
+                `\`zentrixpay_publish_status\` with the resource ID from step 4.`,
                 ``,
                 `**Step 6: Verify listing**`,
                 `Confirm the resource appears in the catalog:`,
-                `\`mindvault_browse\` or \`mindvault_search\``,
+                `\`zentrixpay_browse\` or \`zentrixpay_search\``,
               ]
                 .filter(Boolean)
                 .join("\n"),
@@ -148,13 +148,13 @@ export function getPrompt(
 
     case "buy":
       return {
-        description: "Guided buy workflow for MindVault",
+        description: "Guided buy workflow for ZentrixPay",
         messages: [
           {
             role: "user",
             content: {
               type: "text",
-              text: `I want to buy resource "${resourceId}" from MindVault. Walk me through the process.`,
+              text: `I want to buy resource "${resourceId}" from ZentrixPay. Walk me through the process.`,
             },
           },
           {
@@ -166,26 +166,26 @@ export function getPrompt(
                 ``,
                 `**Step 1: Set up a wallet**`,
                 `If you don't have one yet:`,
-                `\`mindvault_setup_wallet\``,
+                `\`zentrixpay_setup_wallet\``,
                 ``,
                 `**Step 2: Check your balance**`,
-                `\`mindvault_wallet_info\``,
+                `\`zentrixpay_wallet_info\``,
                 `Make sure you have enough USDC to cover the resource price.`,
                 `If balance is insufficient, fund the wallet address shown.`,
                 ``,
                 `**Step 3: Preview the resource**`,
                 `Before buying, check what you're getting:`,
-                `\`mindvault_preview\` with resourceId: "${resourceId}"`,
+                `\`zentrixpay_preview\` with resourceId: "${resourceId}"`,
                 `This shows title, description, price, and verification status.`,
                 ``,
                 `**Step 4: Buy the resource**`,
-                `\`mindvault_buy\` with resourceId: "${resourceId}"`,
+                `\`zentrixpay_buy\` with resourceId: "${resourceId}"`,
                 `This pays via x402 and returns the access URL.`,
                 ``,
                 `**Step 5: Access your purchase**`,
                 `After a successful buy, the response includes the access URL.`,
                 `You can also check your purchase history:`,
-                `\`mindvault_purchase_history\``,
+                `\`zentrixpay_purchase_history\``,
               ].join("\n"),
             },
           },

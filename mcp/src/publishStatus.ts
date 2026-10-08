@@ -1,7 +1,7 @@
 /**
- * Publish status polling helpers for the MindVault MCP server.
+ * Publish status polling helpers for the ZentrixPay MCP server.
  *
- * After mindvault_publish, agents use mindvault_publish_status to read
+ * After zentrixpay_publish, agents use zentrixpay_publish_status to read
  * verificationStatus (pending | verified | rejected | skipped) and on-chain
  * sync fields (onchainStatus, onchainTxHash), optionally waiting until
  * verification settles.
@@ -88,7 +88,7 @@ export function isVerificationSettled(status: string | null | undefined): boolea
 
 function resourceNotFound(resourceId: string): Error {
   return new Error(
-    `Resource "${resourceId}" not found. Confirm the id from mindvault_publish or mindvault_browse.`,
+    `Resource "${resourceId}" not found. Confirm the id from zentrixpay_publish or zentrixpay_browse.`,
   );
 }
 
@@ -189,7 +189,7 @@ export function buildPublishStatusSnapshot(
 
   let message: string;
   if (opts.timedOut && !settled) {
-    message = `Timed out waiting for verification to settle (last status: ${verificationStatus}). Re-run mindvault_publish_status or increase timeoutMs.`;
+    message = `Timed out waiting for verification to settle (last status: ${verificationStatus}). Re-run zentrixpay_publish_status or increase timeoutMs.`;
   } else if (verificationStatus === "pending") {
     message = "Verification is still pending. Pass wait: true to poll, or re-check shortly.";
   } else if (verificationStatus === "verified") {
@@ -197,10 +197,10 @@ export function buildPublishStatusSnapshot(
       onchainStatus === "registered"
         ? "Verified and registered on-chain."
         : onchainStatus === "failed"
-          ? "Verified, but on-chain registration failed — retry with mindvault_register_onchain."
+          ? "Verified, but on-chain registration failed — retry with zentrixpay_register_onchain."
           : onchainStatus === "pending"
             ? "Verified; on-chain registration is still pending."
-            : "Verified. On-chain registration may still be needed — use mindvault_register_onchain if onchainStatus is none/failed.";
+            : "Verified. On-chain registration may still be needed — use zentrixpay_register_onchain if onchainStatus is none/failed.";
   } else if (verificationStatus === "rejected") {
     message = "Verification rejected the resource. It will not be listed for purchase.";
   } else if (verificationStatus === "skipped") {

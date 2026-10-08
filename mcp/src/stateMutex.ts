@@ -2,14 +2,14 @@
  * Serialization for state-touching tool calls (#855).
  *
  * The MCP server keeps its profiles, wallet, and publisher API key in
- * module-level state and persists them to `~/.mindvault/state.json`. Two tools
+ * module-level state and persists them to `~/.zentrixpay/state.json`. Two tools
  * that both read the active profile and then write it can interleave across an
  * `await`, because nothing in the dispatch path holds a lock:
  *
- *   1. `mindvault_buy` reads the active wallet (`requireWallet`), then awaits
+ *   1. `zentrixpay_buy` reads the active wallet (`requireWallet`), then awaits
  *      the x402 payment.
- *   2. `mindvault_reset` clears the profile and persists it.
- *   3. `mindvault_buy` resumes and its receipt/response reports state that no
+ *   2. `zentrixpay_reset` clears the profile and persists it.
+ *   3. `zentrixpay_buy` resumes and its receipt/response reports state that no
  *      longer exists.
  *
  * The fix is a FIFO async mutex held for the whole of a state-touching tool
@@ -30,16 +30,16 @@
  */
 export const STATE_SERIALIZED_TOOLS: ReadonlySet<string> = new Set([
   // Mutate the profile store.
-  "mindvault_reset",
-  "mindvault_restore_state",
-  "mindvault_setup_wallet",
-  "mindvault_import_wallet",
-  "mindvault_use_profile",
-  "mindvault_register",
-  "mindvault_rotate_publisher_key",
+  "zentrixpay_reset",
+  "zentrixpay_restore_state",
+  "zentrixpay_setup_wallet",
+  "zentrixpay_import_wallet",
+  "zentrixpay_use_profile",
+  "zentrixpay_register",
+  "zentrixpay_rotate_publisher_key",
   // Spend credentials read from the profile store.
-  "mindvault_publish",
-  "mindvault_buy",
+  "zentrixpay_publish",
+  "zentrixpay_buy",
 ]);
 
 /** True when `name` must hold the state mutex for its whole dispatch. */

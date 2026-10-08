@@ -1,10 +1,10 @@
 /**
- * Fixture-backed install smoke check for the MindVault MCP server.
+ * Fixture-backed install smoke check for the ZentrixPay MCP server.
  *
  * The README tells an agent operator to install the server by pointing their
  * client at the built entry point:
  *
- *     claude mcp add mindvault node /path/to/mindvault/mcp/dist/index.js
+ *     claude mcp add zentrixpay node /path/to/zentrixpay/mcp/dist/index.js
  *
  * Nothing in CI exercised that path. The unit suites import modules directly,
  * the integration harness wires an in-memory transport to an already-imported
@@ -17,9 +17,9 @@
  * freshly installed client makes in its first seconds (list the tools, verify
  * the install, read the catalog, preview a resource, look one up on-chain), and
  * the environment that makes them deterministic. Every call is served by the
- * in-process fixtures of `mock.ts` (MINDVAULT_MOCK=1), so the check needs no
+ * in-process fixtures of `mock.ts` (ZENTRIXPAY_MOCK=1), so the check needs no
  * network, no funded wallet, and no live backend, and agent state is redirected
- * to a scratch HOME so a run never touches `~/.mindvault/state.json`.
+ * to a scratch HOME so a run never touches `~/.zentrixpay/state.json`.
  *
  * The module is transport-free and side-effect-free: `scripts/install-smoke.ts`
  * spawns the built server over stdio and feeds it these steps through
@@ -36,19 +36,19 @@ import type { SmokeReport, SmokeStep } from "./smoke.js";
  * `integration.test.ts` and the metadata snapshots already own.
  */
 export const REQUIRED_INSTALL_TOOLS = [
-  "mindvault_verify_install",
-  "mindvault_wallet_info",
-  "mindvault_browse",
-  "mindvault_search",
-  "mindvault_preview",
-  "mindvault_buy",
+  "zentrixpay_verify_install",
+  "zentrixpay_wallet_info",
+  "zentrixpay_browse",
+  "zentrixpay_search",
+  "zentrixpay_preview",
+  "zentrixpay_buy",
 ] as const;
 
 /** Resource id seeded by the mock fixtures; every fixture-backed step uses it. */
 export const FIXTURE_RESOURCE_ID = "mock-1";
 
 /**
- * Variables `mindvault_verify_install` flags as secret-bearing.
+ * Variables `zentrixpay_verify_install` flags as secret-bearing.
  *
  * Kept in sync with the check in verifyInstall.ts on purpose: a variable whose
  * name looks like a secret has no business in an MCP client config, so the
@@ -78,9 +78,9 @@ export function installSmokeEnv(
     ...env,
     HOME: home,
     USERPROFILE: home,
-    MINDVAULT_MOCK: "1",
+    ZENTRIXPAY_MOCK: "1",
     STELLAR_NETWORK: "testnet",
-    MINDVAULT_PURCHASES_FILE: `${home}/purchases.json`,
+    ZENTRIXPAY_PURCHASES_FILE: `${home}/purchases.json`,
   };
 }
 
@@ -96,20 +96,20 @@ export function buildInstallSmokeSteps(): SmokeStep[] {
   return [
     {
       label: "Verify install",
-      tool: "mindvault_verify_install",
-      expect: (text) => /^✓ MindVault MCP install OK\./m.test(text),
+      tool: "zentrixpay_verify_install",
+      expect: (text) => /^✓ ZentrixPay MCP install OK\./m.test(text),
       expectMessage:
-        "mindvault_verify_install reported a problem with the installation (see the ✗ lines below).",
+        "zentrixpay_verify_install reported a problem with the installation (see the ✗ lines below).",
     },
     {
       label: "Browse catalog (fixtures)",
-      tool: "mindvault_browse",
+      tool: "zentrixpay_browse",
       expect: (text) => text.includes(FIXTURE_RESOURCE_ID),
-      expectMessage: `Browse did not return the seeded fixture resource ${FIXTURE_RESOURCE_ID}. Is MINDVAULT_MOCK=1 set for the server process?`,
+      expectMessage: `Browse did not return the seeded fixture resource ${FIXTURE_RESOURCE_ID}. Is ZENTRIXPAY_MOCK=1 set for the server process?`,
     },
     {
       label: "Browse sorted by price",
-      tool: "mindvault_browse",
+      tool: "zentrixpay_browse",
       args: { sort: "price_asc", limit: 10 },
       expect: (text) => text.includes(FIXTURE_RESOURCE_ID),
       expectMessage:
@@ -117,30 +117,30 @@ export function buildInstallSmokeSteps(): SmokeStep[] {
     },
     {
       label: "Search catalog (fixtures)",
-      tool: "mindvault_search",
+      tool: "zentrixpay_search",
       args: { query: "Stellar" },
       expect: (text) => text.includes(FIXTURE_RESOURCE_ID),
       expectMessage: "Search did not match the seeded fixture resource.",
     },
     {
       label: "Preview resource (fixtures)",
-      tool: "mindvault_preview",
+      tool: "zentrixpay_preview",
       args: { resourceId: FIXTURE_RESOURCE_ID },
       expect: (text) => text.includes(FIXTURE_RESOURCE_ID),
       expectMessage: "Preview did not return the seeded fixture resource.",
     },
     {
       label: "Registry lookup (fixtures)",
-      tool: "mindvault_registry_lookup",
+      tool: "zentrixpay_registry_lookup",
       args: { resourceId: FIXTURE_RESOURCE_ID },
       expect: (text) => text.includes('"found": true'),
       expectMessage: "Registry lookup did not find the seeded fixture resource.",
     },
     {
       label: "Export receipts",
-      tool: "mindvault_export_receipts",
+      tool: "zentrixpay_export_receipts",
       args: { format: "json" },
-      expect: (text) => text.includes("mindvault.receipt-export/v1"),
+      expect: (text) => text.includes("zentrixpay.receipt-export/v1"),
       expectMessage: "Receipt export did not return a versioned export envelope.",
     },
   ];

@@ -1,6 +1,6 @@
 # MCP Progress Notifications
 
-Some MindVault tools take long enough that an agent client looks hung while it
+Some ZentrixPay tools take long enough that an agent client looks hung while it
 waits. Those tools stream MCP `notifications/progress` updates so the client can
 render a progress indicator instead of a blank spinner.
 
@@ -13,7 +13,7 @@ token in the request metadata:
 {
   "method": "tools/call",
   "params": {
-    "name": "mindvault_publish_status",
+    "name": "zentrixpay_publish_status",
     "arguments": { "resourceId": "cm7x8y9z", "wait": true },
     "_meta": { "progressToken": "publish-1" }
   }
@@ -54,13 +54,13 @@ returned — success or error — the call handler waits for any notification st
 being written, then closes the scope, so an update a tool emits afterwards (a
 fire-and-forget call, or a callback that outlives the tool) is dropped instead
 of reaching the transport. Both the stdio entry point and servers built with
-[`createMindVaultServer`](mcp-server-factory.md) do this.
+[`createZentrixPayServer`](mcp-server-factory.md) do this.
 
-## Publish verification (`mindvault_publish_status`)
+## Publish verification (`zentrixpay_publish_status`)
 
 Verification is asynchronous: a freshly published resource starts at
 `verificationStatus: "pending"` and settles to `verified`, `rejected`, or
-`skipped`. Calling `mindvault_publish_status` with `wait: true` polls until it
+`skipped`. Calling `zentrixpay_publish_status` with `wait: true` polls until it
 settles or `timeoutMs` elapses — the wait that most needs progress feedback.
 
 One notification is emitted per poll:
@@ -84,9 +84,9 @@ loses no information.
 
 ## Other tools that report progress
 
-- `mindvault_buy` — validating the resource, submitting the x402 payment, and
+- `zentrixpay_buy` — validating the resource, submitting the x402 payment, and
   recording the purchase (4 steps).
-- `mindvault_register_onchain` — preparing, signing, and submitting the registry
+- `zentrixpay_register_onchain` — preparing, signing, and submitting the registry
   transaction (3 steps).
 
 ## Related docs

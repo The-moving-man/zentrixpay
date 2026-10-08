@@ -9,15 +9,15 @@ import {
 describe("metricsEnabledFromEnv", () => {
   it("is opt-in: enabled only for truthy values", () => {
     for (const value of ["1", "true", "TRUE", "yes", "on", " on "]) {
-      expect(metricsEnabledFromEnv({ MINDVAULT_METRICS: value })).toBe(true);
+      expect(metricsEnabledFromEnv({ ZENTRIXPAY_METRICS: value })).toBe(true);
     }
   });
   it("is disabled by default and for falsy/absent values", () => {
     for (const env of [
       {},
-      { MINDVAULT_METRICS: "" },
-      { MINDVAULT_METRICS: "0" },
-      { MINDVAULT_METRICS: "off" },
+      { ZENTRIXPAY_METRICS: "" },
+      { ZENTRIXPAY_METRICS: "0" },
+      { ZENTRIXPAY_METRICS: "off" },
     ]) {
       expect(metricsEnabledFromEnv(env)).toBe(false);
     }
@@ -28,7 +28,7 @@ describe("disabled (noop) recorder", () => {
   it("reports a disabled, empty snapshot and records nothing", () => {
     const recorder = createMetricsRecorder(false, 30000);
     expect(recorder.enabled).toBe(false);
-    recorder.recordToolCall("mindvault_buy", 12, false);
+    recorder.recordToolCall("zentrixpay_buy", 12, false);
     recorder.recordPayment(false);
     const snap = recorder.snapshot();
     expect(snap.enabled).toBe(false);
@@ -41,20 +41,20 @@ describe("disabled (noop) recorder", () => {
 describe("active recorder", () => {
   it("counts success and failure paths per tool and tracks budget", () => {
     const recorder = createMetricsRecorder(true, 10);
-    recorder.recordToolCall("mindvault_browse", 5, true);
-    recorder.recordToolCall("mindvault_browse", 7, true);
-    recorder.recordToolCall("mindvault_buy", 20, false);
+    recorder.recordToolCall("zentrixpay_browse", 5, true);
+    recorder.recordToolCall("zentrixpay_browse", 7, true);
+    recorder.recordToolCall("zentrixpay_buy", 20, false);
 
     const snap = recorder.snapshot();
     expect(snap.enabled).toBe(true);
-    expect(snap.tools.mindvault_browse).toEqual({
+    expect(snap.tools.zentrixpay_browse).toEqual({
       calls: 2,
       errors: 0,
       totalDurationMs: 12,
       maxDurationMs: 7,
       budgetExceeded: 0,
     });
-    expect(snap.tools.mindvault_buy).toMatchObject({ calls: 1, errors: 1, budgetExceeded: 1 });
+    expect(snap.tools.zentrixpay_buy).toMatchObject({ calls: 1, errors: 1, budgetExceeded: 1 });
     expect(snap.totals).toEqual({ calls: 3, errors: 1, budgetExceeded: 1 });
     expect(snap.toolDurationBudgetMs).toBe(10);
   });
@@ -69,9 +69,9 @@ describe("active recorder", () => {
 
   it("clamps non-finite/negative durations to zero", () => {
     const recorder = createMetricsRecorder(true, 30000);
-    recorder.recordToolCall("mindvault_preview", Number.NaN, true);
-    recorder.recordToolCall("mindvault_preview", -3, true);
-    expect(recorder.snapshot().tools.mindvault_preview).toMatchObject({
+    recorder.recordToolCall("zentrixpay_preview", Number.NaN, true);
+    recorder.recordToolCall("zentrixpay_preview", -3, true);
+    expect(recorder.snapshot().tools.zentrixpay_preview).toMatchObject({
       calls: 2,
       totalDurationMs: 0,
       maxDurationMs: 0,
@@ -81,7 +81,7 @@ describe("active recorder", () => {
   it("reset clears counters and moves the since timestamp forward", () => {
     const recorder = createMetricsRecorder(true, 30000);
     const before = recorder.snapshot().since;
-    recorder.recordToolCall("mindvault_browse", 5, true);
+    recorder.recordToolCall("zentrixpay_browse", 5, true);
     recorder.reset();
     const snap = recorder.snapshot();
     expect(snap.totals).toEqual({ calls: 0, errors: 0, budgetExceeded: 0 });
@@ -92,10 +92,10 @@ describe("active recorder", () => {
 
   it("never records secret-looking material — only tool names and numbers", () => {
     const recorder = createMetricsRecorder(true, 30000);
-    recorder.recordToolCall("mindvault_register", 5, true);
+    recorder.recordToolCall("zentrixpay_register", 5, true);
     const serialized = JSON.stringify(recorder.snapshot());
     // Keys of a tool metric are strictly the numeric counters.
-    const metric = recorder.snapshot().tools.mindvault_register;
+    const metric = recorder.snapshot().tools.zentrixpay_register;
     expect(Object.keys(metric).sort()).toEqual([
       "budgetExceeded",
       "calls",
@@ -130,21 +130,21 @@ describe("measureTool", () => {
 
   it("records a successful call and returns the result", async () => {
     const { recorder, calls } = counting();
-    const result = await measureTool(recorder, "mindvault_browse", () => "ok");
+    const result = await measureTool(recorder, "zentrixpay_browse", () => "ok");
     expect(result).toBe("ok");
     expect(calls).toHaveLength(1);
-    expect(calls[0][0]).toBe("mindvault_browse");
+    expect(calls[0][0]).toBe("zentrixpay_browse");
     expect(calls[0][2]).toBe(true);
   });
 
   it("records a failed call and re-throws the error unchanged", async () => {
     const { recorder, calls } = counting();
     await expect(
-      measureTool(recorder, "mindvault_buy", () => {
+      measureTool(recorder, "zentrixpay_buy", () => {
         throw new Error("Buy failed [402]");
       }),
     ).rejects.toThrow("Buy failed [402]");
-    expect(calls[0][0]).toBe("mindvault_buy");
+    expect(calls[0][0]).toBe("zentrixpay_buy");
     expect(calls[0][2]).toBe(false);
   });
 });

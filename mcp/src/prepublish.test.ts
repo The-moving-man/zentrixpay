@@ -29,13 +29,13 @@ const PACKAGE_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
 const realManifest = JSON.parse(readFileSync(join(PACKAGE_DIR, "package.json"), "utf-8"));
 
 const GOOD_MANIFEST = {
-  name: "@mindvault/mcp",
+  name: "@zentrixpay/mcp",
   version: "1.0.0",
   description: "MCP server",
   license: "MIT",
   type: "module",
   main: "dist/index.js",
-  bin: { "mindvault-mcp": "dist/index.js" },
+  bin: { "zentrixpay-mcp": "dist/index.js" },
   files: ["dist"],
   engines: { node: ">=20" },
   scripts: { smoke: "tsx scripts/smoke.ts" },
@@ -113,7 +113,7 @@ describe("checkBinEntrypoint", () => {
 
   it("fails when bin points at TypeScript source", () => {
     const results = checkBinEntrypoint(
-      snapshot({ manifest: { ...GOOD_MANIFEST, bin: { "mindvault-mcp": "src/index.ts" } } }),
+      snapshot({ manifest: { ...GOOD_MANIFEST, bin: { "zentrixpay-mcp": "src/index.ts" } } }),
     );
     expect(result(results, "bin:built").status).toBe("fail");
   });
@@ -136,7 +136,7 @@ describe("checkBinEntrypoint", () => {
 
   it("normalizes a ./-prefixed bin path", () => {
     const results = checkBinEntrypoint(
-      snapshot({ manifest: { ...GOOD_MANIFEST, bin: { "mindvault-mcp": "./dist/index.js" } } }),
+      snapshot({ manifest: { ...GOOD_MANIFEST, bin: { "zentrixpay-mcp": "./dist/index.js" } } }),
     );
     expect(hasFailures(results)).toBe(false);
   });
@@ -226,17 +226,17 @@ describe("checkDependencies", () => {
 
   it("flags a workspace range pointing at a private package", () => {
     const results = checkDependencies(
-      { dependencies: { "@mindvault/registry-client": "workspace:*" } },
-      { "@mindvault/registry-client": { private: true } },
+      { dependencies: { "@zentrixpay/registry-client": "workspace:*" } },
+      { "@zentrixpay/registry-client": { private: true } },
     );
     expect(result(results, "deps:resolvable").status).toBe("fail");
-    expect(result(results, "deps:resolvable").detail).toContain("@mindvault/registry-client");
+    expect(result(results, "deps:resolvable").detail).toContain("@zentrixpay/registry-client");
   });
 
   it("accepts a workspace range pointing at a publishable package", () => {
     const results = checkDependencies(
-      { dependencies: { "@mindvault/registry-client": "workspace:*" } },
-      { "@mindvault/registry-client": { private: false, version: "0.1.0" } },
+      { dependencies: { "@zentrixpay/registry-client": "workspace:*" } },
+      { "@zentrixpay/registry-client": { private: false, version: "0.1.0" } },
     );
     expect(hasFailures(results)).toBe(false);
     expect(result(results, "deps:workspace").detail).toContain("pnpm publish");

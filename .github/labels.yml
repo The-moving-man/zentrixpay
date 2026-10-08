@@ -1,4 +1,4 @@
-# Canonical MindVault label set.
+# Canonical ZentrixPay label set.
 #
 # This file is the single source of truth for repository labels. It is consumed
 # by .github/workflows/labels.yml (manual dispatch) to sync labels via the
@@ -29,7 +29,7 @@
   description: "MCP server for AI agents (mcp/)"
 - name: "area: registry-client"
   color: "1d76db"
-  description: "Shared @mindvault/registry-client package (packages/registry-client/)"
+  description: "Shared @zentrixpay/registry-client package (packages/registry-client/)"
 - name: "area: docs"
   color: "1d76db"
   description: "Documentation, README, guides (docs/)"

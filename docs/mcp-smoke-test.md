@@ -1,6 +1,6 @@
 # MCP Smoke Test
 
-An end-to-end smoke script that boots the MindVault MCP server over stdio and
+An end-to-end smoke script that boots the ZentrixPay MCP server over stdio and
 drives the full agent flow — **set up wallet → register → publish → preview →
 buy** — exactly as an MCP client would. It exits non-zero the moment any tool
 call fails, so it works as a fast pre-release or CI gate for the MCP surface.
@@ -13,9 +13,9 @@ Source: [`mcp/scripts/smoke.ts`](../mcp/scripts/smoke.ts) (orchestration core in
 
 ```bash
 # From the repo root
-pnpm --filter @mindvault/mcp smoke              # default: mock target
-pnpm --filter @mindvault/mcp smoke -- --target mock
-pnpm --filter @mindvault/mcp smoke -- --target testnet
+pnpm --filter @zentrixpay/mcp smoke              # default: mock target
+pnpm --filter @zentrixpay/mcp smoke -- --target mock
+pnpm --filter @zentrixpay/mcp smoke -- --target testnet
 
 # Or from mcp/
 cd mcp && pnpm smoke
@@ -56,7 +56,7 @@ touches live services, this target is slower and not deterministic.
   which excludes wallet secret keys and API keys.
 - **Isolation.** The child MCP server runs with `HOME` pointed at a temp
   directory, so the run never reads or writes the operator's real
-  `~/.mindvault/state.json`.
+  `~/.zentrixpay/state.json`.
 
 ## Install smoke (`smoke:install`)
 
@@ -64,9 +64,9 @@ A second, narrower check answers a different question: **does the server an
 agent actually installs start up and serve its tools?**
 
 ```bash
-pnpm --filter @mindvault/mcp build          # produces dist/index.js
-pnpm --filter @mindvault/mcp smoke:install  # default: the built dist entry
-pnpm --filter @mindvault/mcp smoke:install -- --entry src   # sources via tsx
+pnpm --filter @zentrixpay/mcp build          # produces dist/index.js
+pnpm --filter @zentrixpay/mcp smoke:install  # default: the built dist entry
+pnpm --filter @zentrixpay/mcp smoke:install -- --entry src   # sources via tsx
 ```
 
 Source: [`mcp/scripts/install-smoke.ts`](../mcp/scripts/install-smoke.ts), with
@@ -76,13 +76,13 @@ It launches the exact command the README tells an operator to configure —
 `node mcp/dist/index.js` over stdio — and then:
 
 1. lists the tools and checks the ones a new agent needs are advertised;
-2. runs `mindvault_verify_install` and requires a clean report;
+2. runs `zentrixpay_verify_install` and requires a clean report;
 3. reads the catalog, twice (plain, and sorted with `sort: price_asc`);
 4. searches, previews, and looks a resource up on the registry;
 5. exports receipts and checks the document carries its schema version.
 
 Every call is served by the in-process fixtures in
-[`mcp/src/mock.ts`](../mcp/src/mock.ts) (`MINDVAULT_MOCK=1`), so the run needs no
+[`mcp/src/mock.ts`](../mcp/src/mock.ts) (`ZENTRIXPAY_MOCK=1`), so the run needs no
 network, no funded wallet, and no live backend, and `HOME` plus the purchase
 store are redirected into a temp directory. The scenario is **read-only** — it
 never publishes, pays, or writes on-chain — so it is safe to run against any
@@ -104,7 +104,7 @@ failure, and it runs in CI on every PR ([`.github/workflows/pr.yml`](../.github/
 | ----------- | ------------------------------------ | ---------------------------------------- |
 | Entry point | `src/index.ts` via tsx               | `dist/index.js` (the documented install) |
 | Scenario    | publish → preview → buy (write path) | list → verify → browse → export (read)   |
-| Fixtures    | local HTTP stub over `*.localhost`   | in-process `MINDVAULT_MOCK=1`            |
+| Fixtures    | local HTTP stub over `*.localhost`   | in-process `ZENTRIXPAY_MOCK=1`            |
 | Needs build | no                                   | yes                                      |
 | Runs in CI  | no                                   | yes                                      |
 
@@ -115,7 +115,7 @@ The orchestration core is unit-tested in
 short-circuit, soft-error handling, and transport failure) and the install
 scenario in [`mcp/src/installSmoke.test.ts`](../mcp/src/installSmoke.test.ts)
 (healthy install, missing tools, unset fixtures, rejected sort argument). Both
-run as part of `pnpm --filter @mindvault/mcp test` and the root `pnpm test`.
+run as part of `pnpm --filter @zentrixpay/mcp test` and the root `pnpm test`.
 
 For SDK-level coverage of `listTools` / `callTool` against the real server
 handlers (with mocked fetch/registry), see
@@ -123,13 +123,13 @@ handlers (with mocked fetch/registry), see
 
 ## Offline fixture generation
 
-The `MINDVAULT_MOCK=1` in-process fixtures live in
+The `ZENTRIXPAY_MOCK=1` in-process fixtures live in
 [`mcp/src/mock.ts`](../mcp/src/mock.ts). A companion script serialises them to
 static JSON files under `mcp/fixtures/` so tests and tooling can load
 pre-generated data without booting any process:
 
 ```bash
-pnpm --filter @mindvault/mcp generate-fixtures
+pnpm --filter @zentrixpay/mcp generate-fixtures
 # or from mcp/
 pnpm generate-fixtures
 ```
@@ -159,7 +159,7 @@ The fixture files are derived from `MOCK_CATALOG_RESOURCES` and
 regenerate the fixtures:
 
 ```bash
-pnpm --filter @mindvault/mcp generate-fixtures
+pnpm --filter @zentrixpay/mcp generate-fixtures
 git add mcp/fixtures/
 ```
 

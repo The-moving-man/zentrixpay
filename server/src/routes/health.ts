@@ -8,7 +8,7 @@ const router: RouterType = Router();
 router.get("/health", (_req, res) => {
   res.json({
     status: "ok",
-    service: "mindvault",
+    service: "zentrixpay",
     timestamp: new Date().toISOString(),
   });
 });
@@ -19,7 +19,7 @@ router.get("/health/ready", async (_req, res) => {
   if (!isAccepting()) {
     res.status(503).json({
       status: "shutting_down",
-      service: "mindvault",
+      service: "zentrixpay",
       timestamp: new Date().toISOString(),
     });
     return;
@@ -33,7 +33,7 @@ router.get("/health/ready", async (_req, res) => {
 
   res.status(httpStatus).json({
     status,
-    service: "mindvault",
+    service: "zentrixpay",
     checks,
     timestamp: new Date().toISOString(),
   });

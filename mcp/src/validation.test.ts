@@ -31,7 +31,7 @@ const OVERSIZE_BATCH = Array.from({ length: 26 }, (_, i) => `res-${String(i).pad
 /**
  * Advertised tools that go through this layer.
  *
- * `mindvault_publish_status` and `mindvault_purchase_history` normalize their
+ * `zentrixpay_publish_status` and `zentrixpay_purchase_history` normalize their
  * own arguments (see TOOLS_WITHOUT_ARG_VALIDATION) and so have no spec to
  * compare against. The exemption itself is checked below.
  */
@@ -42,80 +42,80 @@ function specValidatedTools() {
 
 /** Minimum arguments that must pass for each tool. */
 const VALID_CALLS: Record<string, Record<string, unknown>> = {
-  mindvault_setup_wallet: {},
-  mindvault_repair_sponsored_account: {
+  zentrixpay_setup_wallet: {},
+  zentrixpay_repair_sponsored_account: {
     secretKey: "SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
   },
-  mindvault_wallet_info: {},
-  mindvault_use_profile: { name: "publisher" },
-  mindvault_switch_network_profile: { name: "mainnet", network: "mainnet" },
-  mindvault_list_profiles: {},
-  mindvault_browse: {},
-  mindvault_search: { query: "stellar" },
-  mindvault_preview: { resourceId: "res-001" },
-  mindvault_register: { name: "Agent A", email: "agent@example.com" },
-  mindvault_publish: {
+  zentrixpay_wallet_info: {},
+  zentrixpay_use_profile: { name: "publisher" },
+  zentrixpay_switch_network_profile: { name: "mainnet", network: "mainnet" },
+  zentrixpay_list_profiles: {},
+  zentrixpay_browse: {},
+  zentrixpay_search: { query: "stellar" },
+  zentrixpay_preview: { resourceId: "res-001" },
+  zentrixpay_register: { name: "Agent A", email: "agent@example.com" },
+  zentrixpay_publish: {
     title: "Dataset",
     price: "5.00",
     externalUrl: "https://example.com/data.json",
   },
-  mindvault_buy: { resourceId: "res-001" },
-  mindvault_export_receipts: {},
-  mindvault_register_onchain: { resourceId: "res-001" },
-  mindvault_agent_status: {},
-  mindvault_registry_info: {},
-  mindvault_terms: {
+  zentrixpay_buy: { resourceId: "res-001" },
+  zentrixpay_export_receipts: {},
+  zentrixpay_register_onchain: { resourceId: "res-001" },
+  zentrixpay_agent_status: {},
+  zentrixpay_registry_info: {},
+  zentrixpay_terms: {
     operation: "get",
     creator: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
   },
-  mindvault_network_profile: {},
-  mindvault_check_bindings: {},
-  mindvault_check_consistency: { resourceId: "res-001" },
-  mindvault_verify_attestation: {
+  zentrixpay_network_profile: {},
+  zentrixpay_check_bindings: {},
+  zentrixpay_check_consistency: { resourceId: "res-001" },
+  zentrixpay_verify_attestation: {
     resourceId: "res001",
     attestationHash: "a".repeat(64),
   },
-  mindvault_registry_lookup: { resourceId: "res-001" },
-  mindvault_registry_list: {},
-  mindvault_registry_count: {},
-  mindvault_registry_count: {},
-  mindvault_tx_status: { txHash: VALID_SHA256 },
-  mindvault_reset: {},
-  mindvault_backup_state: { passphrase: "correct-horse" },
-  mindvault_resource_provenance: { resourceId: "res-001" },
-  mindvault_resource_change_log: { resourceId: "res-001" },
-  mindvault_restore_state: { blob: "v1:abc", passphrase: "correct-horse" },
-  mindvault_metrics: {},
-  mindvault_update_metadata: { resourceId: "res-001", metadata: "ipfs://Qm123" },
-  mindvault_set_price: { resourceId: "res-001", price: "10.00" },
-  mindvault_transfer_ownership: {
+  zentrixpay_registry_lookup: { resourceId: "res-001" },
+  zentrixpay_registry_list: {},
+  zentrixpay_registry_count: {},
+  zentrixpay_registry_count: {},
+  zentrixpay_tx_status: { txHash: VALID_SHA256 },
+  zentrixpay_reset: {},
+  zentrixpay_backup_state: { passphrase: "correct-horse" },
+  zentrixpay_resource_provenance: { resourceId: "res-001" },
+  zentrixpay_resource_change_log: { resourceId: "res-001" },
+  zentrixpay_restore_state: { blob: "v1:abc", passphrase: "correct-horse" },
+  zentrixpay_metrics: {},
+  zentrixpay_update_metadata: { resourceId: "res-001", metadata: "ipfs://Qm123" },
+  zentrixpay_set_price: { resourceId: "res-001", price: "10.00" },
+  zentrixpay_transfer_ownership: {
     resourceId: "res-001",
     newCreator: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
   },
-  mindvault_accept_transfer: { resourceId: "res-001" },
-  mindvault_cancel_transfer: { resourceId: "res-001" },
-  mindvault_pending_transfer: { resourceId: "res-001" },
-  mindvault_set_listed: { resourceId: "res-001", listed: true },
-  mindvault_dispute: { resourceId: "res-001", action: "flag", reason: "Duplicate listing" },
-  mindvault_set_tags: { resourceId: "res-001", tags: ["dataset"] },
-  mindvault_freeze: { resourceId: "res-001", confirm: "freeze_metadata" },
-  mindvault_fee_config: {},
-  mindvault_royalty: {
+  zentrixpay_accept_transfer: { resourceId: "res-001" },
+  zentrixpay_cancel_transfer: { resourceId: "res-001" },
+  zentrixpay_pending_transfer: { resourceId: "res-001" },
+  zentrixpay_set_listed: { resourceId: "res-001", listed: true },
+  zentrixpay_dispute: { resourceId: "res-001", action: "flag", reason: "Duplicate listing" },
+  zentrixpay_set_tags: { resourceId: "res-001", tags: ["dataset"] },
+  zentrixpay_freeze: { resourceId: "res-001", confirm: "freeze_metadata" },
+  zentrixpay_fee_config: {},
+  zentrixpay_royalty: {
     resourceId: "res-001",
     royaltyRecipient: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
   },
-  mindvault_check_state_permissions: {},
-  mindvault_registry_health: {},
-  mindvault_prewarm_catalog: {},
-  mindvault_client_config: {},
-  mindvault_mainnet_banner: {},
-  mindvault_import_wallet: {},
-  mindvault_rotate_publisher_key: {},
-  mindvault_verify_install: {},
-  mindvault_debug_bundle: { auditLogLines: 50, includeEnvironment: true },
-  mindvault_recover_catalog_cache: {},
-  mindvault_wallet_balances: {},
-  mindvault_server_endpoints: {},
+  zentrixpay_check_state_permissions: {},
+  zentrixpay_registry_health: {},
+  zentrixpay_prewarm_catalog: {},
+  zentrixpay_client_config: {},
+  zentrixpay_mainnet_banner: {},
+  zentrixpay_import_wallet: {},
+  zentrixpay_rotate_publisher_key: {},
+  zentrixpay_verify_install: {},
+  zentrixpay_debug_bundle: { auditLogLines: 50, includeEnvironment: true },
+  zentrixpay_recover_catalog_cache: {},
+  zentrixpay_wallet_balances: {},
+  zentrixpay_server_endpoints: {},
 };
 
 function expectInvalid(tool: string, args: unknown): ToolValidationError {
@@ -241,35 +241,35 @@ describe.each(Object.keys(TOOL_ARGUMENT_SPECS))("%s", (tool) => {
 describe("unknown tools", () => {
   it("throws UnknownToolError naming the available tools", () => {
     try {
-      validateToolArgs("mindvault_not_a_tool", {});
+      validateToolArgs("zentrixpay_not_a_tool", {});
       throw new Error("expected a throw");
     } catch (err) {
       expect(err).toBeInstanceOf(UnknownToolError);
-      expect((err as Error).message).toContain("Unknown tool: mindvault_not_a_tool");
-      expect((err as Error).message).toContain("mindvault_browse");
+      expect((err as Error).message).toContain("Unknown tool: zentrixpay_not_a_tool");
+      expect((err as Error).message).toContain("zentrixpay_browse");
     }
   });
 });
 
 describe("string arguments", () => {
   it("trims surrounding whitespace", () => {
-    const args = validateToolArgs("mindvault_search", { query: "  stellar  " });
+    const args = validateToolArgs("zentrixpay_search", { query: "  stellar  " });
     expect(requiredString(args, "query")).toBe("stellar");
   });
 
   it("rejects an empty or whitespace-only required string", () => {
-    expect(expectInvalid("mindvault_search", { query: "" }).issues[0].code).toBe("empty_string");
-    expect(expectInvalid("mindvault_search", { query: "   " }).issues[0].code).toBe("empty_string");
+    expect(expectInvalid("zentrixpay_search", { query: "" }).issues[0].code).toBe("empty_string");
+    expect(expectInvalid("zentrixpay_search", { query: "   " }).issues[0].code).toBe("empty_string");
   });
 
   it("enforces maxLength", () => {
-    const err = expectInvalid("mindvault_search", { query: "x".repeat(257) });
+    const err = expectInvalid("zentrixpay_search", { query: "x".repeat(257) });
     expect(err.issues[0].code).toBe("too_long");
     expect(err.message).toContain("at most 256 characters");
   });
 
   it("enforces minLength for passphrases", () => {
-    const err = expectInvalid("mindvault_backup_state", { passphrase: "short" });
+    const err = expectInvalid("zentrixpay_backup_state", { passphrase: "short" });
     expect(err.issues[0].code).toBe("too_short");
     expect(err.message).toContain("at least 8 characters");
     // The rejected passphrase must not appear in agent-facing output.
@@ -278,20 +278,20 @@ describe("string arguments", () => {
 
   it("rejects a resourceId that could alter the request path", () => {
     for (const bad of ["../secrets", "res 001", "res/001", "res?x=1"]) {
-      expect(expectInvalid("mindvault_preview", { resourceId: bad }).issues[0].code).toBe(
+      expect(expectInvalid("zentrixpay_preview", { resourceId: bad }).issues[0].code).toBe(
         "pattern_mismatch",
       );
     }
   });
 
   it("enforces the on-chain resource id and attestation hash limits", () => {
-    const invalidId = expectInvalid("mindvault_verify_attestation", {
+    const invalidId = expectInvalid("zentrixpay_verify_attestation", {
       resourceId: "res-001",
       attestationHash: "a".repeat(64),
     });
     expect(invalidId.issues[0].code).toBe("pattern_mismatch");
 
-    const oversizedHash = expectInvalid("mindvault_verify_attestation", {
+    const oversizedHash = expectInvalid("zentrixpay_verify_attestation", {
       resourceId: "res001",
       attestationHash: "a".repeat(65),
     });
@@ -299,16 +299,16 @@ describe("string arguments", () => {
   });
 
   it("rejects a malformed email and accepts a valid one", () => {
-    const err = expectInvalid("mindvault_register", { name: "A", email: "not-an-email" });
+    const err = expectInvalid("zentrixpay_register", { name: "A", email: "not-an-email" });
     expect(err.issues[0].field).toBe("email");
     expect(err.issues[0].code).toBe("pattern_mismatch");
     expect(() =>
-      validateToolArgs("mindvault_register", { name: "A", email: "a@b.co" }),
+      validateToolArgs("zentrixpay_register", { name: "A", email: "a@b.co" }),
     ).not.toThrow();
   });
 
   it("rejects a non-Stellar wallet address", () => {
-    const err = expectInvalid("mindvault_register", {
+    const err = expectInvalid("zentrixpay_register", {
       name: "A",
       email: "a@b.co",
       walletAddress: "not-a-key",
@@ -317,7 +317,7 @@ describe("string arguments", () => {
   });
 
   it("rejects a non-http externalUrl", () => {
-    const err = expectInvalid("mindvault_publish", {
+    const err = expectInvalid("zentrixpay_publish", {
       title: "T",
       price: "1.00",
       externalUrl: "ftp://example.com/x",
@@ -328,7 +328,7 @@ describe("string arguments", () => {
 
   it("rejects a non-decimal price", () => {
     for (const price of ["free", "-1", "1.2.3", "1,50"]) {
-      const err = expectInvalid("mindvault_publish", {
+      const err = expectInvalid("zentrixpay_publish", {
         title: "T",
         price,
         externalUrl: "https://example.com/x",
@@ -338,10 +338,10 @@ describe("string arguments", () => {
   });
 
   it("rejects an invalid profile name", () => {
-    expect(expectInvalid("mindvault_use_profile", { name: "has space" }).issues[0].code).toBe(
+    expect(expectInvalid("zentrixpay_use_profile", { name: "has space" }).issues[0].code).toBe(
       "pattern_mismatch",
     );
-    expect(expectInvalid("mindvault_use_profile", { name: "x".repeat(65) }).issues[0].code).toBe(
+    expect(expectInvalid("zentrixpay_use_profile", { name: "x".repeat(65) }).issues[0].code).toBe(
       "too_long",
     );
   });
@@ -351,18 +351,18 @@ describe("enum arguments", () => {
   it("accepts every advertised literal", () => {
     for (const status of ["pending", "verified", "rejected", "skipped"]) {
       expect(() =>
-        validateToolArgs("mindvault_search", { query: "x", verificationStatus: status }),
+        validateToolArgs("zentrixpay_search", { query: "x", verificationStatus: status }),
       ).not.toThrow();
     }
     for (const type of ["file", "link"]) {
       expect(() =>
-        validateToolArgs("mindvault_search", { query: "x", resourceType: type }),
+        validateToolArgs("zentrixpay_search", { query: "x", resourceType: type }),
       ).not.toThrow();
     }
   });
 
   it("rejects a value outside the set and lists the alternatives", () => {
-    const err = expectInvalid("mindvault_search", { query: "x", verificationStatus: "approved" });
+    const err = expectInvalid("zentrixpay_search", { query: "x", verificationStatus: "approved" });
     expect(err.issues[0].code).toBe("not_in_enum");
     expect(err.message).toContain("pending, verified, rejected, skipped");
   });
@@ -370,25 +370,25 @@ describe("enum arguments", () => {
 
 describe("flag arguments", () => {
   it("accepts booleans", () => {
-    expect(flag(validateToolArgs("mindvault_reset", { all: true }), "all")).toBe(true);
-    expect(flag(validateToolArgs("mindvault_reset", { all: false }), "all")).toBe(false);
+    expect(flag(validateToolArgs("zentrixpay_reset", { all: true }), "all")).toBe(true);
+    expect(flag(validateToolArgs("zentrixpay_reset", { all: false }), "all")).toBe(false);
   });
 
   it("accepts the common string and numeric spellings", () => {
     for (const value of ["true", "TRUE", " yes ", "1", "on", 1]) {
-      expect(flag(validateToolArgs("mindvault_metrics", { reset: value }), "reset")).toBe(true);
+      expect(flag(validateToolArgs("zentrixpay_metrics", { reset: value }), "reset")).toBe(true);
     }
     for (const value of ["false", "no", "0", "off", 0]) {
-      expect(flag(validateToolArgs("mindvault_metrics", { reset: value }), "reset")).toBe(false);
+      expect(flag(validateToolArgs("zentrixpay_metrics", { reset: value }), "reset")).toBe(false);
     }
   });
 
   it("defaults to false when omitted", () => {
-    expect(flag(validateToolArgs("mindvault_metrics", {}), "reset")).toBe(false);
+    expect(flag(validateToolArgs("zentrixpay_metrics", {}), "reset")).toBe(false);
   });
 
   it("rejects ambiguous values", () => {
-    const err = expectInvalid("mindvault_metrics", { reset: "maybe" });
+    const err = expectInvalid("zentrixpay_metrics", { reset: "maybe" });
     expect(err.issues[0].code).toBe("wrong_type");
     expect(err.message).toContain("boolean");
   });
@@ -396,17 +396,17 @@ describe("flag arguments", () => {
 
 describe("hash arguments", () => {
   it("normalizes txHash to bare lowercase hex", () => {
-    const args = validateToolArgs("mindvault_tx_status", { txHash: VALID_SHA256.toUpperCase() });
+    const args = validateToolArgs("zentrixpay_tx_status", { txHash: VALID_SHA256.toUpperCase() });
     expect(requiredString(args, "txHash")).toBe(VALID_SHA256);
   });
 
   it("accepts a sha256:-prefixed txHash", () => {
-    const args = validateToolArgs("mindvault_tx_status", { txHash: `sha256:${VALID_SHA256}` });
+    const args = validateToolArgs("zentrixpay_tx_status", { txHash: `sha256:${VALID_SHA256}` });
     expect(requiredString(args, "txHash")).toBe(VALID_SHA256);
   });
 
   it("normalizes expectedMetadataHash to canonical algorithm:hex form", () => {
-    const args = validateToolArgs("mindvault_check_consistency", {
+    const args = validateToolArgs("zentrixpay_check_consistency", {
       resourceId: "res-001",
       expectedMetadataHash: VALID_SHA256,
     });
@@ -414,13 +414,13 @@ describe("hash arguments", () => {
   });
 
   it("rejects a digest of the wrong length", () => {
-    const err = expectInvalid("mindvault_tx_status", { txHash: VALID_SHA256.slice(0, 63) });
+    const err = expectInvalid("zentrixpay_tx_status", { txHash: VALID_SHA256.slice(0, 63) });
     expect(err.issues[0].code).toBe("invalid_hash");
     expect(err.message).toContain("63 hex characters");
   });
 
   it("rejects non-hexadecimal characters", () => {
-    const err = expectInvalid("mindvault_tx_status", { txHash: "z".repeat(64) });
+    const err = expectInvalid("zentrixpay_tx_status", { txHash: "z".repeat(64) });
     expect(err.issues[0].code).toBe("invalid_hash");
     expect(err.message).toContain("hexadecimal");
   });
@@ -428,28 +428,28 @@ describe("hash arguments", () => {
 
 describe("string_array arguments", () => {
   it("accepts an array and keeps case and duplicates (#608)", () => {
-    const args = validateToolArgs("mindvault_batch_catalog_lookup", {
+    const args = validateToolArgs("zentrixpay_batch_catalog_lookup", {
       resourceIds: ["Res-001", "res-001"],
     });
     expect(requiredStringArray(args, "resourceIds")).toEqual(["Res-001", "res-001"]);
   });
 
   it("trims entries and drops empties", () => {
-    const args = validateToolArgs("mindvault_batch_catalog_lookup", {
+    const args = validateToolArgs("zentrixpay_batch_catalog_lookup", {
       resourceIds: [" res-001 ", "", "   ", "res-002"],
     });
     expect(requiredStringArray(args, "resourceIds")).toEqual(["res-001", "res-002"]);
   });
 
   it("accepts a comma-separated string", () => {
-    const args = validateToolArgs("mindvault_batch_catalog_lookup", {
+    const args = validateToolArgs("zentrixpay_batch_catalog_lookup", {
       resourceIds: "res-001, res-002,res-003",
     });
     expect(requiredStringArray(args, "resourceIds")).toEqual(["res-001", "res-002", "res-003"]);
   });
 
   it("rejects a non-string entry with a deterministic message", () => {
-    const err = expectInvalid("mindvault_batch_catalog_lookup", {
+    const err = expectInvalid("zentrixpay_batch_catalog_lookup", {
       resourceIds: ["res-001", 42],
     });
     expect(err.issues[0].code).toBe("invalid_string_array");
@@ -459,7 +459,7 @@ describe("string_array arguments", () => {
   });
 
   it("reports the position of a malformed entry", () => {
-    const err = expectInvalid("mindvault_batch_catalog_lookup", {
+    const err = expectInvalid("zentrixpay_batch_catalog_lookup", {
       resourceIds: ["res-001", "not ok!"],
     });
     expect(err.issues[0].code).toBe("invalid_string_array");
@@ -467,19 +467,19 @@ describe("string_array arguments", () => {
   });
 
   it("rejects an empty selection after normalization", () => {
-    const err = expectInvalid("mindvault_batch_catalog_lookup", { resourceIds: [] });
+    const err = expectInvalid("zentrixpay_batch_catalog_lookup", { resourceIds: [] });
     expect(err.issues[0].code).toBe("invalid_string_array");
     expect(err.message).toContain("at least 1");
   });
 
   it("rejects a batch above the advertised ceiling", () => {
-    const err = expectInvalid("mindvault_batch_catalog_lookup", { resourceIds: OVERSIZE_BATCH });
+    const err = expectInvalid("zentrixpay_batch_catalog_lookup", { resourceIds: OVERSIZE_BATCH });
     expect(err.issues[0].code).toBe("invalid_string_array");
     expect(err.message).toContain(`at most ${BATCH_LOOKUP_MAX_IDS}`);
   });
 
   it("rejects a non-array bag for the batch field", () => {
-    const err = expectInvalid("mindvault_batch_catalog_lookup", { resourceIds: 7 });
+    const err = expectInvalid("zentrixpay_batch_catalog_lookup", { resourceIds: 7 });
     expect(err.issues[0].code).toBe("invalid_string_array");
     expect(err.message).toContain("array of strings or a comma-separated string");
   });
@@ -487,7 +487,7 @@ describe("string_array arguments", () => {
 
 describe("multi-issue reporting", () => {
   it("reports every problem in one deterministic error", () => {
-    const err = expectInvalid("mindvault_publish", {
+    const err = expectInvalid("zentrixpay_publish", {
       title: "",
       price: "free",
       externalUrl: "nope",
@@ -495,14 +495,14 @@ describe("multi-issue reporting", () => {
     });
     const fields = err.issues.map((i) => i.field);
     expect(fields).toEqual(["typo", "title", "price", "externalUrl"]);
-    expect(err.tool).toBe("mindvault_publish");
-    expect(err.message.startsWith("Invalid arguments for mindvault_publish:")).toBe(true);
+    expect(err.tool).toBe("zentrixpay_publish");
+    expect(err.message.startsWith("Invalid arguments for zentrixpay_publish:")).toBe(true);
   });
 });
 
 describe("normalized output", () => {
   it("returns only validated fields", () => {
-    const args = validateToolArgs("mindvault_publish", {
+    const args = validateToolArgs("zentrixpay_publish", {
       title: " Dataset ",
       price: "5.00",
       externalUrl: "https://example.com/data.json",
@@ -520,21 +520,21 @@ describe("normalized output", () => {
 
 describe("tag array arguments", () => {
   it("normalizes, deduplicates, and accepts an empty replacement", () => {
-    const args = validateToolArgs("mindvault_set_tags", {
+    const args = validateToolArgs("zentrixpay_set_tags", {
       resourceId: "res-001",
       tags: [" Dataset ", "dataset", "API"],
     });
     expect(requiredTagArray(args, "tags")).toEqual(["dataset", "api"]);
     expect(
       requiredTagArray(
-        validateToolArgs("mindvault_set_tags", { resourceId: "res-001", tags: [] }),
+        validateToolArgs("zentrixpay_set_tags", { resourceId: "res-001", tags: [] }),
         "tags",
       ),
     ).toEqual([]);
   });
 
   it("accepts the documented comma-separated convenience form", () => {
-    const args = validateToolArgs("mindvault_set_tags", {
+    const args = validateToolArgs("zentrixpay_set_tags", {
       resourceId: "res-001",
       tags: "dataset, research",
     });
@@ -542,13 +542,13 @@ describe("tag array arguments", () => {
   });
 
   it("rejects invalid tag arrays with a stable issue code", () => {
-    const tooMany = expectInvalid("mindvault_set_tags", {
+    const tooMany = expectInvalid("zentrixpay_set_tags", {
       resourceId: "res-001",
       tags: Array.from({ length: 9 }, (_, i) => `tag-${i}`),
     });
     expect(tooMany.issues[0].code).toBe("invalid_tag_array");
 
-    const invalidCharacter = expectInvalid("mindvault_set_tags", {
+    const invalidCharacter = expectInvalid("zentrixpay_set_tags", {
       resourceId: "res-001",
       tags: ["not valid"],
     });
@@ -559,19 +559,19 @@ describe("tag array arguments", () => {
 describe("catalog filter arguments", () => {
   it("accepts every sort value on browse and on search", () => {
     for (const sort of ["newest", "price_asc", "price_desc", "title"]) {
-      expect(() => validateToolArgs("mindvault_browse", { sort })).not.toThrow();
-      expect(() => validateToolArgs("mindvault_search", { query: "x", sort })).not.toThrow();
+      expect(() => validateToolArgs("zentrixpay_browse", { sort })).not.toThrow();
+      expect(() => validateToolArgs("zentrixpay_search", { query: "x", sort })).not.toThrow();
     }
   });
 
   it("rejects an unknown sort value", () => {
-    const err = expectInvalid("mindvault_browse", { sort: "cheapest" });
+    const err = expectInvalid("zentrixpay_browse", { sort: "cheapest" });
     expect(err.issues[0].code).toBe("not_in_enum");
   });
 
   it("accepts the whole advertised filter set on browse", () => {
     expect(() =>
-      validateToolArgs("mindvault_browse", {
+      validateToolArgs("zentrixpay_browse", {
         query: "stellar",
         minPrice: "0.10",
         maxPrice: "5.00",
@@ -588,22 +588,22 @@ describe("catalog filter arguments", () => {
   });
 
   it("still reports a typo rather than silently ignoring it", () => {
-    const err = expectInvalid("mindvault_browse", { sortBy: "price" });
+    const err = expectInvalid("zentrixpay_browse", { sortBy: "price" });
     expect(err.issues[0].code).toBe("unknown_argument");
     expect(err.issues[0].message).toContain("sort");
   });
 
   it("browse and search validate against the same argument names", () => {
-    expect(Object.keys(TOOL_ARGUMENT_SPECS.mindvault_browse).sort()).toEqual(
-      Object.keys(TOOL_ARGUMENT_SPECS.mindvault_search).sort(),
+    expect(Object.keys(TOOL_ARGUMENT_SPECS.zentrixpay_browse).sort()).toEqual(
+      Object.keys(TOOL_ARGUMENT_SPECS.zentrixpay_search).sort(),
     );
   });
 });
 
-describe("mindvault_export_receipts arguments", () => {
+describe("zentrixpay_export_receipts arguments", () => {
   it("accepts the documented filters", () => {
     expect(() =>
-      validateToolArgs("mindvault_export_receipts", {
+      validateToolArgs("zentrixpay_export_receipts", {
         format: "csv",
         resourceId: "res-001",
         network: "stellar:testnet",
@@ -615,26 +615,26 @@ describe("mindvault_export_receipts arguments", () => {
   });
 
   it("rejects a format it cannot produce", () => {
-    const err = expectInvalid("mindvault_export_receipts", { format: "xml" });
+    const err = expectInvalid("zentrixpay_export_receipts", { format: "xml" });
     expect(err.issues[0].code).toBe("not_in_enum");
   });
 
   it("rejects a limit outside the supported range", () => {
-    expect(expectInvalid("mindvault_export_receipts", { limit: 0 }).issues).toHaveLength(1);
+    expect(expectInvalid("zentrixpay_export_receipts", { limit: 0 }).issues).toHaveLength(1);
   });
 });
 
-describe("mindvault_debug_bundle", () => {
+describe("zentrixpay_debug_bundle", () => {
   it("accepts an empty call and both arguments", () => {
-    expect(() => validateToolArgs("mindvault_debug_bundle", {})).not.toThrow();
+    expect(() => validateToolArgs("zentrixpay_debug_bundle", {})).not.toThrow();
     expect(() =>
-      validateToolArgs("mindvault_debug_bundle", { auditLogLines: 0, includeEnvironment: false }),
+      validateToolArgs("zentrixpay_debug_bundle", { auditLogLines: 0, includeEnvironment: false }),
     ).not.toThrow();
   });
 
   it("rejects an audit line count outside 0..500 and a non-boolean flag", () => {
-    expectInvalid("mindvault_debug_bundle", { auditLogLines: 501 });
-    expectInvalid("mindvault_debug_bundle", { auditLogLines: -1 });
-    expectInvalid("mindvault_debug_bundle", { includeEnvironment: "maybe" });
+    expectInvalid("zentrixpay_debug_bundle", { auditLogLines: 501 });
+    expectInvalid("zentrixpay_debug_bundle", { auditLogLines: -1 });
+    expectInvalid("zentrixpay_debug_bundle", { includeEnvironment: "maybe" });
   });
 });

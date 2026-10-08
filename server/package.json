@@ -1,8 +1,8 @@
 {
-  "name": "@mindvault/server",
+  "name": "@zentrixpay/server",
   "version": "1.0.0",
   "type": "module",
-  "description": "A marketplace where humans and AI agents publish and trade digital resources via HTTP 402 payments on Stellar",
+  "description": "Pay-per-call API gateway: x402 paywall and proxy for HTTP APIs, settled in USDC on Stellar",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
@@ -29,7 +29,7 @@
   "author": "mano.dev",
   "license": "MIT",
   "dependencies": {
-    "@mindvault/registry-client": "workspace:*",
+    "@zentrixpay/registry-client": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.217.0",
     "@opentelemetry/instrumentation-express": "^0.57.0",

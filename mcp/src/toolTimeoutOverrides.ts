@@ -3,19 +3,19 @@
  *
  * `httpTimeout.ts` gives each *service* a budget: `http`, `horizon`, `soroban`,
  * `payment`. That is the right granularity for most deployments and the wrong
- * one for a few specific tools. `mindvault_publish` and
- * `mindvault_register_onchain` do markedly more work than a catalog read, yet
- * both sit under the same `http` budget; raising `MINDVAULT_HTTP_TIMEOUT_MS` to
+ * one for a few specific tools. `zentrixpay_publish` and
+ * `zentrixpay_register_onchain` do markedly more work than a catalog read, yet
+ * both sit under the same `http` budget; raising `ZENTRIXPAY_HTTP_TIMEOUT_MS` to
  * accommodate them also makes every quick call wait four times as long before
  * giving up, which is the opposite of what a deadline is for.
  *
- * One environment variable, `MINDVAULT_TOOL_TIMEOUTS`, carries a list of
+ * One environment variable, `ZENTRIXPAY_TOOL_TIMEOUTS`, carries a list of
  * per-tool overrides:
  *
- *     MINDVAULT_TOOL_TIMEOUTS="mindvault_publish=120000,mindvault_browse=5000"
+ *     ZENTRIXPAY_TOOL_TIMEOUTS="zentrixpay_publish=120000,zentrixpay_browse=5000"
  *
  * A tool named there uses its own budget; every other tool keeps the service
- * default. The `mindvault_` prefix is optional, so `publish=120000` works too.
+ * default. The `zentrixpay_` prefix is optional, so `publish=120000` works too.
  *
  * A single variable rather than one per tool is deliberate: the tool list grows
  * every release, and a scheme that mints a new environment variable per tool
@@ -30,10 +30,10 @@
 import type { TimeoutBudgets, TimeoutService } from "./httpTimeout.js";
 
 /** Environment variable holding the per-tool override list. */
-export const TOOL_TIMEOUTS_ENV_VAR = "MINDVAULT_TOOL_TIMEOUTS";
+export const TOOL_TIMEOUTS_ENV_VAR = "ZENTRIXPAY_TOOL_TIMEOUTS";
 
 /** Prefix every MCP tool name carries; optional in the override list. */
-const TOOL_PREFIX = "mindvault_";
+const TOOL_PREFIX = "zentrixpay_";
 
 /** Parsed overrides: fully-qualified tool name -> milliseconds. */
 export type ToolTimeoutOverrides = Record<string, number>;
@@ -44,7 +44,7 @@ export interface ParsedOverrides {
   problems: string[];
 }
 
-/** Add the `mindvault_` prefix when the operator left it off. */
+/** Add the `zentrixpay_` prefix when the operator left it off. */
 export function normalizeToolName(name: string): string {
   const trimmed = name.trim();
   return trimmed.startsWith(TOOL_PREFIX) ? trimmed : `${TOOL_PREFIX}${trimmed}`;
@@ -129,7 +129,7 @@ export function hasOverride(
 /**
  * Validate overrides against the tools the server actually exposes.
  *
- * A typo like `mindvault_publsh=120000` parses perfectly and silently applies
+ * A typo like `zentrixpay_publsh=120000` parses perfectly and silently applies
  * to nothing — exactly the failure a tuning variable must not have. Call this
  * with the real tool names at startup and surface what comes back.
  */

@@ -27,15 +27,15 @@ function textResult(text: string, isError = false): ToolCallResult {
 /** Responses a correctly installed, mock-backed server returns. */
 function healthyResponses(): Record<string, ToolCallResult> {
   return {
-    mindvault_verify_install: textResult(
-      "✓ MindVault MCP install OK.\n\n✓ Node.js v20.11.0 (>= v20 required) ✓",
+    zentrixpay_verify_install: textResult(
+      "✓ ZentrixPay MCP install OK.\n\n✓ Node.js v20.11.0 (>= v20 required) ✓",
     ),
-    mindvault_browse: textResult(`[${FIXTURE_RESOURCE_ID}] Intro to Stellar — $1.5 USDC`),
-    mindvault_search: textResult(`[${FIXTURE_RESOURCE_ID}] Intro to Stellar — $1.5 USDC`),
-    mindvault_preview: textResult(JSON.stringify({ id: FIXTURE_RESOURCE_ID, price: "$1.5 USDC" })),
-    mindvault_registry_lookup: textResult(JSON.stringify({ found: true }, null, 2)),
-    mindvault_export_receipts: textResult(
-      JSON.stringify({ schema: "mindvault.receipt-export/v1", count: 0 }, null, 2),
+    zentrixpay_browse: textResult(`[${FIXTURE_RESOURCE_ID}] Intro to Stellar — $1.5 USDC`),
+    zentrixpay_search: textResult(`[${FIXTURE_RESOURCE_ID}] Intro to Stellar — $1.5 USDC`),
+    zentrixpay_preview: textResult(JSON.stringify({ id: FIXTURE_RESOURCE_ID, price: "$1.5 USDC" })),
+    zentrixpay_registry_lookup: textResult(JSON.stringify({ found: true }, null, 2)),
+    zentrixpay_export_receipts: textResult(
+      JSON.stringify({ schema: "zentrixpay.receipt-export/v1", count: 0 }, null, 2),
     ),
   };
 }
@@ -60,17 +60,17 @@ function fakeClient(responses: Record<string, ToolCallResult>): {
 
 describe("checkToolSurface", () => {
   it("passes when every required tool is advertised", () => {
-    const result = checkToolSurface([...REQUIRED_INSTALL_TOOLS, "mindvault_metrics"]);
+    const result = checkToolSurface([...REQUIRED_INSTALL_TOOLS, "zentrixpay_metrics"]);
     expect(result.ok).toBe(true);
     expect(result.missing).toEqual([]);
     expect(result.advertised).toBe(REQUIRED_INSTALL_TOOLS.length + 1);
   });
 
   it("names the tools a half-installed server fails to advertise", () => {
-    const result = checkToolSurface(["mindvault_browse"]);
+    const result = checkToolSurface(["zentrixpay_browse"]);
     expect(result.ok).toBe(false);
-    expect(result.missing).toContain("mindvault_verify_install");
-    expect(result.missing).not.toContain("mindvault_browse");
+    expect(result.missing).toContain("zentrixpay_verify_install");
+    expect(result.missing).not.toContain("zentrixpay_browse");
   });
 
   it("fails an install that boots but advertises nothing", () => {
@@ -83,9 +83,9 @@ describe("installSmokeEnv", () => {
     const env = installSmokeEnv("/tmp/scratch-home", {});
     expect(env.HOME).toBe("/tmp/scratch-home");
     expect(env.USERPROFILE).toBe("/tmp/scratch-home");
-    expect(env.MINDVAULT_MOCK).toBe("1");
+    expect(env.ZENTRIXPAY_MOCK).toBe("1");
     expect(env.STELLAR_NETWORK).toBe("testnet");
-    expect(env.MINDVAULT_PURCHASES_FILE).toBe("/tmp/scratch-home/purchases.json");
+    expect(env.ZENTRIXPAY_PURCHASES_FILE).toBe("/tmp/scratch-home/purchases.json");
   });
 
   it("pins the network even when the operator's environment says mainnet", () => {
@@ -99,12 +99,12 @@ describe("installSmokeEnv", () => {
       STELLAR_SECRET_KEY: "S...",
       MY_PRIVATE_KEY: "x",
       WALLET_MNEMONIC: "y",
-      MINDVAULT_URL: "https://example.com",
+      ZENTRIXPAY_URL: "https://example.com",
     });
     expect(env.STELLAR_SECRET_KEY).toBeUndefined();
     expect(env.MY_PRIVATE_KEY).toBeUndefined();
     expect(env.WALLET_MNEMONIC).toBeUndefined();
-    expect(env.MINDVAULT_URL).toBe("https://example.com");
+    expect(env.ZENTRIXPAY_URL).toBe("https://example.com");
   });
 });
 
@@ -116,8 +116,8 @@ describe("install smoke scenario", () => {
     expect(report.ok).toBe(true);
     expect(report.steps.every((s) => s.ok)).toBe(true);
     // Read-only: an install check must never publish, pay, or write on-chain.
-    expect(calls.map((c) => c.name)).not.toContain("mindvault_publish");
-    expect(calls.map((c) => c.name)).not.toContain("mindvault_buy");
+    expect(calls.map((c) => c.name)).not.toContain("zentrixpay_publish");
+    expect(calls.map((c) => c.name)).not.toContain("zentrixpay_buy");
   });
 
   it("asks for the catalog sorted, so an unaccepted sort argument fails the run", async () => {
@@ -129,8 +129,8 @@ describe("install smoke scenario", () => {
     let call = 0;
     const client: SmokeToolClient = {
       callTool: async ({ name }) => {
-        if (name === "mindvault_browse" && ++call === 2) {
-          return textResult("Error: sort is not a recognized argument for mindvault_browse", true);
+        if (name === "zentrixpay_browse" && ++call === 2) {
+          return textResult("Error: sort is not a recognized argument for zentrixpay_browse", true);
         }
         return responses[name];
       },
@@ -143,8 +143,8 @@ describe("install smoke scenario", () => {
 
   it("fails when the install cannot verify itself", async () => {
     const responses = healthyResponses();
-    responses.mindvault_verify_install = textResult(
-      "✗ MindVault MCP install has issues.\n\n✗ Node.js v18.0.0 is below the minimum v20.",
+    responses.zentrixpay_verify_install = textResult(
+      "✗ ZentrixPay MCP install has issues.\n\n✗ Node.js v18.0.0 is below the minimum v20.",
     );
     const { client } = fakeClient(responses);
 
@@ -155,18 +155,18 @@ describe("install smoke scenario", () => {
 
   it("fails when fixtures are not serving the catalog", async () => {
     const responses = healthyResponses();
-    responses.mindvault_browse = textResult("No resources listed yet.");
+    responses.zentrixpay_browse = textResult("No resources listed yet.");
     const { client } = fakeClient(responses);
 
     const report = await runSmoke(client, buildInstallSmokeSteps());
     expect(report.ok).toBe(false);
     expect(report.failedStep).toBe("Browse catalog (fixtures)");
-    expect(report.steps.at(-1)?.text).toContain("MINDVAULT_MOCK=1");
+    expect(report.steps.at(-1)?.text).toContain("ZENTRIXPAY_MOCK=1");
   });
 
   it("fails when the receipt export returns an unversioned document", async () => {
     const responses = healthyResponses();
-    responses.mindvault_export_receipts = textResult(JSON.stringify({ count: 0 }));
+    responses.zentrixpay_export_receipts = textResult(JSON.stringify({ count: 0 }));
     const { client } = fakeClient(responses);
 
     const report = await runSmoke(client, buildInstallSmokeSteps());
@@ -176,11 +176,11 @@ describe("install smoke scenario", () => {
 
   it("stops at the first failure instead of running the rest", async () => {
     const responses = healthyResponses();
-    responses.mindvault_verify_install = textResult("Error: boom", true);
+    responses.zentrixpay_verify_install = textResult("Error: boom", true);
     const { client, calls } = fakeClient(responses);
 
     await runSmoke(client, buildInstallSmokeSteps());
-    expect(calls.map((c) => c.name)).toEqual(["mindvault_verify_install"]);
+    expect(calls.map((c) => c.name)).toEqual(["zentrixpay_verify_install"]);
   });
 });
 

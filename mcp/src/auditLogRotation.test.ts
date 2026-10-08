@@ -155,12 +155,12 @@ describe("RotatingJsonlWriter – writing", () => {
   it("writes entries that parse back individually", () => {
     const writer = new RotatingJsonlWriter({ path: logPath, maxBytes: 4096, maxFiles: 2 });
 
-    writer.write({ toolName: "mindvault_browse", status: "success" });
-    writer.write({ toolName: "mindvault_buy", status: "error" });
+    writer.write({ toolName: "zentrixpay_browse", status: "success" });
+    writer.write({ toolName: "zentrixpay_buy", status: "error" });
 
     expect(lines(logPath).map((line) => JSON.parse(line).toolName)).toEqual([
-      "mindvault_browse",
-      "mindvault_buy",
+      "zentrixpay_browse",
+      "zentrixpay_buy",
     ]);
   });
 
@@ -328,13 +328,13 @@ describe("createRotatingWriter", () => {
 
 describe("audit log integration", () => {
   it("stays stderr-only when no file is configured", () => {
-    initAuditLogging({ MINDVAULT_AUDIT_LOG: "1" });
+    initAuditLogging({ ZENTRIXPAY_AUDIT_LOG: "1" });
 
     expect(getAuditFileWriter()).toBeNull();
   });
 
   it("attaches the file sink when a path is set", () => {
-    initAuditLogging({ MINDVAULT_AUDIT_LOG: "1", [AUDIT_FILE_ENV_VARS.file]: logPath });
+    initAuditLogging({ ZENTRIXPAY_AUDIT_LOG: "1", [AUDIT_FILE_ENV_VARS.file]: logPath });
 
     expect(getAuditFileWriter()).not.toBeNull();
   });
@@ -347,21 +347,21 @@ describe("audit log integration", () => {
 
   it("writes real entries as JSONL", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
-    initAuditLogging({ MINDVAULT_AUDIT_LOG: "1", [AUDIT_FILE_ENV_VARS.file]: logPath });
+    initAuditLogging({ ZENTRIXPAY_AUDIT_LOG: "1", [AUDIT_FILE_ENV_VARS.file]: logPath });
 
-    logToolSuccess("mindvault_browse", 12, { network: "testnet" });
+    logToolSuccess("zentrixpay_browse", 12, { network: "testnet" });
 
     const [entry] = lines(logPath).map((line) => JSON.parse(line));
-    expect(entry.toolName).toBe("mindvault_browse");
+    expect(entry.toolName).toBe("zentrixpay_browse");
     expect(entry.status).toBe("success");
     expect(entry.duration).toBe(12);
   });
 
   it("keeps writing to stderr as well", () => {
     const stderr = vi.spyOn(console, "error").mockImplementation(() => {});
-    initAuditLogging({ MINDVAULT_AUDIT_LOG: "1", [AUDIT_FILE_ENV_VARS.file]: logPath });
+    initAuditLogging({ ZENTRIXPAY_AUDIT_LOG: "1", [AUDIT_FILE_ENV_VARS.file]: logPath });
 
-    logToolSuccess("mindvault_browse", 1);
+    logToolSuccess("zentrixpay_browse", 1);
 
     // stderr is for watching a live session; the file is for keeping.
     expect(stderr).toHaveBeenCalled();
@@ -370,13 +370,13 @@ describe("audit log integration", () => {
   it("rotates a real audit stream", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     initAuditLogging({
-      MINDVAULT_AUDIT_LOG: "1",
+      ZENTRIXPAY_AUDIT_LOG: "1",
       [AUDIT_FILE_ENV_VARS.file]: logPath,
       [AUDIT_FILE_ENV_VARS.maxBytes]: String(MIN_MAX_BYTES),
       [AUDIT_FILE_ENV_VARS.maxFiles]: "2",
     });
 
-    for (let n = 0; n < 300; n++) logToolSuccess("mindvault_browse", n, { message: `call ${n}` });
+    for (let n = 0; n < 300; n++) logToolSuccess("zentrixpay_browse", n, { message: `call ${n}` });
 
     expect(existsSync(rotatedPath(logPath, 1))).toBe(true);
     expect(statSync(logPath).size).toBeLessThanOrEqual(MIN_MAX_BYTES);

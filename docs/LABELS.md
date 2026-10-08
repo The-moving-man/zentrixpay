@@ -1,6 +1,6 @@
 # Issue & PR Labels
 
-MindVault uses a small, consistent label taxonomy so contributors and
+ZentrixPay uses a small, consistent label taxonomy so contributors and
 maintainers can triage at a glance and so open-source contributor **waves** can
 be tracked together.
 
@@ -32,7 +32,7 @@ client package.
 - `area: web` — React web app (`web/`)
 - `area: contract` — Soroban vault-registry contract (`contract/`)
 - `area: mcp` — MCP server for AI agents (`mcp/`)
-- `area: registry-client` — shared `@mindvault/registry-client` package
+- `area: registry-client` — shared `@zentrixpay/registry-client` package
   (`packages/registry-client/`)
 - `area: docs` — documentation, README, guides (`docs/`)
 - `area: ci` — CI workflows, tooling, repo config (`.github/`, `scripts/`)

@@ -1,25 +1,25 @@
 # MCP Wallet Profiles
 
-The MindVault MCP server supports **multiple named wallet profiles** so a single
+The ZentrixPay MCP server supports **multiple named wallet profiles** so a single
 agent can keep separate identities — for example `testnet` vs `mainnet`, or a
 `publisher` identity vs a `buyer` identity. Each profile has its own Stellar
 wallet and its own publisher API key. Exactly one profile is **active** at a
 time, and every tool operates on the active profile.
 
-Profiles are persisted to `~/.mindvault/state.json` (mode `0600`) and reloaded on
+Profiles are persisted to `~/.zentrixpay/state.json` (mode `0600`) and reloaded on
 restart. Secret keys are never shown in tool output.
 
 ## Tools
 
 | Tool                      | What it does                                                                                                                                                                              |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mindvault_setup_wallet`  | Create a wallet. Optional `profile` arg creates/switches to that named profile before creating it.                                                                                        |
-| `mindvault_use_profile`   | Switch the active profile (`name` required), creating it if it does not exist.                                                                                                            |
-| `mindvault_list_profiles` | List all profiles, marking the active one and showing each wallet address and registration state.                                                                                         |
-| `mindvault_wallet_info`   | Show the active profile name, wallet address, USDC balance, and whether it is registered.                                                                                                 |
-| `mindvault_reset`         | Clear the active profile's credentials, or pass `all=true` to remove every profile and delete state. Requires `confirm=true` — see [Reset confirmation guard](#reset-confirmation-guard). |
-| `mindvault_backup_state`  | Export an encrypted backup of `~/.mindvault/state.json` (passphrase min 8 chars). No plaintext secrets in the blob.                                                                       |
-| `mindvault_restore_state` | Restore state from a `mindvault_backup_state` blob. Integrity-checked before any write.                                                                                                   |
+| `zentrixpay_setup_wallet`  | Create a wallet. Optional `profile` arg creates/switches to that named profile before creating it.                                                                                        |
+| `zentrixpay_use_profile`   | Switch the active profile (`name` required), creating it if it does not exist.                                                                                                            |
+| `zentrixpay_list_profiles` | List all profiles, marking the active one and showing each wallet address and registration state.                                                                                         |
+| `zentrixpay_wallet_info`   | Show the active profile name, wallet address, USDC balance, and whether it is registered.                                                                                                 |
+| `zentrixpay_reset`         | Clear the active profile's credentials, or pass `all=true` to remove every profile and delete state. Requires `confirm=true` — see [Reset confirmation guard](#reset-confirmation-guard). |
+| `zentrixpay_backup_state`  | Export an encrypted backup of `~/.zentrixpay/state.json` (passphrase min 8 chars). No plaintext secrets in the blob.                                                                       |
+| `zentrixpay_restore_state` | Restore state from a `zentrixpay_backup_state` blob. Integrity-checked before any write.                                                                                                   |
 
 ## Moving environments (backup / restore)
 
@@ -27,15 +27,15 @@ When you need to move an agent between machines, export an encrypted backup on
 the source and restore it on the destination. The blob is AES-256-GCM ciphertext
 keyed from your passphrase (scrypt); wallet secret keys and API keys never appear
 in plaintext. Wrong passphrase or a tampered blob fails the integrity check
-before any state is written. Existing `mindvault_reset` behavior is unchanged.
+before any state is written. Existing `zentrixpay_reset` behavior is unchanged.
 
 ```text
 # Source environment
-mindvault_backup_state { "passphrase": "your-long-passphrase" }
+zentrixpay_backup_state { "passphrase": "your-long-passphrase" }
 # → returns a v1:… blob (copy it offline)
 
 # Destination environment
-mindvault_restore_state {
+zentrixpay_restore_state {
   "blob": "v1:…",
   "passphrase": "your-long-passphrase"
 }
@@ -49,45 +49,45 @@ Unit coverage: [`mcp/src/stateBackup.test.ts`](../mcp/src/stateBackup.test.ts).
 A profile's wallet is only usable if the secret key it stores derives the address
 it stores. That is checked at both boundaries where a keypair can enter:
 
-- `mindvault_setup_wallet` verifies the sponsored-account service's response
+- `zentrixpay_setup_wallet` verifies the sponsored-account service's response
   before persisting, so a half-completed creation cannot leave a funded address
   the keystore does not own (#839, see
   [mcp-error-reference.md](mcp-error-reference.md#half-completed-creation-839)).
-- `mindvault_wallet_info` re-checks the stored keypair and adds a `⚠ Keystore:`
+- `zentrixpay_wallet_info` re-checks the stored keypair and adds a `⚠ Keystore:`
   line — and `ownsAddress: false` in its structured output — when they disagree,
   so a balance for an unsignable address never reads as spendable funds.
 
-`mindvault_import_wallet` derives the address from the secret it is given, so an
+`zentrixpay_import_wallet` derives the address from the secret it is given, so an
 imported wallet is consistent by construction.
 
 ## Reset confirmation guard
 
-`mindvault_reset` deletes wallet secret keys and publisher API keys. They are
-unrecoverable — the wallet secret exists only in `~/.mindvault/state.json` — so
+`zentrixpay_reset` deletes wallet secret keys and publisher API keys. They are
+unrecoverable — the wallet secret exists only in `~/.zentrixpay/state.json` — so
 an agent that misreads a prompt must not be able to wipe them in one call.
 
 The tool is therefore two-step. Without a truthy `confirm`, it **changes
 nothing** and returns a warning naming exactly what would be removed:
 
 ```text
-mindvault_reset {}
+zentrixpay_reset {}
 # → Reset NOT performed — confirmation required.
 #   This would permanently remove the active profile "publisher"
 #   (wallet secret key + publisher API key).
 #   Wallet secret keys cannot be recovered once deleted; back them up first
-#   with mindvault_backup_state.
-#   State file: ~/.mindvault/state.json
+#   with zentrixpay_backup_state.
+#   State file: ~/.zentrixpay/state.json
 #
-#   To proceed, call mindvault_reset again with confirm: true.
+#   To proceed, call zentrixpay_reset again with confirm: true.
 ```
 
 Passing `confirm: true` performs the reset:
 
 ```text
-mindvault_reset { "confirm": true }
+zentrixpay_reset { "confirm": true }
 # → Profile "publisher" cleared (wallet and publisher API key removed).
 
-mindvault_reset { "all": true, "confirm": true }
+zentrixpay_reset { "all": true, "confirm": true }
 # → Reset complete. All profiles removed from memory and disk.
 ```
 
@@ -106,7 +106,7 @@ Notes:
 - The warning is deterministic and never echoes a secret key.
 - The guard is independent of the mainnet guardrail: on mainnet a reset needs
   both `confirmMainnet` and `confirm`.
-- Back up first with `mindvault_backup_state` if the credentials still matter.
+- Back up first with `zentrixpay_backup_state` if the credentials still matter.
 
 Unit coverage: [`mcp/src/resetGuard.test.ts`](../mcp/src/resetGuard.test.ts) and
 [`mcp/src/resetTool.test.ts`](../mcp/src/resetTool.test.ts).
@@ -115,20 +115,20 @@ Unit coverage: [`mcp/src/resetGuard.test.ts`](../mcp/src/resetGuard.test.ts) and
 
 ```text
 # Create a dedicated publisher wallet under a named profile
-mindvault_setup_wallet { "profile": "publisher" }
-mindvault_register     { "name": "Alice", "email": "alice@example.com" }
+zentrixpay_setup_wallet { "profile": "publisher" }
+zentrixpay_register     { "name": "Alice", "email": "alice@example.com" }
 
 # Create a separate buyer identity and switch to it
-mindvault_setup_wallet { "profile": "buyer" }
+zentrixpay_setup_wallet { "profile": "buyer" }
 
 # See both identities (the active one is marked with *)
-mindvault_list_profiles
+zentrixpay_list_profiles
 #   publisher — GJPUBLISHER..., registered
 # * buyer — GJBUYER...
 
 # Switch back to the publisher to list something
-mindvault_use_profile  { "name": "publisher" }
-mindvault_publish      { "title": "My Dataset", "price": "5", "externalUrl": "https://example.com/data" }
+zentrixpay_use_profile  { "name": "publisher" }
+zentrixpay_publish      { "title": "My Dataset", "price": "5", "externalUrl": "https://example.com/data" }
 ```
 
 ## Profile names
@@ -182,4 +182,4 @@ overwritten. The quarantine and preservation helpers live in
 
 ## Mainnet guardrails
 
-When `STELLAR_NETWORK` is `mainnet`, mutation and buy tools require `confirmMainnet: true` (or process env `MINDVAULT_ALLOW_MAINNET=1`). Profile list/switch/info tools are read-only and stay unrestricted. See [mainnet-deployment-checklist.md](./mainnet-deployment-checklist.md#mcp-mainnet-guardrails).
+When `STELLAR_NETWORK` is `mainnet`, mutation and buy tools require `confirmMainnet: true` (or process env `ZENTRIXPAY_ALLOW_MAINNET=1`). Profile list/switch/info tools are read-only and stay unrestricted. See [mainnet-deployment-checklist.md](./mainnet-deployment-checklist.md#mcp-mainnet-guardrails).

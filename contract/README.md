@@ -1,12 +1,12 @@
-# MindVault Contracts (Soroban)
+# ZentrixPay Contracts (Soroban)
 
-Soroban smart contracts for MindVault. Today there is one:
+Soroban smart contracts for ZentrixPay. Today there is one:
 
 ## `vault-registry`
 
 An on-chain registry of vault resources. It is the transparent source of truth
 for **what** exists in the vault, **who** owns it, and **what it costs** —
-anyone can read it directly from the chain without trusting the MindVault API.
+anyone can read it directly from the chain without trusting the ZentrixPay API.
 
 Payments themselves do **not** run through this contract. They continue to flow
 through x402 and the USDC Stellar Asset Contract (see the root README). The
@@ -303,7 +303,7 @@ See [`docs/adr-fee-config.md`](../docs/adr-fee-config.md) for the full design ra
 | `get_memo_hash(id)`                                                          | —                                                        | `id: String`                                                                                                                                                                                                                                         | `Option<BytesN<32>>`                   | Fetch the memo hash recorded at registration by `register_with_memo`, or `None` for any other resource.                                                                                                                                                                                                  |
 | `set_verification_status(id, verifier, status, attestation_hash)`            | `verifier`                                               | `id: String`; `verifier: Address`; `status: VerificationStatus`; `attestation_hash: Option<String>`                                                                                                                                                  | `Result<(), Error>`                    | Mirror off-chain verification status on-chain. Hashes are stored as `algorithm:digest`; untagged hashes are memoized as `sha256:<digest>`. Emits `verify` with old status, new status, and the stored hash.                                                                                              |
 | `get_attestation_hash(id)`                                                   | —                                                        | `id: String`                                                                                                                                                                                                                                         | `Option<String>`                       | Fetch the optional version-tagged off-chain attestation hash recorded for a resource.                                                                                                                                                                                                                    |
-| `compute_attestation_hash(id, status, document_hash)` | — | `id: String`, `status: VerificationStatus`, `document_hash: BytesN<32>` | `String` | Pure: returns `sha256:<hex>` of `"mindvault-attestation-v1" \|\| u32_be(len(id)) \|\| id \|\| u32_be(status) \|\| document_hash`, so off-chain clients can recompute the expected attestation hash without trusting a wallet. |
+| `compute_attestation_hash(id, status, document_hash)` | — | `id: String`, `status: VerificationStatus`, `document_hash: BytesN<32>` | `String` | Pure: returns `sha256:<hex>` of `"zentrixpay-attestation-v1" \|\| u32_be(len(id)) \|\| id \|\| u32_be(status) \|\| document_hash`, so off-chain clients can recompute the expected attestation hash without trusting a wallet. |
 | `verify_attestation_hash(id, status, document_hash)` | — | `id: String`, `status: VerificationStatus`, `document_hash: BytesN<32>` | `bool` | `true` when the resource is in `status` and its stored attestation hash equals `compute_attestation_hash(...)`. |
 | `add_verifier(verifier)`                                                     | `admin`                                                  | `verifier: Address`                                                                                                                                                                                                                                  | `Result<(), Error>`                    | Grant the verifier role, authorizing `set_verification_status`. Errors `AdminNotSet` if no admin has been set yet.                                                                                                                                                                                       |
 | `remove_verifier(verifier)`                                                  | `admin`                                                  | `verifier: Address`                                                                                                                                                                                                                                  | `Result<(), Error>`                    | Revoke the verifier role.                                                                                                                                                                                                                                                                                |
@@ -1054,7 +1054,7 @@ like `get`, and stay available while the registry is paused.
 
 ```rust
 pub struct RegistryInfo {
-    pub name: String,                  // stable registry name ("mindvault-vault-registry")
+    pub name: String,                  // stable registry name ("zentrixpay-vault-registry")
     pub version: String,               // contract crate version (Cargo.toml, CARGO_PKG_VERSION)
     pub resource_schema_version: u32,  // version of the on-chain Resource schema
     pub network_id: BytesN<32>,        // env.ledger().network_id() of the ledger this is deployed on
@@ -1084,7 +1084,7 @@ For feature detection, `resource_schema_version()` returns
 | `LEASE_HOUR_LEDGERS` / `LEASE_DAY_LEDGERS` / `LEASE_WEEK_LEDGERS` | `720` / `17280` / `120960` | Lease duration per `LeaseTier`. |
 | `LEASE_HOUR_MULTIPLIER` / `LEASE_DAY_MULTIPLIER` / `LEASE_WEEK_MULTIPLIER` | `1` / `5` / `20` | Lease price multiplier over the per-request price, per `LeaseTier`. |
 | `RESOURCE_SCHEMA_VERSION`  | `2`                          | Current `Resource` schema version (tags added in v2). |
-| `REGISTRY_NAME`            | `"mindvault-vault-registry"` | Stable name returned by `registry_info()`.            |
+| `REGISTRY_NAME`            | `"zentrixpay-vault-registry"` | Stable name returned by `registry_info()`.            |
 
 Before a deployment is used, call
 `initialize_network(env.ledger().network_id())` once. The contract records the
@@ -1116,14 +1116,14 @@ must require an explicit deployment guard.
 | `LEASE_HOUR_LEDGERS` / `LEASE_DAY_LEDGERS` / `LEASE_WEEK_LEDGERS` | `720` / `17280` / `120960` | Lease duration per `LeaseTier`.                                                                                          |
 | `LEASE_HOUR_MULTIPLIER` / `LEASE_DAY_MULTIPLIER` / `LEASE_WEEK_MULTIPLIER` | `1` / `5` / `20` | Lease price multiplier over the per-request price, per `LeaseTier`.                                                     |
 | `RESOURCE_SCHEMA_VERSION`  | `2`                          | Current `Resource` schema version (tags added in v2).                                                                                        |
-| `REGISTRY_NAME`            | `"mindvault-vault-registry"` | Stable name returned by `registry_info()`.                                                                                                   |
+| `REGISTRY_NAME`            | `"zentrixpay-vault-registry"` | Stable name returned by `registry_info()`.                                                                                                   |
 | Constant                   | Value                        | Description                                                                                                                                  |
 | -------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | `MAX_METADATA_POINTER_LEN` | `512`                        | Maximum length of the metadata pointer in bytes.                                                                                             |
 | `MAX_TERMS_HASH_LEN`       | `64`                         | Maximum length of the creator terms hash in bytes.                                                                                           |
 | `MAX_PRICE`                | `1_000_000_000_000_000_000`  | Maximum price in USDC base units (100 billion USDC).                                                                                          |
 | `RESOURCE_SCHEMA_VERSION`  | `6`                          | Current `Resource` schema version (`metadata_frozen_at` added in v6).                                                                        |
-| `REGISTRY_NAME`            | `"mindvault-vault-registry"` | Stable name returned by `registry_info()`.                                                                                                   |
+| `REGISTRY_NAME`            | `"zentrixpay-vault-registry"` | Stable name returned by `registry_info()`.                                                                                                   |
 | `MAX_FEE_BPS`              | `5_000`                      | Maximum fee in basis points (50 %). Neither `platform_fee_bps` nor `royalty_bps` may exceed this individually, and their sum may not either. |
 | `FEE_BPS_DENOM`            | `10_000`                     | Basis-point denominator. `amount * fee_bps / FEE_BPS_DENOM` converts a fee to a USDC base-unit amount.                                          |
 | `MAX_FEE_DESTINATION_BPS`  | `10_000`                     | Maximum share of the platform fee routed to a burn or charity destination.                                                                         |

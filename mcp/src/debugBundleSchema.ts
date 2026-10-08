@@ -1,10 +1,10 @@
 /**
- * Constants and the advertised output schema for `mindvault_debug_bundle`
+ * Constants and the advertised output schema for `zentrixpay_debug_bundle`
  * (#675), kept import-free so `tools.ts` and `validation.ts` can read them
  * without pulling in the runtime (which itself depends on `tools.ts`).
  */
 
-export const DEBUG_BUNDLE_SCHEMA = "mindvault.debug-bundle/v1";
+export const DEBUG_BUNDLE_SCHEMA = "zentrixpay.debug-bundle/v1";
 
 /** Default and ceiling for the audit-log tail. */
 export const DEBUG_BUNDLE_DEFAULT_AUDIT_LINES = 50;
@@ -58,7 +58,7 @@ export const DEBUG_BUNDLE_OUTPUT_SCHEMA = {
     environment: {
       type: ["object", "null"],
       description:
-        'MindVault-related environment variables; credential-like names carry "[REDACTED]". Null when includeEnvironment is false.',
+        'ZentrixPay-related environment variables; credential-like names carry "[REDACTED]". Null when includeEnvironment is false.',
       additionalProperties: { type: "string" },
     },
     diagnostics: {
@@ -135,7 +135,7 @@ export const DEBUG_BUNDLE_OUTPUT_SCHEMA = {
     },
     metrics: {
       type: "object",
-      description: "The mindvault_metrics snapshot; enabled=false when metrics are off.",
+      description: "The zentrixpay_metrics snapshot; enabled=false when metrics are off.",
     },
     catalogCache: {
       type: "object",

@@ -164,7 +164,7 @@ Legend:
     --network $NETWORK \
     --id $NEW_CONTRACT_ID \
     -- registry_info
-  # Expected: name="mindvault-vault-registry",
+  # Expected: name="zentrixpay-vault-registry",
   #           version=<new cargo version>,
   #           resource_schema_version=<current RESOURCE_SCHEMA_VERSION>,
   #           network_id=<correct network>
@@ -219,7 +219,7 @@ embedded contract ID in the generated client.
 
   ```bash
   # From within an MCP session, or via the registry-client package test:
-  pnpm --filter @mindvault/registry-client test
+  pnpm --filter @zentrixpay/registry-client test
   ```
 
   The `bindingCheck.test.ts` suite compares the installed binding method set
@@ -241,7 +241,7 @@ embedded contract ID in the generated client.
 - [ ] **Server starts without errors against the new contract ID**
 
   ```bash
-  VAULT_REGISTRY_CONTRACT_ID=$NEW_CONTRACT_ID pnpm --filter @mindvault/server dev
+  VAULT_REGISTRY_CONTRACT_ID=$NEW_CONTRACT_ID pnpm --filter @zentrixpay/server dev
   # Check stderr for any registry client initialisation errors
   ```
 
@@ -263,20 +263,20 @@ embedded contract ID in the generated client.
       In an MCP session connected to the updated server:
 
   ```
-  mindvault_registry_info
+  zentrixpay_registry_info
   # Check: bindingCheck.status === "match"
   ```
 
 - [ ] **End-to-end smoke test passes** (testnet only)
 
   ```bash
-  pnpm --filter @mindvault/mcp smoke
+  pnpm --filter @zentrixpay/mcp smoke
   # Expected: all tool calls succeed, exits 0
   ```
 
 - [ ] **Reconciliation reports no drift** (after seeding any data)
   ```bash
-  pnpm --filter @mindvault/server reconcile
+  pnpm --filter @zentrixpay/server reconcile
   # Expected: "Result: ALL CLEAR"
   ```
 
@@ -381,10 +381,10 @@ CONTRACT_WASM=contract/target/wasm32v1-none/release/vault_registry.wasm \
   pnpm contract:bindings
 
 # 6. Run server tests
-pnpm --filter @mindvault/server test
+pnpm --filter @zentrixpay/server test
 
 # 7. Reconcile
-pnpm --filter @mindvault/server reconcile
+pnpm --filter @zentrixpay/server reconcile
 ```
 
 ---

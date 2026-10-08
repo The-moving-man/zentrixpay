@@ -1,6 +1,6 @@
 # MCP Architecture — Agent Flow
 
-This document describes how an AI agent (Claude Code, Codex, or any MCP-enabled client) interacts with MindVault through the MCP server.
+This document describes how an AI agent (Claude Code, Codex, or any MCP-enabled client) interacts with ZentrixPay through the MCP server.
 
 The MCP server is a thin adapter layer. It translates natural-language tool calls into HTTP API requests and x402 payment flows, then returns a human-readable text block and, for tools with structured results, a machine-readable `structuredContent` object (see [mcp-structured-output.md](mcp-structured-output.md)). The agent never touches Stellar or Soroban directly — the MCP server handles wallet management, payment signing, and x402 negotiation.
 
@@ -13,31 +13,31 @@ sequenceDiagram
     participant Agent as AI Agent<br/>(Claude / Codex)
     participant MCP as MCP Server<br/>(mcp/src/index.ts)
     participant Sponsored as Sponsored Account<br/>Service
-    participant API as MindVault API<br/>(server/)
+    participant API as ZentrixPay API<br/>(server/)
     participant Facilitator as x402 Facilitator<br/>(x402.org)
     participant Stellar as Stellar / Soroban<br/>(testnet / mainnet)
 
     Note over Agent,Stellar: ── 1. Wallet Setup ──────────────────────────────────────
 
-    Agent->>MCP: mindvault_setup_wallet
+    Agent->>MCP: zentrixpay_setup_wallet
     MCP->>Sponsored: POST /create
     Sponsored->>Stellar: sponsor reserve + create account + USDC trustline
     Stellar-->>Sponsored: account funded
     Sponsored-->>MCP: { publicKey, secretKey }
     MCP-->>Agent: "Wallet created. Address: G..."
-    Note over MCP: secretKey persisted to<br/>~/.mindvault/state.json (mode 0600)
+    Note over MCP: secretKey persisted to<br/>~/.zentrixpay/state.json (mode 0600)
 
     Note over Agent,Stellar: ── 2. Publisher Registration ─────────────────────────
 
-    Agent->>MCP: mindvault_register(name, email)
+    Agent->>MCP: zentrixpay_register(name, email)
     MCP->>API: POST /publishers { name, email, walletAddress }
     API-->>MCP: { id, apiKey }
     MCP-->>Agent: "Registered as publisher."
-    Note over MCP: apiKey persisted to<br/>~/.mindvault/state.json (mode 0600)
+    Note over MCP: apiKey persisted to<br/>~/.zentrixpay/state.json (mode 0600)
 
     Note over Agent,Stellar: ── 3. Publish + Verification Payment ────────────────
 
-    Agent->>MCP: mindvault_publish(title, price, externalUrl)
+    Agent->>MCP: zentrixpay_publish(title, price, externalUrl)
     MCP->>API: POST /resources [x-api-key] { title, price, externalUrl }
     API-->>MCP: { id, accessUrl, verificationStatus: "pending" }
 
@@ -58,19 +58,19 @@ sequenceDiagram
 
     Note over Agent,Stellar: ── 4. Browse & Preview ──────────────────────────────
 
-    Agent->>MCP: mindvault_browse
+    Agent->>MCP: zentrixpay_browse
     MCP->>API: GET /resources
     API-->>MCP: [ { id, title, price, accessUrl }, ... ]
     MCP-->>Agent: formatted resource list
 
-    Agent->>MCP: mindvault_preview(resourceId)
+    Agent->>MCP: zentrixpay_preview(resourceId)
     MCP->>API: GET /resources/:id/meta
     API-->>MCP: { title, description, price, verificationStatus }
     MCP-->>Agent: formatted resource details
 
     Note over Agent,Stellar: ── 5. Resource Purchase ──────────────────────────────
 
-    Agent->>MCP: mindvault_buy(resourceId)
+    Agent->>MCP: zentrixpay_buy(resourceId)
     MCP->>API: GET /resources/:id
     API-->>MCP: 402 Payment Required<br/>PAYMENT-REQUIRED: eyJ...
 
@@ -105,12 +105,12 @@ The MCP server holds two pieces of state per wallet profile across tool calls:
 
 | State                                    | Set by                   | Used by                                                                             |
 | ---------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------- |
-| `agentWallet` `{ publicKey, secretKey }` | `mindvault_setup_wallet` | `mindvault_register`, `mindvault_publish`, `mindvault_buy`, `mindvault_wallet_info` |
-| `agentApiKey`                            | `mindvault_register`     | `mindvault_publish`                                                                 |
+| `agentWallet` `{ publicKey, secretKey }` | `zentrixpay_setup_wallet` | `zentrixpay_register`, `zentrixpay_publish`, `zentrixpay_buy`, `zentrixpay_wallet_info` |
+| `agentApiKey`                            | `zentrixpay_register`     | `zentrixpay_publish`                                                                 |
 
-Both are persisted to `~/.mindvault/state.json` (mode `0600`) and reloaded on
+Both are persisted to `~/.zentrixpay/state.json` (mode `0600`) and reloaded on
 restart, so a new session does not have to re-create the wallet or re-register.
-Clear them with `mindvault_reset`. Multiple named identities live side by side —
+Clear them with `zentrixpay_reset`. Multiple named identities live side by side —
 see [wallet profiles](mcp-wallet-profiles.md) — and the file's location,
 permissions, and backup path are covered in
 [client configs → state path](mcp-client-configs.md#state-path).
@@ -121,15 +121,15 @@ permissions, and backup path are covered in
 
 | Tool                         | API Call(s)                                      | Stellar/Soroban                                                        |
 | ---------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------- |
-| `mindvault_setup_wallet`     | `POST /create` (sponsored service)               | Creates account + trustline                                            |
-| `mindvault_wallet_info`      | Horizon `/accounts/:key`                         | Reads USDC balance                                                     |
-| `mindvault_browse`           | `GET /resources`                                 | None                                                                   |
-| `mindvault_preview`          | `GET /resources/:id/meta`                        | None                                                                   |
-| `mindvault_register`         | `POST /publishers`                               | None                                                                   |
-| `mindvault_publish`          | `POST /resources`, `POST /verify-content` (x402) | Signs + settles USDC payment to platform wallet                        |
-| `mindvault_buy`              | `GET /resources/:id` (x402)                      | Signs + settles USDC payment to creator wallet; persists local receipt |
-| `mindvault_purchase_history` | Local `~/.mindvault/purchases.json`              | None (read-only; filter by resourceId / network)                       |
-| `mindvault_agent_status`     | `GET /agent/status`                              | None                                                                   |
+| `zentrixpay_setup_wallet`     | `POST /create` (sponsored service)               | Creates account + trustline                                            |
+| `zentrixpay_wallet_info`      | Horizon `/accounts/:key`                         | Reads USDC balance                                                     |
+| `zentrixpay_browse`           | `GET /resources`                                 | None                                                                   |
+| `zentrixpay_preview`          | `GET /resources/:id/meta`                        | None                                                                   |
+| `zentrixpay_register`         | `POST /publishers`                               | None                                                                   |
+| `zentrixpay_publish`          | `POST /resources`, `POST /verify-content` (x402) | Signs + settles USDC payment to platform wallet                        |
+| `zentrixpay_buy`              | `GET /resources/:id` (x402)                      | Signs + settles USDC payment to creator wallet; persists local receipt |
+| `zentrixpay_purchase_history` | Local `~/.zentrixpay/purchases.json`              | None (read-only; filter by resourceId / network)                       |
+| `zentrixpay_agent_status`     | `GET /agent/status`                              | None                                                                   |
 
 ---
 
@@ -137,7 +137,7 @@ permissions, and backup path are covered in
 
 | Variable                | Default                                                | Description                         |
 | ----------------------- | ------------------------------------------------------ | ----------------------------------- |
-| `MINDVAULT_URL`         | `https://mindvault-hyr3.onrender.com`                  | MindVault API base URL              |
+| `ZENTRIXPAY_URL`         | `https://mindvault-hyr3.onrender.com`                  | ZentrixPay API base URL              |
 | `SPONSORED_ACCOUNT_URL` | `https://stellar-sponsored-agent-account.onrender.com` | Sponsored account service URL       |
 | `HORIZON_URL`           | `https://horizon-testnet.stellar.org`                  | Stellar Horizon for balance queries |
 
@@ -147,10 +147,10 @@ The MCP server has no `.env` file of its own — pass variables via your MCP cli
 
 ## Outbound Request Correlation
 
-Every outbound HTTP request the MCP server makes — to the MindVault API, Horizon, Soroban RPC, the sponsored-account service, and x402 paid fetches — carries an `x-request-id` header. The API echoes this header back and scopes its request context to it (see `server/src/middleware/requestContext.ts`), so an operator reading the server logs can find every request one MCP tool call produced, even when several tools are in flight at once.
+Every outbound HTTP request the MCP server makes — to the ZentrixPay API, Horizon, Soroban RPC, the sponsored-account service, and x402 paid fetches — carries an `x-request-id` header. The API echoes this header back and scopes its request context to it (see `server/src/middleware/requestContext.ts`), so an operator reading the server logs can find every request one MCP tool call produced, even when several tools are in flight at once.
 
-- **Per-tool-call id (default):** Each tool call runs in its own async scope and gets a fresh UUID. A single `mindvault_buy` issues a catalog/meta read and then an x402 payment; both legs carry the same id, so the trace stitches.
-- **Process-wide id (opt-in):** Set `MINDVAULT_CORRELATION_ID=my-session-id` to pin one id for the entire process lifetime. Useful when one MCP process serves a single agent session and you want every request in that session to share one id in the server logs.
+- **Per-tool-call id (default):** Each tool call runs in its own async scope and gets a fresh UUID. A single `zentrixpay_buy` issues a catalog/meta read and then an x402 payment; both legs carry the same id, so the trace stitches.
+- **Process-wide id (opt-in):** Set `ZENTRIXPAY_CORRELATION_ID=my-session-id` to pin one id for the entire process lifetime. Useful when one MCP process serves a single agent session and you want every request in that session to share one id in the server logs.
 - **No header overwriting:** If a caller explicitly supplies `x-request-id`, that value is preserved — it is more specific than the ambient scope id.
 
 The implementation lives in `mcp/src/correlation.ts` and uses `AsyncLocalStorage` from `node:async_hooks`.

@@ -375,14 +375,14 @@ describe("dryRunPublish – live fee and balance (new fields)", () => {
   it("includes warning when balance was read but fee was not", () => {
     const result = dryRunPublish(input, network, baseUrl, true, true, { usdcBalance: "100.00" });
     expect(result.warnings).toContain(
-      "Balance was read but the fee was not, so affordability could not be determined. Check with mindvault_agent_status.",
+      "Balance was read but the fee was not, so affordability could not be determined. Check with zentrixpay_agent_status.",
     );
   });
 
   it("includes warning when no publisher API key", () => {
     const result = dryRunPublish(input, network, baseUrl, true, false, {});
     expect(result.warnings).toContain(
-      "No publisher API key in the active profile; run mindvault_register first.",
+      "No publisher API key in the active profile; run zentrixpay_register first.",
     );
   });
 

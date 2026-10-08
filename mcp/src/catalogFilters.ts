@@ -1,5 +1,5 @@
 /**
- * Shared catalog filter parsing for mindvault_browse and mindvault_search.
+ * Shared catalog filter parsing for zentrixpay_browse and zentrixpay_search.
  * Keeps MCP query params aligned with GET /resources (server catalogQuerySchema)
  * and adds tags + listed for client-side parity with on-chain / meta fields.
  */
@@ -427,7 +427,7 @@ export const catalogFilterInputProperties = {
   listed: {
     type: "boolean",
     description:
-      "Filter by listing state. The public catalog is listed=true only; listed=false yields no public catalog matches (use mindvault_registry_lookup for a specific resource).",
+      "Filter by listing state. The public catalog is listed=true only; listed=false yields no public catalog matches (use zentrixpay_registry_lookup for a specific resource).",
     examples: [true, false],
   },
 } as const;

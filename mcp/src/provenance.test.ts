@@ -27,11 +27,11 @@ import {
 const COMMIT = "0123456789abcdef0123456789abcdef01234567";
 
 const MANIFEST = {
-  name: "@mindvault/mcp",
+  name: "@zentrixpay/mcp",
   version: "1.0.0",
   repository: {
     type: "git",
-    url: "git+https://github.com/distributed-nerd/mindvault.git",
+    url: "git+https://github.com/anitajordan22244-afk/zentrixpay.git",
     directory: "mcp",
   },
 };
@@ -150,7 +150,7 @@ describe("buildProvenance", () => {
   it("records the package identity", () => {
     const provenance = build();
 
-    expect(provenance.name).toBe("@mindvault/mcp");
+    expect(provenance.name).toBe("@zentrixpay/mcp");
     expect(provenance.version).toBe("1.0.0");
     expect(provenance.schemaVersion).toBe(PROVENANCE_SCHEMA_VERSION);
   });
@@ -160,7 +160,7 @@ describe("buildProvenance", () => {
 
     expect(provenance.source.commit).toBe(COMMIT);
     expect(provenance.source.ref).toBe("main");
-    expect(provenance.source.repository).toBe("https://github.com/distributed-nerd/mindvault");
+    expect(provenance.source.repository).toBe("https://github.com/anitajordan22244-afk/zentrixpay");
     expect(provenance.source.dirty).toBe(false);
   });
 
@@ -358,7 +358,7 @@ describe("checkProvenance", () => {
   it("accepts an equivalent repository spelling", () => {
     const results = checkProvenance(
       build(),
-      { ...MANIFEST, repository: "distributed-nerd/mindvault" },
+      { ...MANIFEST, repository: "anitajordan22244-afk/zentrixpay" },
       packed,
     );
 

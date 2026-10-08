@@ -4,7 +4,7 @@ import {
   applyNetworkEnvDefaults,
   resolveStellarNetwork,
   validateNetworkConfig,
-} from "@mindvault/registry-client";
+} from "@zentrixpay/registry-client";
 import { rootLogger } from "./lib/logger.js";
 
 const envWithDefaults = applyNetworkEnvDefaults(process.env);
@@ -102,6 +102,30 @@ const envSchema = z.object({
   // Max distinct filter/sort/pagination combinations cached for the catalog
   // (#316). Bounds key cardinality; oldest entries are evicted (FIFO).
   CATALOG_CACHE_MAX_KEYS: z.coerce.number().int().min(1).default(200),
+
+  // API proxy (pay-per-call gateway)
+  // 32-byte key (64 hex chars) used to encrypt providers' upstream secret
+  // headers at rest. Without it, APIs cannot be registered with a secret.
+  UPSTREAM_SECRET_KEY: z
+    .string()
+    .regex(/^[0-9a-fA-F]{64}$/, "UPSTREAM_SECRET_KEY must be 64 hex characters")
+    .optional(),
+  // Largest request body forwarded to an upstream API (express size string).
+  PROXY_MAX_REQUEST_BODY: z.string().default("5mb"),
+  // Upstream responses are held in memory until payment settles, so they are capped.
+  PROXY_MAX_RESPONSE_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(10 * 1024 * 1024),
+  // Default and ceiling for a single upstream call. Kept under REQUEST_TIMEOUT_MS.
+  PROXY_DEFAULT_TIMEOUT_MS: z.coerce.number().int().positive().default(15_000),
+  PROXY_MAX_TIMEOUT_MS: z.coerce.number().int().positive().default(25_000),
+  // Local development only: allow upstreams on loopback/private networks.
+  PROXY_ALLOW_PRIVATE_UPSTREAMS: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((v) => v === "true"),
 });
 
 const parsed = envSchema.safeParse(envWithDefaults);

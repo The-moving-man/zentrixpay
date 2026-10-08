@@ -93,21 +93,21 @@ export const PAYMENT_STAGE_CLASSIFICATION: Record<PaymentStage, PaymentRetryClas
     "conditional",
     true,
     "A payment was constructed and signed but not confirmed as submitted. A signed Stellar transaction can still be submitted by anyone holding it, so it may settle after the failure was reported.",
-    "Check mindvault_purchase_history and, if a tx hash is known, mindvault_tx_status before retrying. Retry only once the original is confirmed not to have settled.",
+    "Check zentrixpay_purchase_history and, if a tx hash is known, zentrixpay_tx_status before retrying. Retry only once the original is confirmed not to have settled.",
   ),
   submitted: classification(
     "submitted",
     "conditional",
     true,
     "The signed payment was submitted and the response was lost — a timeout, a dropped connection, or a 5xx after submission. The network may have accepted it.",
-    "Do not retry blind. Confirm with mindvault_tx_status; a timeout is not evidence of failure. Retry only if the transaction is definitively absent.",
+    "Do not retry blind. Confirm with zentrixpay_tx_status; a timeout is not evidence of failure. Retry only if the transaction is definitively absent.",
   ),
   settled: classification(
     "settled",
     "unsafe",
     true,
     "The payment settled on-chain; the failure happened afterwards, in delivery or bookkeeping.",
-    "Never retry the payment — it succeeded. Re-fetch the resource, and use mindvault_purchase_history to confirm the receipt was recorded.",
+    "Never retry the payment — it succeeded. Re-fetch the resource, and use zentrixpay_purchase_history to confirm the receipt was recorded.",
   ),
 };
 

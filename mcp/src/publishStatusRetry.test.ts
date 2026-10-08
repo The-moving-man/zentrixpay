@@ -1,5 +1,5 @@
 /**
- * Regression test for mindvault_publish_status under HTTP retry (#840).
+ * Regression test for zentrixpay_publish_status under HTTP retry (#840).
  *
  * Drives the tool against a stubbed `fetch`, so every poll goes through the
  * real `jsonFetch` and its bounded retry. The scenario from the issue: a
@@ -10,7 +10,7 @@
  */
 import { describe, it, expect, vi, afterEach } from "vitest";
 
-process.env.MINDVAULT_RETRY_ATTEMPTS = "3";
+process.env.ZENTRIXPAY_RETRY_ATTEMPTS = "3";
 
 const { publishStatus } = await import("./tools/wallet.js");
 
@@ -72,7 +72,7 @@ async function waitForStatus() {
   return { snapshot: JSON.parse(out), updates };
 }
 
-describe("mindvault_publish_status wait: true under retry", () => {
+describe("zentrixpay_publish_status wait: true under retry", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });

@@ -12,7 +12,7 @@ import {
 } from "./sponsoredDiagnostics.js";
 
 const SERVICE = "https://stellar-sponsored-agent-account.onrender.com";
-const OPERATION = "mindvault_setup_wallet failed to create wallet";
+const OPERATION = "zentrixpay_setup_wallet failed to create wallet";
 
 describe("sanitizeServiceUrl", () => {
   it("keeps a plain service URL intact", () => {
@@ -117,7 +117,7 @@ describe("diagnoseSponsoredOutage", () => {
   it("classifies a transport timeout separately from an unreachable host", () => {
     const outage = diagnoseSponsoredOutage({ serviceUrl: SERVICE, category: "timeout" });
     expect(outage.kind).toBe("timeout");
-    expect(outage.guidance.join(" ")).toContain("MINDVAULT_HTTP_TIMEOUT_MS");
+    expect(outage.guidance.join(" ")).toContain("ZENTRIXPAY_HTTP_TIMEOUT_MS");
   });
 
   it.each([502, 503, 504])("treats %i as the service being unavailable", (status) => {

@@ -3,8 +3,8 @@
  *
  * MCP tool handlers are async and can overlap. State-mutating tools perform
  * read-modify-write on module-level wallet/profile state and persist it to
- * `~/.mindvault/state.json`, so two overlapping calls (for example
- * `mindvault_setup_wallet` and `mindvault_register`) can interleave and lose an
+ * `~/.zentrixpay/state.json`, so two overlapping calls (for example
+ * `zentrixpay_setup_wallet` and `zentrixpay_register`) can interleave and lose an
  * update. `Mutex.runExclusive` serializes those critical sections: only one
  * caller holds the lock at a time, so reads and writes cannot interleave.
  */

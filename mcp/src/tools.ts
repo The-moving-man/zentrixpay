@@ -1,5 +1,5 @@
 /**
- * MCP tool definitions for the MindVault server.
+ * MCP tool definitions for the ZentrixPay server.
  *
  * This array is the single source of truth for the tool surface advertised to
  * agent clients (ListTools). It lives outside index.ts so tests and the
@@ -13,6 +13,8 @@
  * index.ts kept its own copy of this list and the two had drifted apart in
  * both directions; the contract test exists so that cannot recur silently.
  */
+
+import { API_TOOL_DEFINITIONS } from "./apiTools.js";
 
 import { catalogFilterInputProperties } from "./catalogFilters.js";
 import {
@@ -67,7 +69,7 @@ import {
 const CONFIRM_PAID_PROPERTY = {
   type: "boolean",
   description:
-    "Required when the server runs with MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
+    "Required when the server runs with ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc or =all. Explicitly confirm that this call may spend from the agent wallet. Ignored when the policy is off (the default) and on dry runs.",
 } as const;
 
 /** JSON Schema (draft subset) advertised for a tool's arguments. */
@@ -108,10 +110,11 @@ export interface ToolDefinition {
 }
 
 export const TOOL_DEFINITIONS: ToolDefinition[] = [
+  ...API_TOOL_DEFINITIONS,
   {
-    name: "mindvault_setup_wallet",
+    name: "zentrixpay_setup_wallet",
     description:
-      "Create a Stellar wallet using the sponsored account protocol. Optionally pass a profile name to create the wallet under a named profile (e.g. testnet, mainnet, publisher, buyer) and make it active; defaults to the active profile. The wallet (public key + secret key) is persisted to ~/.mindvault/state.json (mode 0600) and reloaded automatically on restart.",
+      "Create a Stellar wallet using the sponsored account protocol. Optionally pass a profile name to create the wallet under a named profile (e.g. testnet, mainnet, publisher, buyer) and make it active; defaults to the active profile. The wallet (public key + secret key) is persisted to ~/.zentrixpay/state.json (mode 0600) and reloaded automatically on restart.",
     inputSchema: {
       type: "object",
       properties: {
@@ -124,7 +127,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
       },
       required: [],
@@ -138,7 +141,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_wallet_info",
+    name: "zentrixpay_wallet_info",
     description:
       "Check the active profile name, its agent wallet address, USDC balance, and whether it is registered as a publisher.",
     inputSchema: { type: "object", properties: {}, required: [] },
@@ -151,7 +154,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_repair_sponsored_account",
+    name: "zentrixpay_repair_sponsored_account",
     description:
       "Repair a half-created sponsored account. Derives the address from a recovered secret key, re-fetches its Horizon balances, and restores the wallet to a local profile only when the on-chain account exists. The secret is never returned.",
     inputSchema: {
@@ -169,7 +172,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm restoring credentials for the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm restoring credentials for the public Stellar network.",
         },
       },
       required: ["secretKey"],
@@ -182,7 +185,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_use_profile",
+    name: "zentrixpay_use_profile",
     description:
       "Switch the active wallet profile, creating it if it does not exist. Profiles let one agent keep separate identities (e.g. testnet vs mainnet, publisher vs buyer); each has its own wallet and publisher API key. Subsequent tools operate on the active profile.",
     inputSchema: {
@@ -206,7 +209,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_list_profiles",
+    name: "zentrixpay_list_profiles",
     description:
       "List all named wallet profiles, marking the active one and showing each profile's wallet address and whether it is registered as a publisher. Secret keys are never shown.",
     inputSchema: { type: "object", properties: {}, required: [] },
@@ -219,7 +222,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_switch_network_profile",
+    name: "zentrixpay_switch_network_profile",
     description:
       "Switch the active wallet profile and Stellar network together, then re-run install verification for the selected network.",
     inputSchema: {
@@ -242,9 +245,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_browse",
+    name: "zentrixpay_browse",
     description:
-      "List resources in the MindVault catalog with the same optional filters as mindvault_search and GET /resources: keyword, price range, verification status, resource type, owner, sort, pagination, tags, and listed state. Sort accepts newest, price_asc, price_desc, or title; results are ordered client-side too, so the order holds even when the backend ignores the parameter.",
+      "List resources in the ZentrixPay catalog with the same optional filters as zentrixpay_search and GET /resources: keyword, price range, verification status, resource type, owner, sort, pagination, tags, and listed state. Sort accepts newest, price_asc, price_desc, or title; results are ordered client-side too, so the order holds even when the backend ignores the parameter.",
     inputSchema: {
       type: "object",
       properties: { ...catalogFilterInputProperties },
@@ -259,9 +262,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_search",
+    name: "zentrixpay_search",
     description:
-      "Search the MindVault catalog by keyword and optional filters for price, resource type, verification status, owner, sort, pagination, tags, and listed state. Uses server-side filtering where supported and returns compact resource summaries.",
+      "Search the ZentrixPay catalog by keyword and optional filters for price, resource type, verification status, owner, sort, pagination, tags, and listed state. Uses server-side filtering where supported and returns compact resource summaries.",
     inputSchema: {
       type: "object",
       properties: { ...catalogFilterInputProperties },
@@ -276,7 +279,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_preview",
+    name: "zentrixpay_preview",
     description:
       "Get details and price for a specific resource before purchasing. Returns title, description, price, type, verification status, and access URL.",
     inputSchema: {
@@ -285,7 +288,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         resourceId: {
           type: "string",
           description:
-            "The unique resource identifier from mindvault_browse or mindvault_search. Example: 'cm7x8y9z'",
+            "The unique resource identifier from zentrixpay_browse or zentrixpay_search. Example: 'cm7x8y9z'",
           examples: ["cm7x8y9z", "res-001", "ckx9j2h3f"],
         },
       },
@@ -300,9 +303,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_register",
+    name: "zentrixpay_register",
     description:
-      "Register as a publisher using the agent wallet. The API key is persisted to ~/.mindvault/state.json (mode 0600, key not shown in output) and reloaded on restart so mindvault_publish works across sessions.",
+      "Register as a publisher using the agent wallet. The API key is persisted to ~/.zentrixpay/state.json (mode 0600, key not shown in output) and reloaded on restart so zentrixpay_publish works across sessions.",
     inputSchema: {
       type: "object",
       properties: {
@@ -326,7 +329,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
       },
       required: ["name", "email"],
@@ -339,9 +342,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_publish",
+    name: "zentrixpay_publish",
     description:
-      "Publish a link resource to the MindVault catalog. The resource undergoes AI verification (agent wallet pays ~$0.10 USDC via x402) and is automatically registered on-chain if verified. Returns resource ID, access URL, verification result, and on-chain registration status. Pass dryRun: true to validate inputs without submitting payment.",
+      "Publish a link resource to the ZentrixPay catalog. The resource undergoes AI verification (agent wallet pays ~$0.10 USDC via x402) and is automatically registered on-chain if verified. Returns resource ID, access URL, verification result, and on-chain registration status. Pass dryRun: true to validate inputs without submitting payment.",
     inputSchema: {
       type: "object",
       properties: {
@@ -378,7 +381,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -393,16 +396,16 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_buy",
+    name: "zentrixpay_buy",
     description:
-      "Pay USDC via x402 and access a resource. Payments above MINDVAULT_MAX_AUTO_PAY_USDC (10 USDC by default) require maxAutoPayUsdc set to at least the resource price. On mainnet, pass confirmMainnet: true (or set MINDVAULT_ALLOW_MAINNET=1). Pass dryRun: true to validate the resource and show intended payment flow without submitting payment. Pass wait: true to poll the payment transaction until it settles on-chain before returning.",
+      "Pay USDC via x402 and access a resource. Payments above ZENTRIXPAY_MAX_AUTO_PAY_USDC (10 USDC by default) require maxAutoPayUsdc set to at least the resource price. On mainnet, pass confirmMainnet: true (or set ZENTRIXPAY_ALLOW_MAINNET=1). Pass dryRun: true to validate the resource and show intended payment flow without submitting payment. Pass wait: true to poll the payment transaction until it settles on-chain before returning.",
     inputSchema: {
       type: "object",
       properties: {
         resourceId: {
           type: "string",
           description:
-            "The resource ID to buy, from mindvault_browse or mindvault_search. Letters, digits, dot, dash, or underscore.",
+            "The resource ID to buy, from zentrixpay_browse or zentrixpay_search. Letters, digits, dot, dash, or underscore.",
           examples: ["cm7x8y9z", "swcn98besxpp6t1u8e77fqz3"],
         },
         dryRun: {
@@ -413,13 +416,13 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         maxAutoPayUsdc: {
           type: "string",
           description:
-            "Explicit per-call maximum automatic payment in USDC. Required when this resource costs more than MINDVAULT_MAX_AUTO_PAY_USDC; must be at least the advertised price.",
+            "Explicit per-call maximum automatic payment in USDC. Required when this resource costs more than ZENTRIXPAY_MAX_AUTO_PAY_USDC; must be at least the advertised price.",
           examples: ["25.00"],
         },
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
         wait: {
@@ -456,16 +459,16 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_buy_lease",
+    name: "zentrixpay_buy_lease",
     description:
-      "Buy a time-limited access lease on a resource instead of paying per request: pay the creator in USDC directly (hour, day, or week tier priced from the on-chain lease_price), then record the lease on the vault registry contract with the payment hash. The lease is Pending until a settler confirms the payment. Payments above MINDVAULT_MAX_AUTO_PAY_USDC require maxAutoPayUsdc. On mainnet, pass confirmMainnet: true (or set MINDVAULT_ALLOW_MAINNET=1). Pass dryRun: true to see the quote and steps without paying.",
+      "Buy a time-limited access lease on a resource instead of paying per request: pay the creator in USDC directly (hour, day, or week tier priced from the on-chain lease_price), then record the lease on the vault registry contract with the payment hash. The lease is Pending until a settler confirms the payment. Payments above ZENTRIXPAY_MAX_AUTO_PAY_USDC require maxAutoPayUsdc. On mainnet, pass confirmMainnet: true (or set ZENTRIXPAY_ALLOW_MAINNET=1). Pass dryRun: true to see the quote and steps without paying.",
     inputSchema: {
       type: "object",
       properties: {
         resourceId: {
           type: "string",
           description:
-            "The resource ID to lease, from mindvault_browse or mindvault_search. Letters, digits, dot, dash, or underscore.",
+            "The resource ID to lease, from zentrixpay_browse or zentrixpay_search. Letters, digits, dot, dash, or underscore.",
           examples: ["cm7x8y9z", "swcn98besxpp6t1u8e77fqz3"],
         },
         tier: {
@@ -483,13 +486,13 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         maxAutoPayUsdc: {
           type: "string",
           description:
-            "Explicit per-call maximum automatic payment in USDC. Required when the lease costs more than MINDVAULT_MAX_AUTO_PAY_USDC; must be at least the quoted price.",
+            "Explicit per-call maximum automatic payment in USDC. Required when the lease costs more than ZENTRIXPAY_MAX_AUTO_PAY_USDC; must be at least the quoted price.",
           examples: ["25.00"],
         },
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this payment on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -504,7 +507,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_lease_status",
+    name: "zentrixpay_lease_status",
     description:
       "Read the access lease recorded on the vault registry contract for a resource and holder (defaults to the agent wallet): tier, state, start and expiry ledgers, and whether it currently grants access. Read-only; no payment.",
     inputSchema: {
@@ -531,7 +534,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_export_receipts",
+    name: "zentrixpay_export_receipts",
     description:
       "Export receipts for resources this agent has purchased as a schema-versioned document (JSON, RFC 4180 CSV in the envelope's csv field, or Newline-Delimited JSON in the envelope's ndjson field). Filter by resource, network, and date range. Reports a row count and the summed USDC total, so an agent can reconcile spend without re-reading each purchase.",
     inputSchema: {
@@ -592,22 +595,22 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_register_onchain",
+    name: "zentrixpay_register_onchain",
     description:
-      "Register an already-published, verified resource on the vault registry contract. Use this to retry on-chain registration after mindvault_publish reports the on-chain step failed. Prepares the unsigned transaction, signs it with the agent wallet (which must be the resource creator), submits it, and returns the registry status and on-chain tx hash.",
+      "Register an already-published, verified resource on the vault registry contract. Use this to retry on-chain registration after zentrixpay_publish reports the on-chain step failed. Prepares the unsigned transaction, signs it with the agent wallet (which must be the resource creator), submits it, and returns the registry status and on-chain tx hash.",
     inputSchema: {
       type: "object",
       properties: {
         resourceId: {
           type: "string",
           description:
-            "The resource ID to register on-chain (from mindvault_publish output). Must be verified and not already registered. Example: 'cm7x8y9z'",
+            "The resource ID to register on-chain (from zentrixpay_publish output). Must be verified and not already registered. Example: 'cm7x8y9z'",
           examples: ["cm7x8y9z", "res-001", "ckx9j2h3f"],
         },
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -622,7 +625,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_agent_status",
+    name: "zentrixpay_agent_status",
     description:
       "Check the verification agent's earnings and activity. Returns total verifications, pass/fail counts, total USDC earned, average confidence score, and recent verification history with resource titles.",
     inputSchema: { type: "object", properties: {}, required: [] },
@@ -635,9 +638,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_registry_info",
+    name: "zentrixpay_registry_info",
     description:
-      "Return the on-chain vault-registry contract ID, network passphrase, RPC URL, and the resource fields available for direct Soroban queries. Use this to verify ownership, price, and listing state directly from Stellar without trusting the MindVault API.",
+      "Return the on-chain vault-registry contract ID, network passphrase, RPC URL, and the resource fields available for direct Soroban queries. Use this to verify ownership, price, and listing state directly from Stellar without trusting the ZentrixPay API.",
     inputSchema: { type: "object", properties: {}, required: [] },
     outputSchema: REGISTRY_INFO_OUTPUT_SCHEMA as unknown as Record<string, unknown>,
     annotations: {
@@ -648,7 +651,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_terms",
+    name: "zentrixpay_terms",
     description:
       'Get or set the active publisher wallet\'s on-chain licensing terms hash. Use operation "get" with a creator address to inspect terms, or "set" with termsHash to bind the active creator identity to a terms document digest.',
     inputSchema: {
@@ -672,7 +675,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         },
         confirmMainnet: {
           type: "boolean",
-          description: "Required for set on mainnet (or set MINDVAULT_ALLOW_MAINNET=1).",
+          description: "Required for set on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1).",
         },
       },
       required: ["operation"],
@@ -685,7 +688,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_network_profile",
+    name: "zentrixpay_network_profile",
     description:
       "Report current Stellar/x402 network configuration (testnet/mainnet), RPC URLs, registry contract ID, and warnings for custom overrides. Use this to verify which network the MCP is connected to and diagnose configuration issues.",
     inputSchema: { type: "object", properties: {}, required: [] },
@@ -698,7 +701,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_check_bindings",
+    name: "zentrixpay_check_bindings",
     description:
       "Verify the installed registry-client bindings match the deployed vault-registry contract interface. Reports a match, or a warning listing the drifting methods with the contract ID, network, client version, and a recommended fix (redeploy the contract or regenerate bindings). Useful after a contract redeploy or client upgrade.",
     inputSchema: { type: "object", properties: {}, required: [] },
@@ -710,7 +713,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_check_consistency",
+    name: "zentrixpay_check_consistency",
     description:
       "Compare a resource from the API catalog with the same resource in the vault-registry contract. Reports matching fields, mismatches, missing API records, and missing on-chain records, plus the content digest anchored in the on-chain metadata pointer. Pass expectedMetadataHash to assert the anchor matches a digest you computed yourself. Useful for detecting synchronization issues between the API and on-chain registry.",
     inputSchema: {
@@ -741,7 +744,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_verify_attestation",
+    name: "zentrixpay_verify_attestation",
     description:
       "Verify a resource's verifier attestation hash directly against the vault-registry contract. Pass the attestation hash computed for the content received after purchase; the tool compares it with the value registered on-chain and reports whether verification succeeded.",
     inputSchema: {
@@ -776,9 +779,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_registry_lookup",
+    name: "zentrixpay_registry_lookup",
     description:
-      "Look up a resource directly from the on-chain vault registry by its ID. Returns creator wallet address, price (USDC), metadata (title/description), listed state, tags, contract ID, and network. Data comes from Stellar/Soroban, not the MindVault API. Returns an actionable message when the resource is not registered on-chain.",
+      "Look up a resource directly from the on-chain vault registry by its ID. Returns creator wallet address, price (USDC), metadata (title/description), listed state, tags, contract ID, and network. Data comes from Stellar/Soroban, not the ZentrixPay API. Returns an actionable message when the resource is not registered on-chain.",
     inputSchema: {
       type: "object",
       properties: {
@@ -800,9 +803,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_registry_list",
+    name: "zentrixpay_registry_list",
     description:
-      "List resources registered in the on-chain vault-registry contract with pagination (Soroban list). Returns compact summaries directly from Stellar, not the MindVault API catalog. Use start/limit to page through insertion order; limit is capped at 20 to match the contract. Empty pages return a clear message and next-step hint.",
+      "List resources registered in the on-chain vault-registry contract with pagination (Soroban list). Returns compact summaries directly from Stellar, not the ZentrixPay API catalog. Use start/limit to page through insertion order; limit is capped at 20 to match the contract. Empty pages return a clear message and next-step hint.",
     inputSchema: {
       type: "object",
       properties: {
@@ -833,7 +836,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_registry_count",
+    name: "zentrixpay_registry_count",
     description:
       "Return on-chain resource counts directly from the vault-registry contract: total registered resources (count), currently listed resources (listed_count), and optionally how many resources a specific creator currently owns (creator_resource_count). Use this to get a quick summary of registry size without paging through all entries.",
     inputSchema: {
@@ -857,7 +860,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_tx_status",
+    name: "zentrixpay_tx_status",
     description:
       "Look up the status of a Stellar transaction by hash via Soroban RPC. Returns SUCCESS, FAILED, or NOT_FOUND along with ledger number, close time, application order, and XDR envelopes. Useful for debugging on-chain registration failures.",
     inputSchema: {
@@ -866,7 +869,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         txHash: {
           type: "string",
           description:
-            "The 64-character hex transaction hash from Stellar (a sha256 digest; case-insensitive, 'sha256:' prefix accepted). From mindvault_register_onchain or mindvault_publish output.",
+            "The 64-character hex transaction hash from Stellar (a sha256 digest; case-insensitive, 'sha256:' prefix accepted). From zentrixpay_register_onchain or zentrixpay_publish output.",
           examples: [
             "f47ac10b58cc4372a5670e02b2c3d479c3e5d0a1b2c3d4e5f6a7b8c9d0e1f2a3",
             "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278",
@@ -884,9 +887,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_reset",
+    name: "zentrixpay_reset",
     description:
-      "Clear credentials from memory and disk (~/.mindvault/state.json). By default only the active profile is cleared; pass all=true to remove every profile and delete the state file. After reset, run mindvault_setup_wallet and mindvault_register again.",
+      "Clear credentials from memory and disk (~/.zentrixpay/state.json). By default only the active profile is cleared; pass all=true to remove every profile and delete the state file. After reset, run zentrixpay_setup_wallet and zentrixpay_register again.",
     inputSchema: {
       type: "object",
       properties: {
@@ -905,7 +908,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
       },
       required: [],
@@ -918,9 +921,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_backup_state",
+    name: "zentrixpay_backup_state",
     description:
-      "Export ~/.mindvault/state.json to a mode-0600 encrypted recovery file after an explicit confirmation step. Requires a passphrase (min 8 chars); wallet secret keys and API keys never appear in plaintext. Restore with mindvault_restore_state using the file contents and same passphrase.",
+      "Export ~/.zentrixpay/state.json to a mode-0600 encrypted recovery file after an explicit confirmation step. Requires a passphrase (min 8 chars); wallet secret keys and API keys never appear in plaintext. Restore with zentrixpay_restore_state using the file contents and same passphrase.",
     inputSchema: {
       type: "object",
       properties: {
@@ -944,7 +947,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_resource_provenance",
+    name: "zentrixpay_resource_provenance",
     description:
       "Return the chronological creator, purchase, and ownership-transfer chain recorded for a resource. Never exposes wallet secrets or API keys.",
     inputSchema: {
@@ -962,7 +965,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_resource_change_log",
+    name: "zentrixpay_resource_change_log",
     description:
       "Return recent price and metadata changes recorded for a resource in chronological order.",
     inputSchema: {
@@ -980,15 +983,15 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_restore_state",
+    name: "zentrixpay_restore_state",
     description:
-      "Restore ~/.mindvault/state.json from an encrypted backup produced by mindvault_backup_state. Validates integrity (wrong passphrase or tampered data fails before any write). Replaces in-memory profiles and re-persists to disk (mode 0600). Existing reset behavior is unchanged.",
+      "Restore ~/.zentrixpay/state.json from an encrypted backup produced by zentrixpay_backup_state. Validates integrity (wrong passphrase or tampered data fails before any write). Replaces in-memory profiles and re-persists to disk (mode 0600). Existing reset behavior is unchanged.",
     inputSchema: {
       type: "object",
       properties: {
         blob: {
           type: "string",
-          description: "Encrypted backup blob from mindvault_backup_state (v1:… format).",
+          description: "Encrypted backup blob from zentrixpay_backup_state (v1:… format).",
         },
         passphrase: {
           type: "string",
@@ -1005,9 +1008,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_metrics",
+    name: "zentrixpay_metrics",
     description:
-      "Return opt-in tool-level metrics: per-tool call/error counts and durations, plus payment attempt/failure totals. Enable by setting MINDVAULT_METRICS=1 on the server. Output contains only tool names, counts, and durations — never arguments, wallets, or API keys. Pass reset=true to clear counters after reading. format=otlp renders the same snapshot as an OTLP/JSON ExportMetricsServiceRequest body for direct submission to an OpenTelemetry collector.",
+      "Return opt-in tool-level metrics: per-tool call/error counts and durations, plus payment attempt/failure totals. Enable by setting ZENTRIXPAY_METRICS=1 on the server. Output contains only tool names, counts, and durations — never arguments, wallets, or API keys. Pass reset=true to clear counters after reading. format=otlp renders the same snapshot as an OTLP/JSON ExportMetricsServiceRequest body for direct submission to an OpenTelemetry collector.",
     inputSchema: {
       type: "object",
       properties: {
@@ -1037,7 +1040,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_set_tags",
+    name: "zentrixpay_set_tags",
     description:
       "Replace the discovery tags on an on-chain resource. Only the resource creator (the agent wallet) may call this. Tags are normalized to lowercase before the on-chain call — pass them already lowercased to avoid round-trip surprises. Constraints: 0–8 tags, each 1–32 characters, containing only lowercase letters, digits, hyphens, or underscores. Pass an empty array to clear all tags. Requires a funded agent wallet.",
     inputSchema: {
@@ -1046,7 +1049,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         resourceId: {
           type: "string",
           description:
-            "The on-chain resource ID to update tags for (from mindvault_publish or mindvault_browse).",
+            "The on-chain resource ID to update tags for (from zentrixpay_publish or zentrixpay_browse).",
           examples: ["cm7x8y9z", "res-001"],
         },
         tags: {
@@ -1059,7 +1062,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -1073,7 +1076,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_update_metadata",
+    name: "zentrixpay_update_metadata",
     description:
       "Update the on-chain metadata pointer for a registered resource in the vault registry contract. Only the resource creator/owner may call this. Validates the pointer length and format (must start with ipfs://, ar://, http(s)://, sha256:, sha-256:, or 0x and be at most 512 characters) client-side before signing and submitting.",
     inputSchema: {
@@ -1082,7 +1085,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         resourceId: {
           type: "string",
           description:
-            "The on-chain resource ID to update (from mindvault_publish or mindvault_browse). Letters, digits, dot, dash, or underscore.",
+            "The on-chain resource ID to update (from zentrixpay_publish or zentrixpay_browse). Letters, digits, dot, dash, or underscore.",
           examples: ["cm7x8y9z", "res-001"],
         },
         metadata: {
@@ -1097,7 +1100,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -1112,7 +1115,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_set_price",
+    name: "zentrixpay_set_price",
     description:
       "Update the on-chain price in USDC for a registered resource in the vault registry contract. Only the resource creator/owner may call this. Prepares, signs, and submits the set_price mutation.",
     inputSchema: {
@@ -1132,7 +1135,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -1147,7 +1150,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_transfer_ownership",
+    name: "zentrixpay_transfer_ownership",
     description:
       "Transfer ownership of a registered resource on the vault registry contract to a new creator wallet address (G… key). Only the current resource owner may call this.",
     inputSchema: {
@@ -1166,7 +1169,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -1181,9 +1184,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_accept_transfer",
+    name: "zentrixpay_accept_transfer",
     description:
-      "Accept a pending ownership transfer of a registered resource. Only the address that was nominated as the new owner via mindvault_transfer_ownership can call this — the wallet must be the proposed new creator.",
+      "Accept a pending ownership transfer of a registered resource. Only the address that was nominated as the new owner via zentrixpay_transfer_ownership can call this — the wallet must be the proposed new creator.",
     inputSchema: {
       type: "object",
       properties: {
@@ -1195,7 +1198,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
         },
       },
       required: ["resourceId"],
@@ -1209,7 +1212,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_cancel_transfer",
+    name: "zentrixpay_cancel_transfer",
     description:
       "Cancel a pending ownership transfer of a registered resource. Only the current resource owner may call this. After an accepted transfer this will return an error — use this only while the transfer is still pending.",
     inputSchema: {
@@ -1223,7 +1226,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
         },
       },
       required: ["resourceId"],
@@ -1237,9 +1240,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_pending_transfer",
+    name: "zentrixpay_pending_transfer",
     description:
-      "Read the open ownership-transfer proposal for a registered resource. Returns the proposed new owner address if a pending transfer exists (created via mindvault_transfer_ownership), or a clear not-found message when no transfer is pending. Read-only — does not require a funded wallet.",
+      "Read the open ownership-transfer proposal for a registered resource. Returns the proposed new owner address if a pending transfer exists (created via zentrixpay_transfer_ownership), or a clear not-found message when no transfer is pending. Read-only — does not require a funded wallet.",
     inputSchema: {
       type: "object",
       properties: {
@@ -1261,7 +1264,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_set_listed",
+    name: "zentrixpay_set_listed",
     description:
       "Manage catalog availability by changing the listed state (listed or delisted) of a resource on the vault registry contract. Only the resource creator/owner may call this.",
     inputSchema: {
@@ -1281,7 +1284,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -1296,7 +1299,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_freeze",
+    name: "zentrixpay_freeze",
     description:
       'Permanently freeze the on-chain metadata pointer for a resource. Only the resource creator/owner may call this. This is irreversible and requires confirm: "freeze_metadata".',
     inputSchema: {
@@ -1316,7 +1319,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -1331,7 +1334,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_fee_config",
+    name: "zentrixpay_fee_config",
     description:
       "Read the on-chain registry fee configuration: platform fee, royalty fee, total fee, creator payout basis points, and fee recipient. Use this before quoting creator payout.",
     inputSchema: { type: "object", properties: {}, required: [] },
@@ -1344,7 +1347,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_royalty",
+    name: "zentrixpay_royalty",
     description:
       "Set or clear a resource-specific royalty recipient override on the vault registry contract. Only the resource creator/owner may call this.",
     inputSchema: {
@@ -1369,7 +1372,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },
@@ -1384,9 +1387,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_check_state_permissions",
+    name: "zentrixpay_check_state_permissions",
     description:
-      "Verify the state file (~/.mindvault/state.json) has safe permissions (mode 0600). Warns when the file is world-readable or group-readable, which would expose wallet secret keys and API keys to other system users. Safe by default; run after any manual file operations or environment migration.",
+      "Verify the state file (~/.zentrixpay/state.json) has safe permissions (mode 0600). Warns when the file is world-readable or group-readable, which would expose wallet secret keys and API keys to other system users. Safe by default; run after any manual file operations or environment migration.",
     inputSchema: { type: "object", properties: {}, required: [] },
     annotations: {
       title: "Check State Permissions",
@@ -1396,9 +1399,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_registry_health",
+    name: "zentrixpay_registry_health",
     description:
-      "Check the health of every dependency the MCP server relies on: MindVault API, Horizon, Soroban RPC, vault-registry contract, and x402 network alignment. Returns per-dependency status (ok/error) with actionable failure messages. Does not leak secrets or environment variables.",
+      "Check the health of every dependency the MCP server relies on: ZentrixPay API, Horizon, Soroban RPC, vault-registry contract, and x402 network alignment. Returns per-dependency status (ok/error) with actionable failure messages. Does not leak secrets or environment variables.",
     inputSchema: { type: "object", properties: {}, required: [] },
     annotations: {
       title: "Registry Health",
@@ -1408,9 +1411,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_prewarm_catalog",
+    name: "zentrixpay_prewarm_catalog",
     description:
-      "Fetch the full catalog once to warm the offline catalog fallback cache (see catalogCache.ts). Useful right after connecting a new agent session, or after a cold boot, so a transport failure on the first real mindvault_browse/mindvault_search call falls back to a fresh snapshot instead of having none available. The MCP server also does this automatically once at startup, best-effort; this tool lets an agent trigger it explicitly and see the result.",
+      "Fetch the full catalog once to warm the offline catalog fallback cache (see catalogCache.ts). Useful right after connecting a new agent session, or after a cold boot, so a transport failure on the first real zentrixpay_browse/zentrixpay_search call falls back to a fresh snapshot instead of having none available. The MCP server also does this automatically once at startup, best-effort; this tool lets an agent trigger it explicitly and see the result.",
     inputSchema: { type: "object", properties: {}, required: [] },
     annotations: {
       title: "Pre-warm Catalog Cache",
@@ -1420,7 +1423,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_client_config",
+    name: "zentrixpay_client_config",
     description:
       "Emit a copy-paste MCP client config (mirrors docs/mcp-client-configs.md) pre-filled with this server's actual entrypoint path and detected network profile — no placeholder path or env values to hand-edit. Pass client to target one of claude-code, claude-desktop, codex, cursor, vscode, windsurf; omit it to get every supported client.",
     inputSchema: {
@@ -1444,9 +1447,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_mainnet_banner",
+    name: "zentrixpay_mainnet_banner",
     description:
-      "Session-level explanation of the active network, what paid tools (mindvault_publish, mindvault_buy) and on-chain writes actually cost, and exactly how to confirm a mainnet mutation (confirmMainnet: true, or MINDVAULT_ALLOW_MAINNET=1) — plus the current paid-operation confirmation policy (confirmPaid / MINDVAULT_CONFIRM_PAID_OPERATIONS), when the operator has one configured. Call this once at the start of a session, especially before any paid or destructive operation on mainnet.",
+      "Session-level explanation of the active network, what paid tools (zentrixpay_publish, zentrixpay_buy) and on-chain writes actually cost, and exactly how to confirm a mainnet mutation (confirmMainnet: true, or ZENTRIXPAY_ALLOW_MAINNET=1) — plus the current paid-operation confirmation policy (confirmPaid / ZENTRIXPAY_CONFIRM_PAID_OPERATIONS), when the operator has one configured. Call this once at the start of a session, especially before any paid or destructive operation on mainnet.",
     inputSchema: { type: "object", properties: {}, required: [] },
     annotations: {
       title: "Mainnet Session Banner",
@@ -1456,16 +1459,16 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_import_wallet",
+    name: "zentrixpay_import_wallet",
     description:
-      "Import an existing Stellar wallet by providing a secret key (or reading MINDVAULT_AGENT_SECRET from the environment). Validates the key, optionally persists it to the active profile (or a named profile), and never logs the secret. Use this to restore a wallet from backup or connect to an existing identity.",
+      "Import an existing Stellar wallet by providing a secret key (or reading ZENTRIXPAY_AGENT_SECRET from the environment). Validates the key, optionally persists it to the active profile (or a named profile), and never logs the secret. Use this to restore a wallet from backup or connect to an existing identity.",
     inputSchema: {
       type: "object",
       properties: {
         secretKey: {
           type: "string",
           description:
-            "Stellar secret key (S… , 56 chars) to import. If omitted, reads from MINDVAULT_AGENT_SECRET env var.",
+            "Stellar secret key (S… , 56 chars) to import. If omitted, reads from ZENTRIXPAY_AGENT_SECRET env var.",
           examples: ["SCHZPJ..."],
         },
         profile: {
@@ -1482,7 +1485,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
         },
       },
       required: [],
@@ -1496,9 +1499,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_rotate_publisher_key",
+    name: "zentrixpay_rotate_publisher_key",
     description:
-      "Rotate the publisher API key for the active profile. Calls the MindVault server rotation endpoint (POST /publishers/rotate-key), stores the new key in the state file, and returns the updated publisher ID. The old key is invalidated server-side. Requires an existing registration (mindvault_register).",
+      "Rotate the publisher API key for the active profile. Calls the ZentrixPay server rotation endpoint (POST /publishers/rotate-key), stores the new key in the state file, and returns the updated publisher ID. The old key is invalidated server-side. Requires an existing registration (zentrixpay_register).",
     inputSchema: {
       type: "object",
       properties: {
@@ -1511,7 +1514,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation on the public Stellar network.",
         },
       },
       required: [],
@@ -1524,9 +1527,9 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_verify_install",
+    name: "zentrixpay_verify_install",
     description:
-      "Verify the MindVault MCP server is installed and configured correctly. Checks Node.js version (>=20), network settings, URL variables, vault-registry contract ID, and warns about plaintext secrets in the environment. No network calls are made — all checks are local. Run this first when setting up a new agent or diagnosing a configuration problem.",
+      "Verify the ZentrixPay MCP server is installed and configured correctly. Checks Node.js version (>=20), network settings, URL variables, vault-registry contract ID, and warns about plaintext secrets in the environment. No network calls are made — all checks are local. Run this first when setting up a new agent or diagnosing a configuration problem.",
     inputSchema: { type: "object", properties: {}, required: [] },
     annotations: {
       title: "Verify Install",
@@ -1536,7 +1539,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_debug_bundle",
+    name: "zentrixpay_debug_bundle",
     description:
       "Export a sanitized debug bundle to attach to a bug report or support ticket: resolved configuration, startup diagnostics, install checks, a profile summary (addresses only), state-file permissions, metrics, catalog cache status, and the tail of the audit log. Secret keys, API keys, and tokens never enter the bundle; public keys and contract ids are kept so it stays useful. Local and read-only, no network calls.",
     inputSchema: {
@@ -1546,13 +1549,13 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
           type: "integer",
           minimum: 0,
           maximum: DEBUG_BUNDLE_MAX_AUDIT_LINES,
-          description: `Audit-log entries to include from the end of MINDVAULT_AUDIT_LOG_FILE (0–${DEBUG_BUNDLE_MAX_AUDIT_LINES}, default ${DEBUG_BUNDLE_DEFAULT_AUDIT_LINES}). 0 omits the section.`,
+          description: `Audit-log entries to include from the end of ZENTRIXPAY_AUDIT_LOG_FILE (0–${DEBUG_BUNDLE_MAX_AUDIT_LINES}, default ${DEBUG_BUNDLE_DEFAULT_AUDIT_LINES}). 0 omits the section.`,
           examples: [50, 200],
         },
         includeEnvironment: {
           type: "boolean",
           description:
-            "Include the MindVault-related environment variables with credential-like values masked. Default true; pass false to omit the section entirely.",
+            "Include the ZentrixPay-related environment variables with credential-like values masked. Default true; pass false to omit the section entirely.",
           examples: [true, false],
         },
       },
@@ -1567,7 +1570,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_recover_catalog_cache",
+    name: "zentrixpay_recover_catalog_cache",
     description:
       "Attempt a catalog stale-cache recovery: requests the MCP to refresh or re-fetch catalog index data and provides recovery guidance. Useful when browse results appear stale.",
     inputSchema: { type: "object", properties: {}, required: [] },
@@ -1582,7 +1585,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
   {
     // Advertised by the ListTools handler in index.ts long before it was
     // defined here, so the generated tool reference never listed it (#596).
-    name: "mindvault_publish_status",
+    name: "zentrixpay_publish_status",
     description:
       "Poll a published resource's verification and on-chain sync status. Returns verificationStatus (pending, verified, rejected, skipped), listed, onchainStatus, onchainTxHash, and optional verification details. Pass wait: true to poll until verification settles or timeoutMs elapses. Deterministic errors for missing resourceId and 404s.",
     inputSchema: {
@@ -1591,7 +1594,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         resourceId: {
           type: "string",
           description:
-            "The resource ID from mindvault_publish (or browse/search). Example: 'cm7x8y9z'",
+            "The resource ID from zentrixpay_publish (or browse/search). Example: 'cm7x8y9z'",
           examples: ["cm7x8y9z", "res-001", "swcn98besxpp6t1u8e77fqz3"],
         },
         wait: {
@@ -1623,11 +1626,11 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    // As with mindvault_publish_status: advertised from index.ts only, so it
+    // As with zentrixpay_publish_status: advertised from index.ts only, so it
     // was invisible to the generated docs and the schema snapshots (#596).
-    name: "mindvault_purchase_history",
+    name: "zentrixpay_purchase_history",
     description:
-      "List locally persisted purchase receipts from successful mindvault_buy calls (~/.mindvault/purchases.json). Read-only. Filter by resourceId and network (exact match), or search resource ids and titles with a case-insensitive query. Filters can be combined. Returns newest first. Each receipt includes a pre-resolved explorerUrl for the settlement transaction (null when no txHash was recorded) — no external join is needed. To check live on-chain settlement status, pass the receipt's txHash to mindvault_tx_status.",
+      "List locally persisted purchase receipts from successful zentrixpay_buy calls (~/.zentrixpay/purchases.json). Read-only. Filter by resourceId and network (exact match), or search resource ids and titles with a case-insensitive query. Filters can be combined. Returns newest first. Each receipt includes a pre-resolved explorerUrl for the settlement transaction (null when no txHash was recorded) — no external join is needed. To check live on-chain settlement status, pass the receipt's txHash to zentrixpay_tx_status.",
     inputSchema: {
       type: "object",
       properties: {
@@ -1660,7 +1663,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
     },
   },
   {
-    name: "mindvault_publish_batch",
+    name: "zentrixpay_publish_batch",
     description:
       "Publish up to 10 link resources in a single batch. Each resource is created and verified via x402 payment individually (the agent wallet pays the verification fee per item), then all verified resources are registered on-chain in one `register_batch` Soroban transaction — a single wallet approval covers the entire batch. Returns a summary with per-item verification status, on-chain status, and the batch transaction hash.",
     inputSchema: {
@@ -1701,7 +1704,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         confirmMainnet: {
           type: "boolean",
           description:
-            "Required on mainnet (or set MINDVAULT_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
+            "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this mutation/payment on the public Stellar network.",
         },
         confirmPaid: { ...CONFIRM_PAID_PROPERTY },
       },

@@ -1,7 +1,7 @@
 /**
  * Resource subscription tool for monitoring price and status changes.
  *
- * Agents use mindvault_subscribe_resource to monitor a resource's price,
+ * Agents use zentrixpay_subscribe_resource to monitor a resource's price,
  * verification status, and listing state. The tool polls at intervals and
  * emits progress notifications when changes are detected.
  */

@@ -34,9 +34,9 @@ function fakeClient(responses: Record<string, ToolCallResult | ((args: any) => T
 /** Canned happy-path responses for the full scenario. */
 function happyResponses(): Record<string, ToolCallResult | ((args: any) => ToolCallResult)> {
   return {
-    mindvault_setup_wallet: textResult("Wallet created.\nAddress: GABC123"),
-    mindvault_register: textResult("Registered as publisher.\nID: pub-1"),
-    mindvault_publish: textResult(
+    zentrixpay_setup_wallet: textResult("Wallet created.\nAddress: GABC123"),
+    zentrixpay_register: textResult("Registered as publisher.\nID: pub-1"),
+    zentrixpay_publish: textResult(
       JSON.stringify({
         before: { id: null },
         after: {
@@ -49,9 +49,9 @@ function happyResponses(): Record<string, ToolCallResult | ((args: any) => ToolC
         txHash: "MOCK_TX",
       }),
     ),
-    mindvault_preview: (args) =>
+    zentrixpay_preview: (args) =>
       textResult(JSON.stringify({ id: args.resourceId, price: "$0.10" })),
-    mindvault_buy: (args) => textResult(JSON.stringify({ id: args.resourceId, content: "ok" })),
+    zentrixpay_buy: (args) => textResult(JSON.stringify({ id: args.resourceId, content: "ok" })),
   };
 }
 
@@ -121,21 +121,21 @@ describe("runSmoke", () => {
 
     expect(report.ok).toBe(true);
     expect(report.steps.map((s) => s.tool)).toEqual([
-      "mindvault_setup_wallet",
-      "mindvault_register",
-      "mindvault_publish",
-      "mindvault_preview",
-      "mindvault_buy",
+      "zentrixpay_setup_wallet",
+      "zentrixpay_register",
+      "zentrixpay_publish",
+      "zentrixpay_preview",
+      "zentrixpay_buy",
     ]);
-    const previewCall = calls.find((c) => c.name === "mindvault_preview");
-    const buyCall = calls.find((c) => c.name === "mindvault_buy");
+    const previewCall = calls.find((c) => c.name === "zentrixpay_preview");
+    const buyCall = calls.find((c) => c.name === "zentrixpay_buy");
     expect(previewCall?.args).toEqual({ resourceId: "smoke-res-1" });
     expect(buyCall?.args).toEqual({ resourceId: "smoke-res-1" });
   });
 
   it("fails and stops at the first tool that returns isError", async () => {
     const responses = happyResponses();
-    responses.mindvault_publish = textResult("Error: not registered", true);
+    responses.zentrixpay_publish = textResult("Error: not registered", true);
     const { client, calls } = fakeClient(responses);
 
     const report = await runSmoke(client, buildSmokeSteps());
@@ -143,12 +143,12 @@ describe("runSmoke", () => {
     expect(report.ok).toBe(false);
     expect(report.failedStep).toBe("Publish resource");
     // buy/preview must not run once publish fails
-    expect(calls.map((c) => c.name)).not.toContain("mindvault_buy");
+    expect(calls.map((c) => c.name)).not.toContain("zentrixpay_buy");
   });
 
   it("fails when publish returns a soft error (e.g. insufficient funds) that skips the id", async () => {
     const responses = happyResponses();
-    responses.mindvault_publish = textResult(
+    responses.zentrixpay_publish = textResult(
       "Insufficient USDC to pay the content verification fee.\n(Resource created with id smoke-res-1; verify it later once funded.)",
     );
     const { client } = fakeClient(responses);

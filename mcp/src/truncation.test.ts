@@ -64,18 +64,18 @@ describe("truncateResponse", () => {
 
 describe("assertToolDescriptionSafe", () => {
   it("does not throw for a short description", () => {
-    expect(() => assertToolDescriptionSafe("mindvault_test", "A short description.")).not.toThrow();
+    expect(() => assertToolDescriptionSafe("zentrixpay_test", "A short description.")).not.toThrow();
   });
 
   it("does not throw for a description exactly at the limit", () => {
     const atLimit = "A".repeat(MAX_TOOL_DESCRIPTION_BYTES);
-    expect(() => assertToolDescriptionSafe("mindvault_test", atLimit)).not.toThrow();
+    expect(() => assertToolDescriptionSafe("zentrixpay_test", atLimit)).not.toThrow();
   });
 
   it("throws when the description exceeds the limit", () => {
     const tooLong = "A".repeat(MAX_TOOL_DESCRIPTION_BYTES + 1);
-    expect(() => assertToolDescriptionSafe("mindvault_toolname", tooLong)).toThrow(
-      /mindvault_toolname/,
+    expect(() => assertToolDescriptionSafe("zentrixpay_toolname", tooLong)).toThrow(
+      /zentrixpay_toolname/,
     );
   });
 
@@ -83,7 +83,7 @@ describe("assertToolDescriptionSafe", () => {
     const tooLong = "A".repeat(MAX_TOOL_DESCRIPTION_BYTES + 50);
     let message = "";
     try {
-      assertToolDescriptionSafe("mindvault_x", tooLong);
+      assertToolDescriptionSafe("zentrixpay_x", tooLong);
     } catch (err) {
       message = (err as Error).message;
     }

@@ -7,7 +7,7 @@ export type StellarDeploymentNetwork = "testnet" | "mainnet";
 export type ExplorerNetwork = "testnet" | "public";
 
 /**
- * Canonical network constants for MindVault deployments.
+ * Canonical network constants for ZentrixPay deployments.
  * Operators select `testnet` or `mainnet` via STELLAR_NETWORK and may override
  * individual fields with env vars.
  */

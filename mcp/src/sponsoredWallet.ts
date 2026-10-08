@@ -1,7 +1,7 @@
 /**
  * Integrity checks for wallets the sponsored-account service hands back (#839).
  *
- * `mindvault_setup_wallet` posts to an external service, which mints a Stellar
+ * `zentrixpay_setup_wallet` posts to an external service, which mints a Stellar
  * account, funds its reserve, adds the USDC trustline, and returns the keypair.
  * The server used to persist whatever came back:
  *
@@ -14,7 +14,7 @@
  * different account. Persisting it produces the failure mode in the issue: a
  * profile naming a *funded* address that the local keystore cannot sign for.
  *
- * Everything downstream then reads as healthy. `mindvault_wallet_info` shows
+ * Everything downstream then reads as healthy. `zentrixpay_wallet_info` shows
  * the address and queries Horizon, so it reports a real balance; diagnostics
  * report a wallet present; the agent believes it is ready to pay. The truth only
  * surfaces later, as an opaque signing failure inside an x402 payment.
@@ -137,18 +137,18 @@ export function sponsoredWalletIntegrityError(
 ): Error {
   return new Error(
     [
-      `mindvault_setup_wallet refused the wallet returned by ${service}: ${failureResult.message}.`,
+      `zentrixpay_setup_wallet refused the wallet returned by ${service}: ${failureResult.message}.`,
       "Nothing was persisted — the local keystore is unchanged.",
       "If the service already funded that account, it is orphaned: without the matching secret",
       "key nobody can spend from it, and retrying creates a new account rather than recovering it.",
-      "Retry mindvault_setup_wallet; if this repeats, the sponsored-account service is returning",
+      "Retry zentrixpay_setup_wallet; if this repeats, the sponsored-account service is returning",
       "incomplete responses and should be reported rather than retried in a loop.",
     ].join(" "),
   );
 }
 
 /**
- * The note `mindvault_wallet_info` adds when the stored keypair fails the same
+ * The note `zentrixpay_wallet_info` adds when the stored keypair fails the same
  * check, so a balance shown for an address the agent cannot sign for is never
  * presented as spendable funds.
  */
@@ -156,6 +156,6 @@ export function unownedWalletNote(failureResult: WalletIntegrityFailure): string
   return (
     `This profile's stored secret key does not own this address (${failureResult.message}). ` +
     "Any balance shown here is NOT spendable by this agent: payments will fail at signing. " +
-    "Run mindvault_import_wallet with the correct secret key, or mindvault_setup_wallet to create a new wallet."
+    "Run zentrixpay_import_wallet with the correct secret key, or zentrixpay_setup_wallet to create a new wallet."
   );
 }

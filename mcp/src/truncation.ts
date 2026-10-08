@@ -1,5 +1,5 @@
 /**
- * Shared response truncation for MindVault MCP tool outputs.
+ * Shared response truncation for ZentrixPay MCP tool outputs.
  *
  * Tool handlers build a single text string with no size ceiling, so one long
  * description or a large registry listing can dominate an agent's context window.

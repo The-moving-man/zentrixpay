@@ -91,9 +91,9 @@ describe("docs/mcp-client-configs.md", () => {
 
   it("documents the state path the server actually writes", () => {
     const index = readFileSync(join(SRC_DIR, "index.ts"), "utf-8");
-    expect(index).toContain('join(homedir(), ".mindvault")');
+    expect(index).toContain('join(homedir(), ".zentrixpay")');
     expect(index).toContain('join(STATE_DIR, "state.json")');
-    expect(doc).toContain("~/.mindvault/state.json");
+    expect(doc).toContain("~/.zentrixpay/state.json");
     expect(doc).toContain("0600");
   });
 

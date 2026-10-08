@@ -27,7 +27,7 @@ const server: Server = app.listen(config.PORT, () => {
       network: config.NETWORK,
       healthUrl: `http://localhost:${config.PORT}/health`,
     },
-    "MindVault server started",
+    "ZentrixPay server started",
   );
 
   startRetryPendingWorker();

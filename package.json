@@ -1,20 +1,20 @@
 {
-  "name": "mindvault",
+  "name": "zentrixpay",
   "version": "1.0.0",
   "private": true,
-  "description": "Payment-protected vault for digital resources on Stellar, using HTTP 402 + the x402 protocol",
+  "description": "Pay-per-call API gateway on Stellar, using HTTP 402 + the x402 protocol",
   "packageManager": "pnpm@10.28.2",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "dev:server": "pnpm --filter @mindvault/server dev",
-    "dev:web": "pnpm --filter @mindvault/web dev",
-    "build:registry-client": "pnpm --filter @mindvault/registry-client build",
-    "build:server": "pnpm run build:registry-client && pnpm --filter @mindvault/server build",
-    "db:generate": "pnpm --filter @mindvault/server db:generate",
-    "db:migrate": "pnpm --filter @mindvault/server db:migrate",
-    "generate-wallet": "pnpm --filter @mindvault/server generate-wallet",
+    "dev:server": "pnpm --filter @zentrixpay/server dev",
+    "dev:web": "pnpm --filter @zentrixpay/web dev",
+    "build:registry-client": "pnpm --filter @zentrixpay/registry-client build",
+    "build:server": "pnpm run build:registry-client && pnpm --filter @zentrixpay/server build",
+    "db:generate": "pnpm --filter @zentrixpay/server db:generate",
+    "db:migrate": "pnpm --filter @zentrixpay/server db:migrate",
+    "generate-wallet": "pnpm --filter @zentrixpay/server generate-wallet",
     "contract:build": "stellar contract build --manifest-path contract/Cargo.toml",
     "contract:test": "cargo test --manifest-path contract/Cargo.toml",
     "contract:bindings": "node scripts/generate-bindings.mjs",
@@ -22,7 +22,7 @@
     "lint": "pnpm exec eslint \"server/src/**/*.{ts,tsx}\" \"web/src/**/*.{ts,tsx}\" \"packages/**/*.{ts,tsx}\" \"mcp/src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
     "format:check": "pnpm exec prettier --check \"server/**/*.{ts,tsx,js,json,md}\" \"web/**/*.{ts,tsx,js,json,md}\" \"packages/**/*.{ts,tsx,js,json,md}\" \"mcp/**/*.{ts,tsx,js,json,md}\"",
     "test:catalog-parity": "mcp/node_modules/.bin/vitest run tests/catalog-filter-parity.test.ts",
-    "test": "pnpm run build:registry-client && pnpm --filter @mindvault/registry-client test && pnpm --filter @mindvault/server test && pnpm --filter @mindvault/web test && pnpm --filter @mindvault/mcp test",
+    "test": "pnpm run build:registry-client && pnpm --filter @zentrixpay/registry-client test && pnpm --filter @zentrixpay/server test && pnpm --filter @zentrixpay/web test && pnpm --filter @zentrixpay/mcp test",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -53,7 +53,8 @@
     "x402",
     "stellar",
     "soroban",
-    "marketplace",
+    "api-gateway",
+    "pay-per-call",
     "ai-agents",
     "micropayments"
   ],

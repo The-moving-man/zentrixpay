@@ -1,7 +1,7 @@
 /**
- * Optional tool-level metrics for the MindVault MCP server.
+ * Optional tool-level metrics for the ZentrixPay MCP server.
  *
- * Opt-in via the MINDVAULT_METRICS env var. When disabled a no-op recorder is
+ * Opt-in via the ZENTRIXPAY_METRICS env var. When disabled a no-op recorder is
  * used, so there is no bookkeeping and no output. Metrics only ever contain tool
  * names, counts, and durations — never arguments, wallets, or API keys — so a
  * snapshot is always safe to surface to an agent. This module is pure and
@@ -39,13 +39,13 @@ export interface MetricsRecorder {
 
 const TRUTHY = new Set(["1", "true", "yes", "on"]);
 
-/** Metrics are opt-in: enabled only when MINDVAULT_METRICS is a truthy string. */
+/** Metrics are opt-in: enabled only when ZENTRIXPAY_METRICS is a truthy string. */
 export function metricsEnabledFromEnv(env: NodeJS.ProcessEnv): boolean {
-  const raw = env.MINDVAULT_METRICS;
+  const raw = env.ZENTRIXPAY_METRICS;
   return typeof raw === "string" && TRUTHY.has(raw.trim().toLowerCase());
 }
 
-export const TOOL_DURATION_BUDGET_ENV_VAR = "MINDVAULT_TOOL_DURATION_BUDGET_MS";
+export const TOOL_DURATION_BUDGET_ENV_VAR = "ZENTRIXPAY_TOOL_DURATION_BUDGET_MS";
 export const DEFAULT_TOOL_DURATION_BUDGET_MS = 30000;
 
 export function resolveToolDurationBudget(env: NodeJS.ProcessEnv = process.env): number {
@@ -164,7 +164,7 @@ export async function measureTool<T>(
 export const METRICS_EXPORT_FORMATS = ["json", "otlp"] as const;
 export type MetricsExportFormat = (typeof METRICS_EXPORT_FORMATS)[number];
 
-export const METRICS_EXPORT_CONSOLE_ENV_VAR = "MINDVAULT_METRICS_EXPORT_CONSOLE";
+export const METRICS_EXPORT_CONSOLE_ENV_VAR = "ZENTRIXPAY_METRICS_EXPORT_CONSOLE";
 
 /** Serialized as request-scoped preferences, "json" is the default export shape. */
 export function normalizeMetricsExportFormat(raw: unknown): MetricsExportFormat {
@@ -179,7 +179,7 @@ export function normalizeMetricsExportFormat(raw: unknown): MetricsExportFormat 
 
 /**
  * Stream a metrics export to the process console when
- * MINDVAULT_METRICS_EXPORT_CONSOLE is truthy. Opt-in, like metrics themselves;
+ * ZENTRIXPAY_METRICS_EXPORT_CONSOLE is truthy. Opt-in, like metrics themselves;
  * the line goes to stderr so stdout stays clean for the MCP stdio transport.
  */
 export function metricsExportToConsoleEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
@@ -270,56 +270,56 @@ export function toOtlpMetricsExport(snapshot: MetricsSnapshot): OtlpMetricsPaylo
   };
 
   sumMetric(
-    "mindvault.calls",
-    "Total MCP tool calls recorded by the MindVault server.",
+    "zentrixpay.calls",
+    "Total MCP tool calls recorded by the ZentrixPay server.",
     [intPoint(null, snapshot.totals.calls)],
     true,
   );
   sumMetric(
-    "mindvault.errors",
+    "zentrixpay.errors",
     "Total MCP tool calls that failed.",
     [intPoint(null, snapshot.totals.errors)],
     true,
   );
   sumMetric(
-    "mindvault.payments.attempts",
+    "zentrixpay.payments.attempts",
     "x402 payment attempts (including failed verifications).",
     [intPoint(null, snapshot.payments.attempts)],
     true,
   );
   sumMetric(
-    "mindvault.payments.failures",
+    "zentrixpay.payments.failures",
     "x402 payment attempts that did not succeed.",
     [intPoint(null, snapshot.payments.failures)],
     true,
   );
   sumMetric(
-    "mindvault.tool.budget_exceeded",
+    "zentrixpay.tool.budget_exceeded",
     "Tool calls that overran the per-call duration budget.",
     tools.map((tool) => intPoint(tool, snapshot.tools[tool].budgetExceeded)),
     true,
   );
   sumMetric(
-    "mindvault.tool.calls",
+    "zentrixpay.tool.calls",
     "Tool calls per MCP tool.",
     tools.map((tool) => intPoint(tool, snapshot.tools[tool].calls)),
     true,
   );
   sumMetric(
-    "mindvault.tool.errors",
+    "zentrixpay.tool.errors",
     "Failed tool calls per MCP tool.",
     tools.map((tool) => intPoint(tool, snapshot.tools[tool].errors)),
     true,
   );
   sumMetric(
-    "mindvault.tool.duration_ms_total",
+    "zentrixpay.tool.duration_ms_total",
     "Cumulative handler duration in milliseconds per MCP tool.",
     tools.map((tool) => doublePoint(tool, snapshot.tools[tool].totalDurationMs)),
     true,
   );
 
   metricBodies.push({
-    name: "mindvault.tool.duration_ms_max",
+    name: "zentrixpay.tool.duration_ms_max",
     description: "Longest single handler duration in milliseconds per MCP tool.",
     unit: "ms",
     gauge: {
@@ -327,7 +327,7 @@ export function toOtlpMetricsExport(snapshot: MetricsSnapshot): OtlpMetricsPaylo
     },
   });
   metricBodies.push({
-    name: "mindvault.tool_duration_budget_ms",
+    name: "zentrixpay.tool_duration_budget_ms",
     description: "Configured per-call tool duration budget in milliseconds.",
     unit: "ms",
     gauge: {
@@ -340,11 +340,11 @@ export function toOtlpMetricsExport(snapshot: MetricsSnapshot): OtlpMetricsPaylo
       {
         resource: {
           attributes: [
-            attributeOf("service.name", "mindvault-mcp"),
-            attributeOf("mindvault.metrics.since", snapshot.since ?? ""),
+            attributeOf("service.name", "zentrixpay-mcp"),
+            attributeOf("zentrixpay.metrics.since", snapshot.since ?? ""),
           ],
         },
-        scopeMetrics: [{ scope: { name: "mindvault-mcp", version: "mcp" }, metrics: metricBodies }],
+        scopeMetrics: [{ scope: { name: "zentrixpay-mcp", version: "mcp" }, metrics: metricBodies }],
       },
     ],
   };
@@ -361,5 +361,5 @@ export function serializeMetricsExport(
 /** One-line export for the stderr stream when console export is enabled (#891). */
 export function metricsExportLine(snapshot: MetricsSnapshot, format: MetricsExportFormat): string {
   const payload = format === "otlp" ? toOtlpMetricsExport(snapshot) : snapshot;
-  return `[mindvault-metrics] ${JSON.stringify(payload)}`;
+  return `[zentrixpay-metrics] ${JSON.stringify(payload)}`;
 }

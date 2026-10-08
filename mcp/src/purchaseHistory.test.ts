@@ -1,5 +1,5 @@
 /**
- * Tests for local purchase receipt store and mindvault_purchase_history filters.
+ * Tests for local purchase receipt store and zentrixpay_purchase_history filters.
  */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { mkdtempSync, rmSync } from "fs";

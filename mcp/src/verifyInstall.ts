@@ -1,5 +1,5 @@
 /**
- * Install verification for the MindVault MCP server.
+ * Install verification for the ZentrixPay MCP server.
  *
  * `verifyInstall` runs a set of purely local, synchronous checks and returns a
  * structured report that an agent can act on without making any network calls.
@@ -205,13 +205,13 @@ export function verifyInstall(
     });
   }
 
-  // 3. MINDVAULT_URL — optional, but must be a valid URL when set
-  const urlCheckMv = urlIssue("MINDVAULT_URL", env.MINDVAULT_URL);
+  // 3. ZENTRIXPAY_URL — optional, but must be a valid URL when set
+  const urlCheckMv = urlIssue("ZENTRIXPAY_URL", env.ZENTRIXPAY_URL);
   checks.push(
     urlCheckMv ?? {
-      name: "MINDVAULT_URL",
+      name: "ZENTRIXPAY_URL",
       ok: true,
-      detail: "MINDVAULT_URL: unset (default hosted backend in use)",
+      detail: "ZENTRIXPAY_URL: unset (default hosted backend in use)",
     },
   );
 
@@ -287,7 +287,7 @@ export function verifyInstall(
   const allOk = checks.every((c) => c.ok);
   const lines: string[] = [];
 
-  lines.push(allOk ? "✓ MindVault MCP install OK." : "✗ MindVault MCP install has issues.");
+  lines.push(allOk ? "✓ ZentrixPay MCP install OK." : "✗ ZentrixPay MCP install has issues.");
   lines.push("");
 
   for (const check of checks) {

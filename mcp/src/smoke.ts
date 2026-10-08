@@ -1,5 +1,5 @@
 /**
- * MindVault MCP smoke-test orchestration.
+ * ZentrixPay MCP smoke-test orchestration.
  *
  * Transport-agnostic core: given a client that can call MCP tools, run an
  * ordered publish → preview → buy scenario and decide pass/fail. This module is
@@ -72,7 +72,7 @@ export function resultText(res: ToolCallResult): string {
 
 /**
  * A tool call failed if the server flagged `isError`, or if the result text
- * carries the server's "Error:" marker. The MindVault MCP server sets both on a
+ * carries the server's "Error:" marker. The ZentrixPay MCP server sets both on a
  * handler throw, but checking the text too keeps this robust if a transport
  * drops the flag.
  */
@@ -82,7 +82,7 @@ export function isToolError(res: ToolCallResult): boolean {
 }
 
 /**
- * Extract the resource id from `mindvault_publish` output.
+ * Extract the resource id from `zentrixpay_publish` output.
  *
  * The tool reports a JSON before/after summary; older builds printed a plain
  * "ID: <id>" line. Both are accepted so the smoke test works against either.
@@ -124,7 +124,7 @@ function errorMessage(err: unknown): string {
 
 function requireResourceId(ctx: SmokeContext): string {
   if (!ctx.resourceId) {
-    throw new Error("no resource id was captured from mindvault_publish");
+    throw new Error("no resource id was captured from zentrixpay_publish");
   }
   return ctx.resourceId;
 }
@@ -206,12 +206,12 @@ export interface SmokeScenario {
 }
 
 export const DEFAULT_SCENARIO: SmokeScenario = {
-  publisherName: "MindVault Smoke Test",
-  publisherEmail: "smoke@mindvault.test",
+  publisherName: "ZentrixPay Smoke Test",
+  publisherEmail: "smoke@zentrixpay.test",
   title: "Smoke Test Resource",
   description: "Ephemeral resource created by the MCP smoke test.",
   price: "0.10",
-  externalUrl: "https://example.com/mindvault-smoke",
+  externalUrl: "https://example.com/zentrixpay-smoke",
 };
 
 /**
@@ -221,15 +221,15 @@ export const DEFAULT_SCENARIO: SmokeScenario = {
  */
 export function buildSmokeSteps(scenario: SmokeScenario = DEFAULT_SCENARIO): SmokeStep[] {
   return [
-    { label: "Set up wallet", tool: "mindvault_setup_wallet" },
+    { label: "Set up wallet", tool: "zentrixpay_setup_wallet" },
     {
       label: "Register publisher",
-      tool: "mindvault_register",
+      tool: "zentrixpay_register",
       args: { name: scenario.publisherName, email: scenario.publisherEmail },
     },
     {
       label: "Publish resource",
-      tool: "mindvault_publish",
+      tool: "zentrixpay_publish",
       args: {
         title: scenario.title,
         description: scenario.description,
@@ -245,12 +245,12 @@ export function buildSmokeSteps(scenario: SmokeScenario = DEFAULT_SCENARIO): Smo
     },
     {
       label: "Preview resource",
-      tool: "mindvault_preview",
+      tool: "zentrixpay_preview",
       args: (ctx) => ({ resourceId: requireResourceId(ctx) }),
     },
     {
       label: "Buy resource",
-      tool: "mindvault_buy",
+      tool: "zentrixpay_buy",
       args: (ctx) => ({ resourceId: requireResourceId(ctx) }),
     },
   ];

@@ -1,9 +1,9 @@
 /**
- * Structured audit logging for MindVault MCP server.
+ * Structured audit logging for ZentrixPay MCP server.
  *
  * Logs tool calls, network requests, duration, status, and tx hashes with
  * automatic secret redaction for API keys, secret keys, payment headers, and
- * authorization payloads. Respects MINDVAULT_AUDIT_LOG env var.
+ * authorization payloads. Respects ZENTRIXPAY_AUDIT_LOG env var.
  */
 
 import { redactSecrets, redactObject } from "./redaction.js";
@@ -49,25 +49,25 @@ let auditLogEnabled = false;
 
 /**
  * Optional rotating JSONL file sink (#592). Null unless
- * MINDVAULT_AUDIT_LOG_FILE names a path.
+ * ZENTRIXPAY_AUDIT_LOG_FILE names a path.
  */
 let auditFileWriter: RotatingJsonlWriter | null = null;
 
 /**
  * Initialize audit logging from environment.
- * MINDVAULT_AUDIT_LOG=1 enables it.
+ * ZENTRIXPAY_AUDIT_LOG=1 enables it.
  *
- * Entries always go to stderr. When MINDVAULT_AUDIT_LOG_FILE is also set they
+ * Entries always go to stderr. When ZENTRIXPAY_AUDIT_LOG_FILE is also set they
  * are additionally appended to that file as JSON Lines and rotated by size
  * (#592) — stderr is for watching, the file is for keeping.
  */
 export function initAuditLogging(env: NodeJS.ProcessEnv): void {
-  auditLogEnabled = env.MINDVAULT_AUDIT_LOG === "1";
+  auditLogEnabled = env.ZENTRIXPAY_AUDIT_LOG === "1";
   auditFileWriter = auditLogEnabled
     ? createRotatingWriter(env, (error) => {
         // stderr, never stdout: stdout is the MCP protocol channel.
         console.error(
-          `[mindvault] audit log file disabled: ${
+          `[zentrixpay] audit log file disabled: ${
             error instanceof Error ? error.message : String(error)
           }`,
         );

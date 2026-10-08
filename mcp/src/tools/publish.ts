@@ -1,5 +1,5 @@
-import { createRegistryClient, Errors as RegistryErrors } from "@mindvault/registry-client";
-import type { BatchRegisterItem } from "@mindvault/registry-client";
+import { createRegistryClient, Errors as RegistryErrors } from "@zentrixpay/registry-client";
+import type { BatchRegisterItem } from "@zentrixpay/registry-client";
 import {
   activeProfile,
   activeProfileName,
@@ -87,7 +87,7 @@ export async function register(
     });
   activeProfile().apiKey = res.data.apiKey;
   saveState();
-  return `Registered as publisher.\nProfile: ${activeProfileName}\nID: ${res.data.id}\nAPI key persisted to ${STATE_FILE} (not shown). Run mindvault_reset to revoke.`;
+  return `Registered as publisher.\nProfile: ${activeProfileName}\nID: ${res.data.id}\nAPI key persisted to ${STATE_FILE} (not shown). Run zentrixpay_reset to revoke.`;
 }
 
 export async function publish(args: {
@@ -203,7 +203,7 @@ export async function publish(args: {
     if (typeof data.txStatusUrl === "string") {
       failureGuidance.push(`Transaction status: ${data.txStatusUrl}`);
     } else if (onchainTxHash) {
-      failureGuidance.push(`Check transaction ${onchainTxHash} with mindvault_tx_status.`);
+      failureGuidance.push(`Check transaction ${onchainTxHash} with zentrixpay_tx_status.`);
     }
     if (Array.isArray(data.nextSteps)) {
       failureGuidance.push("Next steps:", ...data.nextSteps.map((s: string) => `  - ${s}`));
@@ -318,7 +318,7 @@ export async function buy(
       ...(title ? { title } : {}),
     });
   } catch (err) {
-    console.error("MindVault MCP: failed to persist purchase receipt:", safeErrorMessage(err));
+    console.error("ZentrixPay MCP: failed to persist purchase receipt:", safeErrorMessage(err));
   }
 
   // Settlement confirmation — mirrors index.ts so this legacy copy of the buy
@@ -488,7 +488,7 @@ export async function registerOnchain(
       action: [
         "The resource remains listed and purchasable.",
         "Ensure the agent wallet is funded for fees and retry.",
-        txHash ? `Tx hash: ${txHash} (check with mindvault_tx_status).` : null,
+        txHash ? `Tx hash: ${txHash} (check with zentrixpay_tx_status).` : null,
       ]
         .filter(Boolean)
         .join(" "),
@@ -849,7 +849,7 @@ export async function publishBatch(
       return (
         `${shortMsg}\n` +
         `Resources created (ids: ${createdIds}) but verification not attempted. ` +
-        `Use mindvault_publish_status to retry each resource once funded.`
+        `Use zentrixpay_publish_status to retry each resource once funded.`
       );
     }
   }

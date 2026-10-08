@@ -1,6 +1,6 @@
 # Metadata Hash Format
 
-MindVault anchors a resource's off-chain content on-chain through a digest.
+ZentrixPay anchors a resource's off-chain content on-chain through a digest.
 When the server registers a resource it writes a compact JSON metadata pointer
 into the vault-registry contract:
 
@@ -44,7 +44,7 @@ Every accepted spelling normalizes to lowercase `"<algorithm>:<hex>"`:
 sha256-9F86D081…  →  sha256:9f86d081…
 ```
 
-**Always compare digests in canonical form.** `mindvault_check_consistency`
+**Always compare digests in canonical form.** `zentrixpay_check_consistency`
 canonicalizes both sides before comparing, so a case or prefix difference is
 never reported as a mismatch.
 
@@ -77,9 +77,9 @@ chars), optionally prefixed with "sha256:"/"sha512:" (or "-"); case-insensitive.
 
 | Tool                          | Argument                          | Notes                                                                                            |
 | ----------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `mindvault_check_consistency` | `expectedMetadataHash` (optional) | Compared against the `contentHash` anchored on-chain                                             |
-| `mindvault_preview_metadata_hash` | `resourceId`                  | Reports the anchored digest (or why there is none) without a comparison — see below              |
-| `mindvault_tx_status`         | `txHash`                          | A Stellar transaction hash is a sha256 digest; normalized to bare lowercase hex for the RPC call |
+| `zentrixpay_check_consistency` | `expectedMetadataHash` (optional) | Compared against the `contentHash` anchored on-chain                                             |
+| `zentrixpay_preview_metadata_hash` | `resourceId`                  | Reports the anchored digest (or why there is none) without a comparison — see below              |
+| `zentrixpay_tx_status`         | `txHash`                          | A Stellar transaction hash is a sha256 digest; normalized to bare lowercase hex for the RPC call |
 
 ### Verifying an anchor
 
@@ -125,7 +125,7 @@ misleading "mismatch".
 
 ### Previewing an anchor before buying
 
-`mindvault_preview_metadata_hash` reads the same on-chain pointer and reports
+`zentrixpay_preview_metadata_hash` reads the same on-chain pointer and reports
 the digest (or the deterministic reason there is none) without comparing it
 against anything:
 
@@ -144,7 +144,7 @@ against anything:
 ```
 
 Use it to fetch the anchor before you have the content, then pass the same
-digest as `expectedMetadataHash` to `mindvault_check_consistency` once you do.
+digest as `expectedMetadataHash` to `zentrixpay_check_consistency` once you do.
 An unregistered resource id is an error (the resource must exist on-chain for
 there to be a pointer); a registered resource whose pointer is a bare URI or
 malformed JSON is a successful report with `present: false` / `valid: false`.

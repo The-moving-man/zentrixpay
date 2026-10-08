@@ -1,16 +1,16 @@
-# Contributing to MindVault
+# Contributing to ZentrixPay
 
-Thanks for your interest in building MindVault! This guide gets you from a fresh
+Thanks for your interest in building ZentrixPay! This guide gets you from a fresh
 clone to a running stack and a first pull request.
 
-MindVault is a payment-protected vault for digital resources on Stellar, using
+ZentrixPay is a payment-protected vault for digital resources on Stellar, using
 HTTP 402 and the x402 protocol. Everything runs on **Stellar testnet** — no real
 funds are at risk.
 
 ## Repository layout
 
 ```
-mindvault/
+zentrixpay/
   server/     Express backend, x402 middleware, Supabase, verification agent
   web/        React frontend, Stellar wallet connection, Tailwind   (imported separately)
   mcp/        MCP server for AI agent access                        (imported separately)
@@ -166,7 +166,7 @@ in [`docs/LABELS.md`](docs/LABELS.md). Browse the `good first issue` and current
 
 ## Releases
 
-MindVault uses automated releases powered by [release-please](https://github.com/google-github-actions/release-please-action). Releases are triggered automatically when commits following [Conventional Commits](https://www.conventionalcommits.org/) are merged to `main`.
+ZentrixPay uses automated releases powered by [release-please](https://github.com/google-github-actions/release-please-action). Releases are triggered automatically when commits following [Conventional Commits](https://www.conventionalcommits.org/) are merged to `main`.
 
 - **feat:** triggers a minor version bump (e.g., 1.0.0 → 1.1.0)
 - **fix:** triggers a patch version bump (e.g., 1.0.0 → 1.0.1)

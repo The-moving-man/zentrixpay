@@ -103,7 +103,7 @@ describe("collectStartupDiagnostics — x402 / Stellar network mismatch", () => 
 });
 
 describe("collectStartupDiagnostics — service URL validation", () => {
-  it.each(["MINDVAULT_URL", "SPONSORED_ACCOUNT_URL", "HORIZON_URL", "SOROBAN_RPC_URL"] as const)(
+  it.each(["ZENTRIXPAY_URL", "SPONSORED_ACCOUNT_URL", "HORIZON_URL", "SOROBAN_RPC_URL"] as const)(
     "reports a blocking error for an invalid %s",
     (variable) => {
       const diagnostics = collectStartupDiagnostics(
@@ -121,7 +121,7 @@ describe("collectStartupDiagnostics — service URL validation", () => {
     const diagnostics = collectStartupDiagnostics(
       {
         STELLAR_NETWORK: "testnet",
-        MINDVAULT_URL: "https://api.example.com",
+        ZENTRIXPAY_URL: "https://api.example.com",
         SPONSORED_ACCOUNT_URL: "http://sponsor.example.com",
         HORIZON_URL: "https://horizon-testnet.example.com",
         SOROBAN_RPC_URL: "https://rpc-testnet.example.com",

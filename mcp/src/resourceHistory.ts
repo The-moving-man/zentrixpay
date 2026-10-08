@@ -18,12 +18,12 @@ export interface ResourceHistoryEvent {
 
 export const DEFAULT_RESOURCE_HISTORY_FILE = join(
   homedir(),
-  ".mindvault",
+  ".zentrixpay",
   "resource-history.jsonl",
 );
 
 export function resourceHistoryPath(env: NodeJS.ProcessEnv = process.env): string {
-  return env.MINDVAULT_RESOURCE_HISTORY_FILE?.trim() || DEFAULT_RESOURCE_HISTORY_FILE;
+  return env.ZENTRIXPAY_RESOURCE_HISTORY_FILE?.trim() || DEFAULT_RESOURCE_HISTORY_FILE;
 }
 
 export function recordResourceHistory(

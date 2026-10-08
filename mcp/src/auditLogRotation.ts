@@ -28,9 +28,9 @@ import { dirname } from "node:path";
 
 /** Environment variables controlling the file sink. */
 export const AUDIT_FILE_ENV_VARS = {
-  file: "MINDVAULT_AUDIT_LOG_FILE",
-  maxBytes: "MINDVAULT_AUDIT_LOG_MAX_BYTES",
-  maxFiles: "MINDVAULT_AUDIT_LOG_MAX_FILES",
+  file: "ZENTRIXPAY_AUDIT_LOG_FILE",
+  maxBytes: "ZENTRIXPAY_AUDIT_LOG_MAX_BYTES",
+  maxFiles: "ZENTRIXPAY_AUDIT_LOG_MAX_FILES",
 } as const;
 
 /** 5 MiB: large enough to hold a long session, small enough to open. */

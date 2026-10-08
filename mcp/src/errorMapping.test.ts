@@ -22,7 +22,7 @@ import {
 } from "./errorMapping.js";
 
 describe("categorizeStatus", () => {
-  it("maps the statuses the MindVault surface actually returns", () => {
+  it("maps the statuses the ZentrixPay surface actually returns", () => {
     expect(categorizeStatus(400)).toBe("validation");
     expect(categorizeStatus(401)).toBe("auth");
     expect(categorizeStatus(402)).toBe("payment");
@@ -105,7 +105,7 @@ describe("mapTransportError — network failure", () => {
 
   it("classifies an unreachable service as a network error", () => {
     const mapped = mapTransportError({
-      operation: "MindVault API request failed",
+      operation: "ZentrixPay API request failed",
       source: "api",
       error: new Error("fetch failed"),
     });
@@ -128,7 +128,7 @@ describe("mapTransportError — network failure", () => {
     });
 
     expect(mapped.category).toBe("timeout");
-    expect(mapped.action).toContain("MINDVAULT_HTTP_TIMEOUT_MS");
+    expect(mapped.action).toContain("ZENTRIXPAY_HTTP_TIMEOUT_MS");
   });
 
   it("preserves the underlying cause in the summary", () => {
@@ -154,7 +154,7 @@ describe("mapHttpError — 402 payment", () => {
     expect(mapped.source).toBe("x402");
     expect(mapped.status).toBe(402);
     expect(mapped.summary).toBe("Buy failed [402]: payment rejected");
-    expect(mapped.action).toContain("mindvault_wallet_info");
+    expect(mapped.action).toContain("zentrixpay_wallet_info");
     expect(mapped.action).toContain("USDC");
   });
 });
@@ -190,7 +190,7 @@ describe("mapRegistryError — contract NotFound", () => {
 
     expect(mapped.category).toBe("not_found");
     expect(mapped.source).toBe("registry");
-    expect(mapped.action).toContain("mindvault_register_onchain");
+    expect(mapped.action).toContain("zentrixpay_register_onchain");
     expect(mapped.action).toContain("not registered on-chain");
   });
 
@@ -201,7 +201,7 @@ describe("mapRegistryError — contract NotFound", () => {
     });
 
     expect(mapped.category).toBe("contract");
-    expect(mapped.action).toContain("mindvault_registry_info");
+    expect(mapped.action).toContain("zentrixpay_registry_info");
   });
 
   it("can attribute JSON-RPC level failures to Soroban instead of the contract", () => {
@@ -228,7 +228,7 @@ describe("formatMappedError", () => {
 
     expect(text.split("\n")).toHaveLength(3);
     expect(text).toContain("Browse failed: Internal server error");
-    expect(text).toContain("Source: MindVault API · Category: server · HTTP 500");
+    expect(text).toContain("Source: ZentrixPay API · Category: server · HTTP 500");
     expect(text).toMatch(/^Next: /m);
   });
 
@@ -236,7 +236,7 @@ describe("formatMappedError", () => {
     const text = formatMappedError(
       mapTransportError({ operation: "Browse failed", source: "api", error: new Error("boom") }),
     );
-    expect(text).toContain("Source: MindVault API · Category: network");
+    expect(text).toContain("Source: ZentrixPay API · Category: network");
     expect(text).not.toContain("HTTP");
   });
 
@@ -283,7 +283,7 @@ describe("troubleshootingHint", () => {
         }),
       ),
     ).toEqual({
-      schema: "mindvault.troubleshooting/v1",
+      schema: "zentrixpay.troubleshooting/v1",
       source: "api",
       category: "rate_limit",
       status: 429,
@@ -347,9 +347,9 @@ describe("publisher API key rejection", () => {
     expect(mapped.summary).toContain("Publish failed: Invalid API key");
     expect(mapped.summary).toContain('publisher API key for profile "publisher" was rejected');
     expect(mapped.action).toContain("revoked");
-    expect(mapped.action).toContain("mindvault_register");
-    expect(mapped.action).toContain("mindvault_use_profile");
-    expect(mapped.action).toContain("mindvault_restore_state");
+    expect(mapped.action).toContain("zentrixpay_register");
+    expect(mapped.action).toContain("zentrixpay_use_profile");
+    expect(mapped.action).toContain("zentrixpay_restore_state");
   });
 
   it("keeps the generic advice when no credential was sent", () => {
@@ -401,7 +401,7 @@ describe("publisher API key rejection", () => {
         data: { error: "Invalid API key" },
         credential,
       }),
-    ).toThrow(/Source: MindVault API · Category: auth · HTTP 401/);
+    ).toThrow(/Source: ZentrixPay API · Category: auth · HTTP 401/);
   });
 });
 
@@ -439,7 +439,7 @@ describe("request signature clock-skew rejection (#602)", () => {
     expect(mapped.action).toContain("Sync the system clock");
     expect(mapped.action).toContain("NTP");
     expect(mapped.action).not.toContain("revoked");
-    expect(mapped.action).not.toContain("mindvault_register");
+    expect(mapped.action).not.toContain("zentrixpay_register");
   });
 
   it("does not misdiagnose a plain invalid-key 401 as skew", () => {

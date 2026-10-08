@@ -1,6 +1,6 @@
 # Mainnet Deployment Checklist
 
-Use this checklist when moving a MindVault deployment from Stellar testnet to mainnet.
+Use this checklist when moving a ZentrixPay deployment from Stellar testnet to mainnet.
 
 Legend:
 - 🔒 Involves a secret or private key — handle with care
@@ -93,7 +93,7 @@ Record the printed contract ID. This is your mainnet `VAULT_REGISTRY_CONTRACT_ID
 ### 3c. Regenerate TypeScript bindings
 
 ```bash
-cd /path/to/mindvault
+cd /path/to/zentrixpay
 VAULT_REGISTRY_CONTRACT_ID=<MAINNET_CONTRACT_ID> STELLAR_NETWORK=mainnet pnpm contract:bindings
 ```
 
@@ -189,20 +189,20 @@ curl -s $BASE/agent/status | jq .agent
 
 When the MCP server runs with `STELLAR_NETWORK=mainnet` (or x402 `stellar:pubnet`), tools that **mutate state or spend funds** require an explicit confirmation. Read-only tools stay unrestricted.
 
-**Gated tools:** `mindvault_setup_wallet`, `mindvault_register`, `mindvault_publish`, `mindvault_buy`, `mindvault_register_onchain`, `mindvault_reset`, `mindvault_update_metadata`, `mindvault_set_price`, `mindvault_transfer_ownership`, `mindvault_set_listed`.
+**Gated tools:** `zentrixpay_setup_wallet`, `zentrixpay_register`, `zentrixpay_publish`, `zentrixpay_buy`, `zentrixpay_register_onchain`, `zentrixpay_reset`, `zentrixpay_update_metadata`, `zentrixpay_set_price`, `zentrixpay_transfer_ownership`, `zentrixpay_set_listed`.
 
 **Confirm either:**
 
 1. Pass `confirmMainnet: true` on the tool call, or
-2. Set `MINDVAULT_ALLOW_MAINNET=1` on the MCP process (unlocks all gated tools for that process).
+2. Set `ZENTRIXPAY_ALLOW_MAINNET=1` on the MCP process (unlocks all gated tools for that process).
 
-**Safer defaults for `MINDVAULT_ALLOW_MAINNET` (#606):** the env override is parsed fail-safe. Only `1` / `true` / `yes` widen the policy to process-wide `allow-all`; everything else — unset, empty, `0` / `false` / `no` / `off`, and any unrecognized value — keeps per-call confirmation. A set value that unlocks nothing (an unexpanded `$MINDVAULT_ALLOW_MAINNET` template placeholder, `on`, `enabled`, a typo) is reported as a startup **warning** so the deployment mistake surfaces immediately; explicit denials stay quiet because they state intent. A typo in a safety setting fails towards *more* confirmation, never less.
+**Safer defaults for `ZENTRIXPAY_ALLOW_MAINNET` (#606):** the env override is parsed fail-safe. Only `1` / `true` / `yes` widen the policy to process-wide `allow-all`; everything else — unset, empty, `0` / `false` / `no` / `off`, and any unrecognized value — keeps per-call confirmation. A set value that unlocks nothing (an unexpanded `$ZENTRIXPAY_ALLOW_MAINNET` template placeholder, `on`, `enabled`, a typo) is reported as a startup **warning** so the deployment mistake surfaces immediately; explicit denials stay quiet because they state intent. A typo in a safety setting fails towards *more* confirmation, never less.
 
-Without confirmation the tool returns a deterministic, agent-safe error (no secrets). Diagnostics also appear in `mindvault_registry_info` (`network`, `x402Network`, `mainnetDiagnostics`).
+Without confirmation the tool returns a deterministic, agent-safe error (no secrets). Diagnostics also appear in `zentrixpay_registry_info` (`network`, `x402Network`, `mainnetDiagnostics`).
 
 ```json
 { "resourceId": "res-001", "confirmMainnet": true }
 ```
 
-See also: [`docs/environment-variables.md`](./environment-variables.md) (`STELLAR_NETWORK`, `MINDVAULT_ALLOW_MAINNET`).
+See also: [`docs/environment-variables.md`](./environment-variables.md) (`STELLAR_NETWORK`, `ZENTRIXPAY_ALLOW_MAINNET`).
 

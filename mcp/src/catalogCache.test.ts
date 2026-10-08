@@ -79,7 +79,7 @@ describe("catalogCacheLabel (#556)", () => {
     const now = 1_000_000;
     const label = catalogCacheLabel(now - CATALOG_CACHE_STALE_AFTER_MS - 60_000, now);
     expect(label).toContain("stale");
-    expect(label).toContain("mindvault_registry_lookup");
+    expect(label).toContain("zentrixpay_registry_lookup");
   });
 
   it("labels a snapshot exactly at the fresh/stale boundary as fresh", () => {
@@ -109,6 +109,6 @@ describe("catalogCacheLabel reasons (#837)", () => {
     });
     expect(label).toContain("HTTP 502");
     expect(label).toContain("stale");
-    expect(label).toContain("mindvault_registry_lookup");
+    expect(label).toContain("zentrixpay_registry_lookup");
   });
 });

@@ -1,6 +1,6 @@
 # OAuth-style External Auth Handoff
 
-This document describes a simple OAuth-style external authorization handoff pattern suitable for the MindVault MCP server. It is intentionally framework-agnostic and focuses on operator and integrator guidance: how the MCP can accept a short-lived external auth token via a browser flow and continue acting on behalf of the user.
+This document describes a simple OAuth-style external authorization handoff pattern suitable for the ZentrixPay MCP server. It is intentionally framework-agnostic and focuses on operator and integrator guidance: how the MCP can accept a short-lived external auth token via a browser flow and continue acting on behalf of the user.
 
 Scope
 

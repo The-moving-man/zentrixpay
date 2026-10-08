@@ -215,7 +215,7 @@ describe("applyPreviewLimits", () => {
   });
 });
 
-describe("mindvault_preview size limits", () => {
+describe("zentrixpay_preview size limits", () => {
   beforeEach(() => {
     jsonFetch.mockReset();
     delete process.env[PREVIEW_MAX_BYTES_ENV_VAR];

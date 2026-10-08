@@ -1,6 +1,6 @@
 # Resource Publish Lifecycle
 
-This guide documents the current MindVault resource lifecycle from the first publisher API call through verification, listing, on-chain registration, x402 purchase, and buyer receipt handling.
+This guide documents the current ZentrixPay resource lifecycle from the first publisher API call through verification, listing, on-chain registration, x402 purchase, and buyer receipt handling.
 
 It is written for both web contributors and MCP contributors, and it uses the same state names the server stores in the database and returns from the API.
 
@@ -155,7 +155,7 @@ Important detail: the prepare endpoint is a `GET` in the current API and does no
 
 ### MCP flow
 
-The current `mindvault_publish` tool does three steps in order:
+The current `zentrixpay_publish` tool does three steps in order:
 
 1. create the resource
 2. pay for verification
@@ -279,10 +279,10 @@ For web contributors:
 
 For MCP contributors:
 
-- `mindvault_publish` is a convenience wrapper around create -> verify -> best-effort register
-- `mindvault_publish_status` polls `verificationStatus` (`pending` | `verified` | `rejected` | `skipped`) and on-chain sync fields (`onchainStatus`, `onchainTxHash`); pass `wait: true` to poll until verification settles
+- `zentrixpay_publish` is a convenience wrapper around create -> verify -> best-effort register
+- `zentrixpay_publish_status` polls `verificationStatus` (`pending` | `verified` | `rejected` | `skipped`) and on-chain sync fields (`onchainStatus`, `onchainTxHash`); pass `wait: true` to poll until verification settles
 - a `wait: true` call streams one MCP `notifications/progress` update per poll when the client supplies a progress token — see [mcp-progress-notifications.md](mcp-progress-notifications.md)
-- `mindvault_register_onchain` retries on-chain registration when the publish-time register step fails
+- `zentrixpay_register_onchain` retries on-chain registration when the publish-time register step fails
 - if registration fails, contributors should expect a resource that may be verified and listed but still blocked at purchase time by the current paywall behavior
 
 Related docs:

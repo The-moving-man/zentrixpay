@@ -1,138 +1,38 @@
-import React, { useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { EditPriceModal } from "./components/EditPriceModal.js";
-import { TransferOwnershipModal } from "./components/TransferOwnershipModal.js";
-import { RegisterModal } from "./components/RegisterModal.js";
-import { ResourcePreviewModal } from "./components/ResourcePreviewModal.js";
-import { ExplorerLink } from "./components/ExplorerLink.js";
+import React, { useState } from "react";
+import { ApiCatalog } from "./components/ApiCatalog.js";
+import { ProviderDashboard } from "./components/ProviderDashboard.js";
+import { TryItModal } from "./components/TryItModal.js";
 import { Toast } from "./components/Toast.js";
-import { CatalogSearch } from "./components/CatalogSearch.js";
-import { ResourceGridSkeleton } from "./components/ResourceCardSkeleton.js";
-import { ErrorBanner } from "./components/ErrorBanner.js";
 import { WalletButton } from "./components/WalletButton.js";
-import { AnalyticsDashboard } from "./components/AnalyticsDashboard.js";
-import { CreatorDashboard } from "./components/CreatorDashboard.js";
-import { Leaderboard } from "./components/Leaderboard.js";
-import { AgentStatusPage } from "./components/AgentStatusPage.js";
-import { PublishModal } from "./components/PublishModal.js";
-import { PurchasesDashboard } from "./components/PurchasesDashboard.js";
-import { BuyModal } from "./components/BuyModal.js";
 import { useTheme } from "./hooks/useTheme.js";
-import { useAsync } from "./hooks/useAsync.js";
-import { useCatalog } from "./hooks/useCatalog.js";
 import { useWalletConnection } from "./hooks/useWalletConnection.js";
-import { fetchRegistryStatus } from "./api/resources.js";
-import { CatalogStaleBanner } from "./components/CatalogStaleBanner.js";
-import { LanguageSwitcher } from "./components/LanguageSwitcher.js";
-import type { CatalogFilters } from "./api/resources.js";
+import type { PublicApi } from "./api/apis.js";
 
-interface Resource {
-  id: string;
-  title: string;
-  price: string;
-  resourceType: string;
-  publisherName?: string;
-  walletAddress: string;
-  verificationStatus: string;
-  onchainStatus: string;
-  onchainTxHash?: string;
-  listed: boolean;
-  accessUrl: string;
-}
+type Tab = "browse" | "provide";
 
-type ActiveModal =
-  | { kind: "editPrice"; resource: Resource }
-  | { kind: "transferOwnership"; resource: Resource }
-  | { kind: "register"; resource: Resource }
-  | { kind: "preview"; resource: Resource }
-  | { kind: "buy"; resource: Resource }
-  | null;
-
-type Tab = "catalog" | "dashboard" | "analytics" | "leaderboard" | "purchases" | "agent";
-
-const API_KEY = import.meta.env.VITE_API_KEY ?? "";
-
-const DEFAULT_FILTERS: CatalogFilters = {
-  search: "",
-  minPrice: "",
-  maxPrice: "",
-  verificationStatus: "all",
-  resourceType: "all",
-};
+const TABS: Array<{ id: Tab; label: string }> = [
+  { id: "browse", label: "Browse APIs" },
+  { id: "provide", label: "Sell your API" },
+];
 
 export default function App() {
-  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
+  const [tab, setTab] = useState<Tab>("browse");
+  const [trying, setTrying] = useState<PublicApi | null>(null);
   const [toast, setToast] = useState<{ message: string; fallbackUrl?: string } | null>(null);
-  const [filters, setFilters] = useState<CatalogFilters>(DEFAULT_FILTERS);
-  const [overrides, setOverrides] = useState<Record<string, Partial<Resource>>>({});
-  const [tab, setTab] = useState<Tab>("catalog");
-  const [showPublish, setShowPublish] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const wallet = useWalletConnection();
-  const { t } = useTranslation();
 
-  // ── Public catalog fetch ──────────────────────────────────────────────────
-  // Always the public listing, independent of API_KEY — owned resources have
-  // their own view in the Dashboard tab (#164).
-  const {
-    status: resourcesStatus,
-    data: rawResources,
-    error: resourcesError,
-    retry: retryResources,
-    stale: catalogStale,
-    syncedAt: catalogSyncedAt,
-  } = useCatalog<Resource>(filters);
-
-  // ── Registry status fetch ─────────────────────────────────────────────────
-  const {
-    status: registryStatus,
-    data: registryData,
-    retry: retryRegistry,
-  } = useAsync<{ resourceCount: number }>((_signal) => fetchRegistryStatus(), []);
-
-  const filteredResources: Resource[] = useMemo(() => {
-    if (!rawResources) return [];
-    return rawResources.map((r) => ({ ...r, ...(overrides[r.id] ?? {}) }));
-  }, [rawResources, overrides]);
-
-  async function handleCopyUrl(url: string) {
+  async function copy(text: string) {
     try {
-      await navigator.clipboard.writeText(url);
-      setToast({ message: t("catalog.copied_toast") });
+      await navigator.clipboard.writeText(text);
+      setToast({ message: "Copied to clipboard" });
     } catch {
-      setToast({
-        message: t("catalog.clipboard_fallback"),
-        fallbackUrl: url,
-      });
+      setToast({ message: "Copy this URL:", fallbackUrl: text });
     }
   }
 
-  function applyOverride(id: string, patch: Partial<Resource>) {
-    setOverrides((prev) => ({ ...prev, [id]: { ...(prev[id] ?? {}), ...patch } }));
-  }
-
-  function handlePriceConfirmed(id: string, price: string) {
-    applyOverride(id, { price });
-    setActiveModal(null);
-  }
-
-  function handleOwnershipConfirmed(id: string, newCreator: string) {
-    applyOverride(id, { walletAddress: newCreator });
-    setActiveModal(null);
-  }
-
-  function handleRegistrationConfirmed(id: string, _txHash: string) {
-    applyOverride(id, { onchainStatus: "registered" });
-    setActiveModal(null);
-  }
-
-  const registryCount = registryData?.resourceCount ?? null;
-  const isLoading = resourcesStatus === "idle" || resourcesStatus === "loading";
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* ── Skip to content link ───────────────────────────────────────────── */}
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-indigo-600 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -140,592 +40,65 @@ export default function App() {
         Skip to main content
       </a>
 
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="p-8">
-        <header className="mb-6 flex items-start justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {t("app.title")}
-            </h1>
-            {registryStatus === "error" ? (
-              <div className="flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-                  />
-                </svg>
-                <span>{t("app.registry_unavailable")}</span>
-                <button
-                  onClick={retryRegistry}
-                  className="ml-1 text-xs font-medium underline hover:no-underline"
-                >
-                  Retry
-                </button>
-              </div>
-            ) : registryCount !== null ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Registry:{" "}
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                  {registryCount}
-                </span>{" "}
-                resource{registryCount !== 1 ? "s" : ""} registered on-chain
-              </p>
-            ) : null}
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-8">
+        <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">ZentrixPay</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Pay-per-call APIs. One HTTP call, one USDC payment on Stellar — no accounts, no
+              subscriptions.
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            {/* Mobile menu button */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-menu"
-              aria-label="Toggle navigation menu"
-              className="lg:hidden rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              onClick={toggleTheme}
+              aria-label="Toggle light/dark theme"
+              title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+              className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
             >
-              {mobileMenuOpen ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
+              {theme === "dark" ? "☀️" : "🌙"}
             </button>
-
-            {/* Desktop navigation */}
-            <div className="hidden lg:flex items-center gap-2">
-              <TabButton active={tab === "catalog"} onClick={() => setTab("catalog")}>
-                {t("app.tab_catalog")}
-              </TabButton>
-              <TabButton active={tab === "purchases"} onClick={() => setTab("purchases")}>
-                {t("app.tab_purchases")}
-              </TabButton>
-              <TabButton active={tab === "leaderboard"} onClick={() => setTab("leaderboard")}>
-                {t("app.tab_leaderboard")}
-              </TabButton>
-              <TabButton active={tab === "agent"} onClick={() => setTab("agent")}>
-                {t("app.tab_agent")}
-              </TabButton>
-              {API_KEY && (
-                <>
-                  <TabButton active={tab === "dashboard"} onClick={() => setTab("dashboard")}>
-                    {t("app.tab_dashboard")}
-                  </TabButton>
-                  <TabButton active={tab === "analytics"} onClick={() => setTab("analytics")}>
-                    {t("app.tab_analytics")}
-                  </TabButton>
-                  <button
-                    onClick={() => setShowPublish(true)}
-                    className="rounded-lg bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
-                  >
-                    {t("app.publish")}
-                  </button>
-                </>
-              )}
-              <WalletButton wallet={wallet} />
-              <LanguageSwitcher />
-              <button
-                onClick={toggleTheme}
-                aria-label="Toggle light/dark theme"
-                title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-              >
-                {theme === "dark" ? `☀️ ${t("app.theme_light")}` : `🌙 ${t("app.theme_dark")}`}
-              </button>
-            </div>
+            <WalletButton wallet={wallet} />
           </div>
-
-          {/* Mobile menu */}
-          {mobileMenuOpen && (
-            <nav
-              id="mobile-menu"
-              className="lg:hidden mt-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-              role="navigation"
-              aria-label="Main navigation"
-            >
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={() => {
-                    setTab("catalog");
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`rounded-lg px-4 py-2 text-sm font-medium text-left transition-colors ${
-                    tab === "catalog"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                  }`}
-                >
-                  {t("app.tab_catalog")}
-                </button>
-                <button
-                  onClick={() => {
-                    setTab("purchases");
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`rounded-lg px-4 py-2 text-sm font-medium text-left transition-colors ${
-                    tab === "purchases"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                  }`}
-                >
-                  {t("app.tab_purchases")}
-                </button>
-                <button
-                  onClick={() => {
-                    setTab("leaderboard");
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`rounded-lg px-4 py-2 text-sm font-medium text-left transition-colors ${
-                    tab === "leaderboard"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                  }`}
-                >
-                  {t("app.tab_leaderboard")}
-                </button>
-                <button
-                  onClick={() => {
-                    setTab("agent");
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`rounded-lg px-4 py-2 text-sm font-medium text-left transition-colors ${
-                    tab === "agent"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                  }`}
-                >
-                  {t("app.tab_agent")}
-                </button>
-                {API_KEY && (
-                  <>
-                    <button
-                      onClick={() => {
-                        setTab("dashboard");
-                        setMobileMenuOpen(false);
-                      }}
-                      className={`rounded-lg px-4 py-2 text-sm font-medium text-left transition-colors ${
-                        tab === "dashboard"
-                          ? "bg-indigo-600 text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                      }`}
-                    >
-                      {t("app.tab_dashboard")}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setTab("analytics");
-                        setMobileMenuOpen(false);
-                      }}
-                      className={`rounded-lg px-4 py-2 text-sm font-medium text-left transition-colors ${
-                        tab === "analytics"
-                          ? "bg-indigo-600 text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                      }`}
-                    >
-                      {t("app.tab_analytics")}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowPublish(true);
-                        setMobileMenuOpen(false);
-                      }}
-                      className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-                    >
-                      {t("app.publish")}
-                    </button>
-                  </>
-                )}
-                <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <WalletButton wallet={wallet} />
-                  <LanguageSwitcher />
-                  <button
-                    onClick={toggleTheme}
-                    aria-label="Toggle light/dark theme"
-                    title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-                    className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                  >
-                    {theme === "dark" ? `☀️ ${t("app.theme_light")}` : `🌙 ${t("app.theme_dark")}`}
-                  </button>
-                </div>
-              </div>
-            </nav>
-          )}
         </header>
 
-        {/* ── Main content ───────────────────────────────────────────────────── */}
+        <nav
+          aria-label="Sections"
+          className="mb-6 flex gap-1 border-b border-gray-200 dark:border-gray-700"
+        >
+          {TABS.map(({ id, label }) => (
+            <button
+              key={id}
+              onClick={() => setTab(id)}
+              aria-current={tab === id ? "page" : undefined}
+              className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
+                tab === id
+                  ? "border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+
         <main id="main-content">
-          {tab === "leaderboard" && (
-            <div className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-              <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {t("leaderboard.title")}
-                </h2>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  {t("leaderboard.description")}
-                </p>
-              </div>
-              <Leaderboard />
-            </div>
-          )}
-          {/* ── Dashboard tab ───────────────────────────────────────────────────── */}
-          {tab === "dashboard" && API_KEY && (
-            <CreatorDashboard
-              apiKey={API_KEY}
-              onEditPrice={(resource) => setActiveModal({ kind: "editPrice", resource })}
-              onTransferOwnership={(resource) =>
-                setActiveModal({ kind: "transferOwnership", resource })
-              }
-              onRegister={(resource) => setActiveModal({ kind: "register", resource })}
-            />
-          )}
-
-          {/* ── Agent tab ───────────────────────────────────────────────────────── */}
-          {tab === "agent" && (
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-              <div className="border-b border-gray-200 pb-4 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {t("agent.title")}
-                </h2>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  {t("agent.description")}
-                </p>
-              </div>
-              <AgentStatusPage />
-            </div>
-          )}
-
-          {/* ── Analytics tab ───────────────────────────────────────────────────── */}
-          {tab === "analytics" && API_KEY && <AnalyticsDashboard apiKey={API_KEY} />}
-
-          {/* ── Purchases tab ───────────────────────────────────────────────────── */}
-          {tab === "purchases" && <PurchasesDashboard initialWallet={wallet.address || ""} />}
-
-          {tab === "catalog" && (
-            <>
-              {catalogStale && resourcesStatus === "success" && (
-                <CatalogStaleBanner syncedAt={catalogSyncedAt} />
-              )}
-
-              {/* ── Search + filter bar ──────────────────────────────────────────── */}
-              {!isLoading && resourcesStatus === "success" && (
-                <CatalogSearch
-                  filters={filters}
-                  total={filteredResources.length}
-                  filtered={filteredResources.length}
-                  onChange={setFilters}
-                  onReset={() => setFilters(DEFAULT_FILTERS)}
-                />
-              )}
-
-              {/* ── Loading skeleton ─────────────────────────────────────────────── */}
-              {isLoading && <ResourceGridSkeleton count={6} />}
-
-              {/* ── Error state ──────────────────────────────────────────────────── */}
-              {resourcesStatus === "error" && (
-                <ErrorBanner
-                  message={resourcesError ?? "Failed to load resources."}
-                  onRetry={retryResources}
-                />
-              )}
-
-              {/* ── Resource grid ────────────────────────────────────────────────── */}
-              {resourcesStatus === "success" && (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {filteredResources.length === 0 &&
-                  (filters.search ||
-                    filters.verificationStatus !== "all" ||
-                    filters.resourceType !== "all" ||
-                    filters.minPrice ||
-                    filters.maxPrice) ? (
-                    <div className="col-span-full py-12 text-center text-sm text-gray-400 dark:text-gray-500">
-                      {t("catalog.no_matches")}{" "}
-                      <button
-                        onClick={() => setFilters(DEFAULT_FILTERS)}
-                        className="text-indigo-500 underline hover:text-indigo-700 dark:text-indigo-400"
-                      >
-                        {t("catalog.clear_filters")}
-                      </button>
-                    </div>
-                  ) : filteredResources.length === 0 ? (
-                    <div className="col-span-full flex flex-col items-center gap-4 py-20 text-center">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-950">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-8 w-8 text-indigo-400 dark:text-indigo-500"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={1.5}
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M20 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2ZM12 12v4M10 14h4"
-                          />
-                        </svg>
-                      </div>
-                      <div className="max-w-sm space-y-1">
-                        <p className="text-base font-semibold text-gray-700 dark:text-gray-200">
-                          {t("catalog.empty_title")}
-                        </p>
-                        <p className="text-sm text-gray-400 dark:text-gray-500">
-                          {t("catalog.empty_description")}
-                        </p>
-                      </div>
-                      <a
-                        href="https://docs.mindvault.app/publishing"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-                      >
-                        {t("catalog.publish_cta")}
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-3.5 w-3.5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                          />
-                        </svg>
-                      </a>
-                    </div>
-                  ) : (
-                    filteredResources.map((r) => (
-                      <div
-                        key={r.id}
-                        className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-                      >
-                        <p className="font-semibold text-gray-900 dark:text-gray-100">{r.title}</p>
-                        {r.publisherName && (
-                          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            by {r.publisherName}
-                          </p>
-                        )}
-                        <p
-                          className="mt-1 truncate text-xs text-gray-400 dark:text-gray-500"
-                          title={r.walletAddress}
-                        >
-                          Owner:{" "}
-                          <ExplorerLink
-                            type="account"
-                            value={r.walletAddress}
-                            className="text-gray-500 dark:text-gray-400"
-                          >
-                            {r.walletAddress}
-                          </ExplorerLink>
-                        </p>
-
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          <span
-                            className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                              r.verificationStatus === "verified"
-                                ? "bg-green-100 text-green-700"
-                                : r.verificationStatus === "rejected"
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {r.verificationStatus}
-                          </span>
-                          <span
-                            className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                              r.onchainStatus === "registered"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : r.onchainStatus === "failed"
-                                  ? "bg-red-100 text-red-700"
-                                  : r.onchainStatus === "pending"
-                                    ? "bg-yellow-100 text-yellow-700"
-                                    : "bg-gray-100 text-gray-500"
-                            }`}
-                          >
-                            {r.onchainStatus === "none" ? "not on-chain" : r.onchainStatus}
-                          </span>
-                          {r.onchainStatus === "registered" && r.onchainTxHash && (
-                            <ExplorerLink
-                              type="tx"
-                              value={r.onchainTxHash}
-                              className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium"
-                            >
-                              View on Explorer ↗
-                            </ExplorerLink>
-                          )}
-                        </div>
-
-                        <div className="mt-3 flex items-center justify-between">
-                          <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
-                            {r.price} USDC
-                          </span>
-                          <div className="flex gap-1">
-                            <button
-                              onClick={() => setActiveModal({ kind: "preview", resource: r })}
-                              className="rounded-lg bg-indigo-100 px-3 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-300 dark:hover:bg-indigo-900/75"
-                            >
-                              Preview
-                            </button>
-                            <button
-                              onClick={() => setActiveModal({ kind: "buy", resource: r })}
-                              className="rounded-lg bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700"
-                            >
-                              Buy
-                            </button>
-                            <button
-                              onClick={() => handleCopyUrl(r.accessUrl)}
-                              className="rounded-lg bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                            >
-                              Copy URL
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </>
-          )}
-
-          {/* ── Modals ──────────────────────────────────────────────────────────── */}
-          {activeModal?.kind === "preview" && (
-            <ResourcePreviewModal
-              resourceId={activeModal.resource.id}
-              onClose={() => setActiveModal(null)}
-              onCopyUrl={handleCopyUrl}
-              onBuy={() =>
-                setActiveModal({
-                  kind: "buy",
-                  resource: (activeModal as { resource: Resource }).resource,
-                })
-              }
-            />
-          )}
-
-          {activeModal?.kind === "buy" && (
-            <BuyModal
-              resourceTitle={activeModal.resource.title}
-              price={activeModal.resource.price}
-              recipient={activeModal.resource.walletAddress}
-              accessUrl={activeModal.resource.accessUrl}
-              walletAddress={wallet.status === "connected" ? wallet.address : null}
-              onClose={() => setActiveModal(null)}
-              onCopyUrl={handleCopyUrl}
-            />
-          )}
-
-          {activeModal?.kind === "editPrice" && (
-            <EditPriceModal
-              resourceId={activeModal.resource.id}
-              currentPrice={activeModal.resource.price}
-              apiKey={API_KEY}
-              onClose={() => setActiveModal(null)}
-              onConfirmed={(price) => handlePriceConfirmed(activeModal.resource.id, price)}
-            />
-          )}
-
-          {activeModal?.kind === "transferOwnership" && (
-            <TransferOwnershipModal
-              resourceId={activeModal.resource.id}
-              apiKey={API_KEY}
-              onClose={() => setActiveModal(null)}
-              onConfirmed={(newCreator) =>
-                handleOwnershipConfirmed(activeModal.resource.id, newCreator)
-              }
-            />
-          )}
-
-          {activeModal?.kind === "register" && (
-            <RegisterModal
-              resourceId={activeModal.resource.id}
-              apiKey={API_KEY}
-              onClose={() => setActiveModal(null)}
-              onConfirmed={(txHash) => handleRegistrationConfirmed(activeModal.resource.id, txHash)}
-            />
-          )}
-
-          {showPublish && API_KEY && (
-            <PublishModal
-              apiKey={API_KEY}
-              onClose={() => setShowPublish(false)}
-              onPublished={() => retryResources()}
-            />
-          )}
-
-          {toast && (
-            <Toast
-              message={toast.message}
-              fallbackUrl={toast.fallbackUrl}
-              onDismiss={() => setToast(null)}
-            />
+          {tab === "browse" ? (
+            <ApiCatalog onTry={setTrying} onCopy={copy} />
+          ) : (
+            <ProviderDashboard wallet={wallet} onCopy={copy} />
           )}
         </main>
       </div>
-    </div>
-  );
-}
 
-function TabButton({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
-        active
-          ? "bg-indigo-600 text-white"
-          : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-      }`}
-    >
-      {children}
-    </button>
+      {trying && <TryItModal api={trying} wallet={wallet} onClose={() => setTrying(null)} />}
+      {toast && (
+        <Toast
+          message={toast.message}
+          fallbackUrl={toast.fallbackUrl}
+          onDismiss={() => setToast(null)}
+        />
+      )}
+    </div>
   );
 }

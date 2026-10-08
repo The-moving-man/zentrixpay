@@ -199,9 +199,9 @@ describe("classifying local failures", () => {
   it.each([
     ["Payment 25 USDC exceeds the auto-pay ceiling of 10", "MV_PAYMENT_CEILING_EXCEEDED"],
     ["Pass confirmMainnet: true to proceed", "MV_MAINNET_UNCONFIRMED"],
-    ["No wallet configured; run mindvault_setup_wallet first", "MV_WALLET_MISSING"],
+    ["No wallet configured; run zentrixpay_setup_wallet first", "MV_WALLET_MISSING"],
     ["Insufficient USDC balance for this purchase", "MV_INSUFFICIENT_FUNDS"],
-    ["Unknown tool: mindvault_nope", "MV_TOOL_UNKNOWN"],
+    ["Unknown tool: zentrixpay_nope", "MV_TOOL_UNKNOWN"],
     ["The state file is corrupt and has been quarantined", "MV_STATE_CORRUPT"],
   ])("classifies %s", (message, expected) => {
     expect(localErrorCode(new Error(message))).toBe(expected);
@@ -261,7 +261,7 @@ describe("toolErrorPayload", () => {
   it("carries a versioned schema", () => {
     const payload = toolErrorPayload({ error: new Error("x"), summary: "Failed" });
 
-    expect(payload.schema).toBe("mindvault.error/v1");
+    expect(payload.schema).toBe("zentrixpay.error/v1");
   });
 
   it("carries the code, category and retry safety together", () => {

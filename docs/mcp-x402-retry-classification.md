@@ -81,15 +81,15 @@ ceiling, fund the wallet, or pass `maxAutoPayUsdc`.
 **On a `conditional` verdict** — check before retrying:
 
 ```
-mindvault_purchase_history --resourceId <id>   # did a receipt get written?
-mindvault_tx_status --txHash <hash>            # if a hash is known
+zentrixpay_purchase_history --resourceId <id>   # did a receipt get written?
+zentrixpay_tx_status --txHash <hash>            # if a hash is known
 ```
 
 Retry only once the original is confirmed absent. A timeout is not evidence of
 failure.
 
 **On an `unsafe` verdict** — the payment succeeded. Re-fetch the resource
-rather than paying again, and use `mindvault_purchase_history` to confirm the
+rather than paying again, and use `zentrixpay_purchase_history` to confirm the
 receipt was recorded.
 
 ## Interaction with automatic retries

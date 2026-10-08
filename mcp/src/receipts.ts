@@ -1,8 +1,8 @@
 /**
  * Structured receipt export for purchased resources.
  *
- * `mindvault_buy` already records a local receipt per purchase (see
- * purchaseHistory.ts) and `mindvault_purchase_history` lists them. That listing
+ * `zentrixpay_buy` already records a local receipt per purchase (see
+ * purchaseHistory.ts) and `zentrixpay_purchase_history` lists them. That listing
  * is a browsing aid: it emits whatever fields happen to be stored, with no
  * stable schema, no totals, and no way to hand the result to anything but
  * another agent turn.
@@ -23,13 +23,13 @@
  * message naming the offending argument.
  */
 
-import { type ExplorerNetwork } from "@mindvault/registry-client";
+import { type ExplorerNetwork } from "@zentrixpay/registry-client";
 import { explorerTxUrl, resolveExplorerNetwork } from "./stellarExplorer.js";
 import { listPurchases, type PurchaseReceipt } from "./purchaseHistory.js";
 import { sumUsdc, trimUsdc } from "./usdcAmount.js";
 
 /** Schema identifier carried by every export, so consumers can version-check. */
-export const RECEIPT_EXPORT_SCHEMA = "mindvault.receipt-export/v1";
+export const RECEIPT_EXPORT_SCHEMA = "zentrixpay.receipt-export/v1";
 
 /** The only currency the vault settles in today; stated explicitly in exports. */
 export const RECEIPT_CURRENCY = "USDC";
@@ -371,7 +371,7 @@ export function exportReceiptsToolWithTimeout(
   const result = exportReceiptsTool(args);
   if (Date.now() - started > timeoutMs) {
     throw new Error(
-      `Request timed out after ${timeoutMs}ms (http). Configure mindvault_export_receipts in MINDVAULT_TOOL_TIMEOUTS.`,
+      `Request timed out after ${timeoutMs}ms (http). Configure zentrixpay_export_receipts in ZENTRIXPAY_TOOL_TIMEOUTS.`,
     );
   }
   return result;

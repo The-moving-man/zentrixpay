@@ -8,12 +8,12 @@
  * last few audit-log entries recorded. Collecting them by hand means pasting
  * an environment dump into a ticket, which is exactly how secret keys leak.
  *
- * `mindvault_debug_bundle` gathers all of that into one schema-versioned
+ * `zentrixpay_debug_bundle` gathers all of that into one schema-versioned
  * document that is safe to attach to a bug report by construction:
  *
  *   - Profiles are summarised as address plus flags; secret keys and publisher
  *     API keys are never read into the bundle.
- *   - Environment variables are limited to the MindVault, Stellar and network
+ *   - Environment variables are limited to the ZentrixPay, Stellar and network
  *     settings the server reads, and any whose name suggests a credential is
  *     masked. Public keys and contract ids are kept, since a bundle without
  *     them cannot explain a network or registry mismatch.
@@ -67,7 +67,7 @@ export const REDACTED = "[REDACTED]";
  * outside this set is reported, so an unrelated `AWS_SECRET_ACCESS_KEY` in the
  * parent shell never reaches the bundle even in masked form.
  */
-const ENV_PREFIXES = ["MINDVAULT_", "STELLAR_", "SOROBAN_", "HORIZON_", "VAULT_REGISTRY_"];
+const ENV_PREFIXES = ["ZENTRIXPAY_", "STELLAR_", "SOROBAN_", "HORIZON_", "VAULT_REGISTRY_"];
 const ENV_EXACT = new Set(["NETWORK", "SPONSORED_ACCOUNT_URL", "USDC_CONTRACT_ID", "NODE_ENV"]);
 
 /** Variable names that carry a credential, whatever their value looks like. */
@@ -177,12 +177,12 @@ export interface DebugBundle {
 
 const SANITIZATION_RULES = [
   "Wallet secret keys and publisher API keys are never read into the bundle; profiles carry the public key only.",
-  "Only MindVault, Stellar, network and registry environment variables are listed; names that look like credentials are masked.",
+  "Only ZentrixPay, Stellar, network and registry environment variables are listed; names that look like credentials are masked.",
   "Audit-log entries are the already-redacted lines the server wrote, read from the end of the file only.",
   "Anything shaped like a Stellar secret key is replaced wherever it appears in the serialised document.",
 ];
 
-/** Keep the MindVault-related variables, masking any whose name looks like a credential. */
+/** Keep the ZentrixPay-related variables, masking any whose name looks like a credential. */
 export function sanitizeEnvironment(env: NodeJS.ProcessEnv): {
   environment: Record<string, string>;
   masked: string[];

@@ -312,7 +312,7 @@ describe("exportReceiptsTool", () => {
   let home: string;
 
   beforeEach(() => {
-    home = mkdtempSync(join(tmpdir(), "mindvault-receipts-"));
+    home = mkdtempSync(join(tmpdir(), "zentrixpay-receipts-"));
     _setPurchasesFilePath(join(home, "purchases.json"));
     _clearPurchases();
   });
@@ -322,7 +322,7 @@ describe("exportReceiptsTool", () => {
     rmSync(home, { recursive: true, force: true });
   });
 
-  it("exports the receipts mindvault_buy recorded", () => {
+  it("exports the receipts zentrixpay_buy recorded", () => {
     recordPurchase({
       resourceId: "res-001",
       amount: "1.50",

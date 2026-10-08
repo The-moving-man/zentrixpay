@@ -21,12 +21,12 @@ describe("parseStructuredObject", () => {
 });
 
 describe("normalizeToolResult", () => {
-  const withSchema = (name: string) => name === "mindvault_preview";
+  const withSchema = (name: string) => name === "zentrixpay_preview";
   const none = () => false;
 
   it("attaches structuredContent when the text is a JSON object and the tool has a schema", () => {
     const result = normalizeToolResult(
-      "mindvault_preview",
+      "zentrixpay_preview",
       JSON.stringify({ id: "res-1", price: "$1.50 USDC" }, null, 2),
       withSchema,
     );
@@ -37,9 +37,9 @@ describe("normalizeToolResult", () => {
   it("uses an explicit sidecar without changing the text", () => {
     const text = "[res-1] Intro — $1.5 USDC\n  A guide\n  https://example.com";
     const result = normalizeToolResult(
-      "mindvault_browse",
+      "zentrixpay_browse",
       { text, structured: { items: [{ id: "res-1" }], notice: null, truncated: false } },
-      (name) => name === "mindvault_browse",
+      (name) => name === "zentrixpay_browse",
     );
     expect(result.content[0].text).toBe(text);
     expect(result.structuredContent).toEqual({
@@ -50,14 +50,14 @@ describe("normalizeToolResult", () => {
   });
 
   it("omits structuredContent for text-only tools", () => {
-    const result = normalizeToolResult("mindvault_verify_install", "Install looks good.", none);
+    const result = normalizeToolResult("zentrixpay_verify_install", "Install looks good.", none);
     expect(result.content[0].text).toBe("Install looks good.");
     expect(result.structuredContent).toBeUndefined();
   });
 
   it("uses a text fallback when a schema tool returns prose", () => {
     const text = "Provide a transaction hash to look up.";
-    const result = normalizeToolResult("mindvault_preview", text, withSchema);
+    const result = normalizeToolResult("zentrixpay_preview", text, withSchema);
     expect(result.content[0].text).toBe(text);
     expect(result.structuredContent).toEqual(textFallback(text));
   });

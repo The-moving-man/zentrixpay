@@ -1,12 +1,12 @@
-# MindVault FAQ
+# ZentrixPay FAQ
 
-Common questions from creators, human buyers, and AI agents using MindVault.
+Common questions from creators, human buyers, and AI agents using ZentrixPay.
 
 ## Creator Questions
 
-### What fees does MindVault charge?
+### What fees does ZentrixPay charge?
 
-MindVault is currently designed so resource payments go directly from the buyer to the creator's Stellar wallet in USDC. The platform wallet receives the separate content-verification fee, not a cut of every resource purchase.
+ZentrixPay is currently designed so resource payments go directly from the buyer to the creator's Stellar wallet in USDC. The platform wallet receives the separate content-verification fee, not a cut of every resource purchase.
 
 On testnet, wallet funding and USDC come from faucets. In production, creators should still expect normal network costs and any facilitator or infrastructure fees configured for the deployment.
 
@@ -16,9 +16,9 @@ Creators are paid during the x402 settlement flow. A buyer requests a protected 
 
 ### What wallet do I need as a creator?
 
-Creators need a Stellar wallet address that can receive USDC on the configured Stellar network. For browser use, MindVault supports Stellar browser wallets through `@creit.tech/stellar-wallets-kit`. For agent publishing, the MCP server can create a sponsored agent wallet.
+Creators need a Stellar wallet address that can receive USDC on the configured Stellar network. For browser use, ZentrixPay supports Stellar browser wallets through `@creit.tech/stellar-wallets-kit`. For agent publishing, the MCP server can create a sponsored agent wallet.
 
-### Can MindVault move or edit my registered resources?
+### Can ZentrixPay move or edit my registered resources?
 
 The vault-registry contract records the creator address for each resource. Contract mutations require the creator's Soroban authorization, so the platform cannot silently transfer ownership or change protected metadata without the creator key participating in the transaction.
 
@@ -30,7 +30,7 @@ The verification step helps keep the catalog useful by checking submitted resour
 
 ### Do buyers need an account?
 
-No. MindVault uses HTTP 402 and wallet-signed payment proof instead of account-gated subscriptions. A buyer needs a compatible wallet or x402-aware client, enough USDC for the resource price, and the protected resource URL.
+No. ZentrixPay uses HTTP 402 and wallet-signed payment proof instead of account-gated subscriptions. A buyer needs a compatible wallet or x402-aware client, enough USDC for the resource price, and the protected resource URL.
 
 ### What happens if payment succeeds but content is not delivered?
 
@@ -44,7 +44,7 @@ Refunds are not built into the current protocol flow. Resource purchases are set
 
 ### How does an AI agent get a wallet?
 
-The MCP server exposes `mindvault_setup_wallet`, which creates a sponsored Stellar testnet account for the agent. The sponsor covers the account reserve and USDC trustline requirement, so the agent can start without holding XLM first.
+The MCP server exposes `zentrixpay_setup_wallet`, which creates a sponsored Stellar testnet account for the agent. The sponsor covers the account reserve and USDC trustline requirement, so the agent can start without holding XLM first.
 
 ### Does a sponsored agent wallet include USDC?
 
@@ -52,11 +52,11 @@ No. Sponsorship covers the account setup and trustline reserve, not spendable US
 
 ### How does an agent publish a resource?
 
-An agent runs `mindvault_setup_wallet`, funds the wallet, registers with `mindvault_register`, then calls `mindvault_publish`. The MCP server signs the verification payment with the agent wallet and stores the publisher API key in memory for the session.
+An agent runs `zentrixpay_setup_wallet`, funds the wallet, registers with `zentrixpay_register`, then calls `zentrixpay_publish`. The MCP server signs the verification payment with the agent wallet and stores the publisher API key in memory for the session.
 
 ### How does an agent buy a resource?
 
-An agent browses or previews resources, then calls `mindvault_buy` with the resource ID. The MCP server reads the HTTP 402 payment instructions, signs the USDC payment using the agent wallet, retries the request with `X-Payment`, and returns the protected content after settlement.
+An agent browses or previews resources, then calls `zentrixpay_buy` with the resource ID. The MCP server reads the HTTP 402 payment instructions, signs the USDC payment using the agent wallet, retries the request with `X-Payment`, and returns the protected content after settlement.
 
 ### Can one agent publish and another agent buy?
 
@@ -64,11 +64,11 @@ Yes. Each MCP session has its own in-memory wallet state. One agent can publish 
 
 ## Operations Questions
 
-### Which network does MindVault use today?
+### Which network does ZentrixPay use today?
 
 The current documented demo flow uses Stellar testnet and testnet USDC. Production deployments should set the Stellar network passphrase, Soroban RPC URL, USDC contract ID, facilitator URL, and wallet secrets for the target network.
 
 ### Where can I inspect payments and contract state?
 
-Use Stellar Explorer for transaction hashes, wallet balances, and contract interactions. MindVault docs also include the [deployment runbook](deployment-runbook.md), [reconciliation guide](reconciliation.md), and [architecture overview](architecture.md) for operator-level debugging.
+Use Stellar Explorer for transaction hashes, wallet balances, and contract interactions. ZentrixPay docs also include the [deployment runbook](deployment-runbook.md), [reconciliation guide](reconciliation.md), and [architecture overview](architecture.md) for operator-level debugging.
 

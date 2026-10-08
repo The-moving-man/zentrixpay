@@ -2,7 +2,7 @@
  * Package provenance metadata for release artifacts — issue #586.
  *
  * A published tarball currently says what it is (`name`, `version`) but nothing
- * about where it came from. Anyone who installs `@mindvault/mcp` and wants to
+ * about where it came from. Anyone who installs `@zentrixpay/mcp` and wants to
  * know which commit produced it, whether it was built in CI or on somebody's
  * laptop, or whether the `dist/` they received matches this repository at that
  * commit, has no way to find out. For an MCP server that holds a Stellar

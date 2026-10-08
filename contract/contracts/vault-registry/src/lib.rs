@@ -1,5 +1,5 @@
 #![no_std]
-//! MindVault on-chain vault registry.
+//! ZentrixPay on-chain vault registry.
 //!
 //! Records each vault resource on Stellar: its creator, price (in USDC base
 //! units, 7 decimals — see [`USDC_DECIMALS`]), and a metadata pointer. Payment
@@ -36,7 +36,7 @@ pub const MAX_METADATA_POINTERS: u32 = 4;
 /// Domain separator prefixed to every preimage hashed by
 /// `compute_attestation_hash`, so the digest can never collide with a hash
 /// computed for another purpose over the same bytes.
-pub const ATTESTATION_HASH_DOMAIN: &str = "mindvault-attestation-v1";
+pub const ATTESTATION_HASH_DOMAIN: &str = "zentrixpay-attestation-v1";
 pub const MAX_CONTENT_HASH_LEN: u32 = 128;
 pub const DEFAULT_ATTESTATION_HASH_ALGORITHM: &str = "sha256";
 pub const MAX_ATTESTATION_HASH_ALGORITHM_LEN: u32 = 16;
@@ -91,7 +91,7 @@ pub const MAX_FEE_DESTINATION_BPS: u32 = FEE_BPS_DENOM;
 pub const MIN_CREATOR_SHARE_BPS: u32 = FEE_BPS_DENOM - MAX_FEE_BPS; // 5_000
 
 /// Stable registry name returned by [`VaultRegistry::registry_info`].
-pub const REGISTRY_NAME: &str = "mindvault-vault-registry";
+pub const REGISTRY_NAME: &str = "zentrixpay-vault-registry";
 /// Version of the on-chain `Resource` schema. Bump whenever a change to the
 /// `Resource` struct's fields would require callers to change how they decode
 /// it (e.g. the tags field added in schema version 2, dispute_flag added in

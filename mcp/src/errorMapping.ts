@@ -1,7 +1,7 @@
 /**
- * Structured error mapping for the MindVault MCP server.
+ * Structured error mapping for the ZentrixPay MCP server.
  *
- * Failures reach an agent from four very different places — the MindVault API,
+ * Failures reach an agent from four very different places — the ZentrixPay API,
  * the x402 payment layer, Horizon, and the Soroban registry client — and each
  * one has its own failure vocabulary. Raw, they surface as opaque text like
  * `Browse failed: {"error":"..."}` or an unqualified `fetch failed`, which tells
@@ -55,7 +55,7 @@ export interface MappedError {
  * object lets agents branch on an error category without parsing prose.
  */
 export interface TroubleshootingHint {
-  schema: "mindvault.troubleshooting/v1";
+  schema: "zentrixpay.troubleshooting/v1";
   source: ErrorSource;
   category: ErrorCategory;
   status: number | null;
@@ -67,7 +67,7 @@ export interface TroubleshootingHint {
 /** Convert a mapped failure into the stable, machine-readable MCP payload. */
 export function troubleshootingHint(error: MappedError): TroubleshootingHint {
   return {
-    schema: "mindvault.troubleshooting/v1",
+    schema: "zentrixpay.troubleshooting/v1",
     source: error.source,
     category: error.category,
     status: error.status ?? null,
@@ -79,7 +79,7 @@ export function troubleshootingHint(error: MappedError): TroubleshootingHint {
 
 /** Human label for a source, used in the summary. */
 const SOURCE_LABEL: Record<ErrorSource, string> = {
-  api: "MindVault API",
+  api: "ZentrixPay API",
   x402: "x402 payment",
   horizon: "Horizon",
   soroban: "Soroban RPC",
@@ -92,16 +92,16 @@ const ACTION: Record<ErrorCategory, string> = {
   network:
     "Check network connectivity to the service and retry; idempotent reads retry automatically.",
   timeout:
-    "The request exceeded its configured timeout. Retry, or raise MINDVAULT_HTTP_TIMEOUT_MS for a slow endpoint.",
+    "The request exceeded its configured timeout. Retry, or raise ZENTRIXPAY_HTTP_TIMEOUT_MS for a slow endpoint.",
   payment:
-    "Payment was required or rejected. Check the wallet with mindvault_wallet_info, fund it with USDC, and retry.",
+    "Payment was required or rejected. Check the wallet with zentrixpay_wallet_info, fund it with USDC, and retry.",
   validation: "Correct the invalid arguments and call the tool again.",
-  auth: "Credentials are missing or not accepted. Run mindvault_register, or switch to the profile that owns this resource.",
-  not_found: "Confirm the id with mindvault_browse or mindvault_search before retrying.",
+  auth: "Credentials are missing or not accepted. Run zentrixpay_register, or switch to the profile that owns this resource.",
+  not_found: "Confirm the id with zentrixpay_browse or zentrixpay_search before retrying.",
   conflict: "The resource is already in the requested state — no action needed.",
   rate_limit: "Rate limited. Wait for the window to pass before retrying.",
   server: "The upstream service is failing. Retry shortly; if it persists the service is down.",
-  contract: "Verify the registry contract ID and network with mindvault_registry_info, then retry.",
+  contract: "Verify the registry contract ID and network with zentrixpay_registry_info, then retry.",
   unknown: "Retry once; if it persists, report the summary above with the tool name.",
 };
 
@@ -189,9 +189,9 @@ function revokedKeyAction(profile: string): string {
   return (
     `The publisher API key stored in profile "${profile}" is no longer accepted — ` +
     "it was revoked, rotated from another session, or its publisher record was removed. " +
-    "The stored key cannot be revived: run mindvault_register to obtain a new one, " +
-    "mindvault_use_profile to switch to a profile whose key still works, or " +
-    "mindvault_restore_state to restore a backup that holds a valid key."
+    "The stored key cannot be revived: run zentrixpay_register to obtain a new one, " +
+    "zentrixpay_use_profile to switch to a profile whose key still works, or " +
+    "zentrixpay_restore_state to restore a backup that holds a valid key."
   );
 }
 
@@ -210,7 +210,7 @@ function forbiddenKeyAction(profile: string): string {
   return (
     `The publisher API key in profile "${profile}" is valid but not authorized for this ` +
     "resource — it belongs to a different publisher. Switch to the owning profile with " +
-    "mindvault_use_profile, or act on a resource this publisher owns."
+    "zentrixpay_use_profile, or act on a resource this publisher owns."
   );
 }
 
@@ -329,7 +329,7 @@ export function mapRegistryError(input: {
       category: "not_found",
       summary: `${input.operation}: ${input.message}`,
       action:
-        "The resource is not registered on-chain. Publish it, or run mindvault_register_onchain to register an already-verified resource.",
+        "The resource is not registered on-chain. Publish it, or run zentrixpay_register_onchain to register an already-verified resource.",
     };
   }
   return {

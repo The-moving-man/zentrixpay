@@ -1,7 +1,7 @@
 /**
  * Offline read-only cache for catalog tools (#556).
  *
- * `browse`, `search`, and `preview` normally depend on the MindVault catalog
+ * `browse`, `search`, and `preview` normally depend on the ZentrixPay catalog
  * API. When that service is unreachable (a transport-level failure — DNS,
  * refused connection, or timeout), these tools fall back to the last snapshot
  * captured from a successful read, clearly labelled with the age of the
@@ -35,9 +35,9 @@ export const CATALOG_CACHE_STALE_AFTER_MS = 24 * 60 * 60 * 1000;
 /** Environment variables controlling cache lifetime (#573). */
 export const CATALOG_CACHE_ENV_VARS = {
   /** Age at which a snapshot starts being served with a staleness warning. */
-  ttlMs: "MINDVAULT_CATALOG_CACHE_TTL_MS",
+  ttlMs: "ZENTRIXPAY_CATALOG_CACHE_TTL_MS",
   /** Age past which a snapshot is not served at all. 0 disables the limit. */
-  maxAgeMs: "MINDVAULT_CATALOG_CACHE_MAX_AGE_MS",
+  maxAgeMs: "ZENTRIXPAY_CATALOG_CACHE_MAX_AGE_MS",
 } as const;
 
 /**
@@ -213,7 +213,7 @@ export function catalogCacheLabel(
   return (
     `⚠ Offline catalog snapshot served (cached ${age} ago) — ${describeReason(reason)}; ` +
     `stale, results may be outdated. ` +
-    `Confirm a specific resource on-chain with mindvault_registry_lookup when freshness matters.`
+    `Confirm a specific resource on-chain with zentrixpay_registry_lookup when freshness matters.`
   );
 }
 

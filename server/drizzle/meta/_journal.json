@@ -64,6 +64,13 @@
       "when": 1780200000000,
       "tag": "0008_resource_tags",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1780300000000,
+      "tag": "0009_api_proxy",
+      "breakpoints": true
     }
   ]
 }

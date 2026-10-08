@@ -1,6 +1,6 @@
 # MCP Integration Test Harness
 
-Vitest harness that exercises the MindVault MCP server **through the SDK
+Vitest harness that exercises the ZentrixPay MCP server **through the SDK
 request interface** (`listTools` / `callTool`) instead of calling exported
 helper functions directly.
 
@@ -15,13 +15,13 @@ Source:
 
 ```bash
 # From the repo root
-pnpm --filter @mindvault/mcp test
+pnpm --filter @zentrixpay/mcp test
 
 # Or only the integration suite
-pnpm --filter @mindvault/mcp exec vitest run src/integration.test.ts
+pnpm --filter @zentrixpay/mcp exec vitest run src/integration.test.ts
 ```
 
-The suite sets `MINDVAULT_MOCK=1` before importing the server so HTTP and
+The suite sets `ZENTRIXPAY_MOCK=1` before importing the server so HTTP and
 on-chain registry lookups use the deterministic fixtures in
 [`mcp/src/mock.ts`](../mcp/src/mock.ts). Agent state is isolated under a temp
 `HOME` directory.
@@ -31,9 +31,9 @@ on-chain registry lookups use the deterministic fixtures in
 | Check           | How                                                                                     |
 | --------------- | --------------------------------------------------------------------------------------- |
 | Tool listing    | `client.listTools()` over the in-memory transport                                       |
-| Catalog tools   | `mindvault_browse`, `mindvault_search`, `mindvault_preview`                             |
-| Registry mock   | `mindvault_registry_lookup` (seeded hit + miss), `mindvault_registry_list` (pagination) |
-| Wallet setup    | `mindvault_setup_wallet` via mock `/create`                                             |
+| Catalog tools   | `zentrixpay_browse`, `zentrixpay_search`, `zentrixpay_preview`                             |
+| Registry mock   | `zentrixpay_registry_lookup` (seeded hit + miss), `zentrixpay_registry_list` (pagination) |
+| Wallet setup    | `zentrixpay_setup_wallet` via mock `/create`                                             |
 | Structured JSON | `structuredContent` on catalog, preview, receipts, wallet; absent on text-only tools    |
 | Error shape     | Unknown tool + missing wallet                                                           |
 

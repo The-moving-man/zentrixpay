@@ -20,7 +20,7 @@ import {
 import {
   DEFAULT_IDENTITY,
   createAndStart,
-  createMindVaultServer,
+  createZentrixPayServer,
   startServer,
   type McpTransport,
   type ServerBehaviour,
@@ -28,7 +28,7 @@ import {
 import { createProgressEmitter, type SendNotification } from "./progress.js";
 
 const TOOL = {
-  name: "mindvault_echo",
+  name: "zentrixpay_echo",
   description: "Echo the text back.",
   inputSchema: {
     type: "object" as const,
@@ -46,7 +46,7 @@ function behaviour(overrides: Partial<ServerBehaviour> = {}): ServerBehaviour {
 }
 
 /** Build a server and connect a real client to it over an in-memory pair. */
-async function connectClient(server: ReturnType<typeof createMindVaultServer>) {
+async function connectClient(server: ReturnType<typeof createZentrixPayServer>) {
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   const client = new Client({ name: "test-client", version: "1.0.0" }, { capabilities: {} });
   await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
@@ -65,34 +65,34 @@ function fakeTransport(): McpTransport & { closed: boolean; start: () => Promise
   } as never;
 }
 
-describe("createMindVaultServer", () => {
+describe("createZentrixPayServer", () => {
   it("builds a server without touching a transport", () => {
     // Construction with no side effects is the whole point: no stdio, no
     // process.env.VITEST guard to work around.
-    expect(() => createMindVaultServer(behaviour())).not.toThrow();
+    expect(() => createZentrixPayServer(behaviour())).not.toThrow();
   });
 
   it("uses the default identity", async () => {
-    const { client } = await connectClient(createMindVaultServer(behaviour()));
+    const { client } = await connectClient(createZentrixPayServer(behaviour()));
 
     expect(client.getServerVersion()).toMatchObject(DEFAULT_IDENTITY);
   });
 
   it("accepts a custom identity", async () => {
-    const server = createMindVaultServer(behaviour(), { name: "other", version: "9.9.9" });
+    const server = createZentrixPayServer(behaviour(), { name: "other", version: "9.9.9" });
     const { client } = await connectClient(server);
 
     expect(client.getServerVersion()).toMatchObject({ name: "other", version: "9.9.9" });
   });
 
   it("rejects prompts without a resolver", () => {
-    expect(() => createMindVaultServer(behaviour({ listPrompts: () => [] }))).toThrow(
+    expect(() => createZentrixPayServer(behaviour({ listPrompts: () => [] }))).toThrow(
       /getPrompt is required/,
     );
   });
 
   it("declares prompt capability only when prompts are supplied", async () => {
-    const withPrompts = createMindVaultServer(
+    const withPrompts = createZentrixPayServer(
       behaviour({
         listPrompts: () => [{ name: "p", description: "d", arguments: [] }],
         getPrompt: () => ({ description: "d", messages: [] }),
@@ -106,16 +106,16 @@ describe("createMindVaultServer", () => {
 
 describe("tools over a real session", () => {
   it("advertises the tool list", async () => {
-    const { client } = await connectClient(createMindVaultServer(behaviour()));
+    const { client } = await connectClient(createZentrixPayServer(behaviour()));
 
     const { tools } = await client.listTools();
 
-    expect(tools.map((t) => t.name)).toEqual(["mindvault_echo"]);
+    expect(tools.map((t) => t.name)).toEqual(["zentrixpay_echo"]);
   });
 
   it("calls listTools per request, so the surface can be dynamic", async () => {
     const listTools = vi.fn().mockReturnValue([TOOL]);
-    const { client } = await connectClient(createMindVaultServer(behaviour({ listTools })));
+    const { client } = await connectClient(createZentrixPayServer(behaviour({ listTools })));
 
     await client.listTools();
     await client.listTools();
@@ -124,10 +124,10 @@ describe("tools over a real session", () => {
   });
 
   it("dispatches a call and returns its text", async () => {
-    const { client } = await connectClient(createMindVaultServer(behaviour()));
+    const { client } = await connectClient(createZentrixPayServer(behaviour()));
 
     const result: any = await client.callTool({
-      name: "mindvault_echo",
+      name: "zentrixpay_echo",
       arguments: { text: "hi" },
     });
 
@@ -136,27 +136,27 @@ describe("tools over a real session", () => {
 
   it("passes the tool name and arguments through", async () => {
     const dispatchTool = vi.fn().mockResolvedValue("ok");
-    const { client } = await connectClient(createMindVaultServer(behaviour({ dispatchTool })));
+    const { client } = await connectClient(createZentrixPayServer(behaviour({ dispatchTool })));
 
-    await client.callTool({ name: "mindvault_echo", arguments: { text: "x", n: 1 } });
+    await client.callTool({ name: "zentrixpay_echo", arguments: { text: "x", n: 1 } });
 
-    expect(dispatchTool).toHaveBeenCalledWith("mindvault_echo", { text: "x", n: 1 }, undefined);
+    expect(dispatchTool).toHaveBeenCalledWith("zentrixpay_echo", { text: "x", n: 1 }, undefined);
   });
 
   it("attaches structured content when the behaviour supplies it", async () => {
     const { client } = await connectClient(
-      createMindVaultServer(behaviour({ structuredResult: () => ({ parsed: true }) })),
+      createZentrixPayServer(behaviour({ structuredResult: () => ({ parsed: true }) })),
     );
 
-    const result: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const result: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     expect(result.structuredContent).toEqual({ parsed: true });
   });
 
   it("omits structured content when there is none", async () => {
-    const { client } = await connectClient(createMindVaultServer(behaviour()));
+    const { client } = await connectClient(createZentrixPayServer(behaviour()));
 
-    const result: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const result: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     expect(result.structuredContent).toBeUndefined();
   });
@@ -171,9 +171,9 @@ describe("errors", () => {
     });
 
   it("returns a tool error rather than failing the request", async () => {
-    const { client } = await connectClient(createMindVaultServer(failing()));
+    const { client } = await connectClient(createZentrixPayServer(failing()));
 
-    const result: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const result: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     // isError, not a protocol-level failure: the agent gets to read and react.
     expect(result.isError).toBe(true);
@@ -182,27 +182,27 @@ describe("errors", () => {
 
   it("uses a custom error formatter", async () => {
     const { client } = await connectClient(
-      createMindVaultServer({ ...failing(), formatError: () => "redacted" }),
+      createZentrixPayServer({ ...failing(), formatError: () => "redacted" }),
     );
 
-    const result: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const result: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     expect(result.content[0].text).toContain("redacted");
   });
 
   it("attaches troubleshooting content when supplied", async () => {
     const { client } = await connectClient(
-      createMindVaultServer({ ...failing(), errorContent: () => ({ hint: "check the network" }) }),
+      createZentrixPayServer({ ...failing(), errorContent: () => ({ hint: "check the network" }) }),
     );
 
-    const result: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const result: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     expect(result.structuredContent).toEqual({ hint: "check the network" });
   });
 
   it("handles a thrown non-Error", async () => {
     const { client } = await connectClient(
-      createMindVaultServer(
+      createZentrixPayServer(
         behaviour({
           dispatchTool: async () => {
             throw "a string";
@@ -211,7 +211,7 @@ describe("errors", () => {
       ),
     );
 
-    const result: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const result: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     expect(result.content[0].text).toContain("a string");
   });
@@ -250,7 +250,7 @@ describe("progress notifications (#841)", () => {
 
   async function callWithProgress(dispatchTool: ServerBehaviour["dispatchTool"]) {
     const { client, serverTransport } = await connectClient(
-      createMindVaultServer(
+      createZentrixPayServer(
         behaviour({ dispatchTool, createProgressEmitter: slowProgressEmitter }),
       ),
     );
@@ -260,7 +260,7 @@ describe("progress notifications (#841)", () => {
     const received: string[] = [];
 
     const result: any = await client.callTool(
-      { name: "mindvault_echo", arguments: {} },
+      { name: "zentrixpay_echo", arguments: {} },
       undefined,
       { onprogress: (p) => received.push(String(p.message)) },
     );
@@ -311,9 +311,9 @@ describe("progress notifications (#841)", () => {
 
 describe("correlation IDs (#572)", () => {
   it("attaches an id to a successful result", async () => {
-    const { client } = await connectClient(createMindVaultServer(behaviour()));
+    const { client } = await connectClient(createZentrixPayServer(behaviour()));
 
-    const result: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const result: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     expect(isCorrelationId(result._meta?.[CORRELATION_META_KEY])).toBe(true);
   });
@@ -321,7 +321,7 @@ describe("correlation IDs (#572)", () => {
   it("makes the id visible to the tool while it runs", async () => {
     let seen: string | undefined;
     const { client } = await connectClient(
-      createMindVaultServer(
+      createZentrixPayServer(
         behaviour({
           dispatchTool: async () => {
             seen = currentCorrelationId();
@@ -331,24 +331,24 @@ describe("correlation IDs (#572)", () => {
       ),
     );
 
-    const result: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const result: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     // The same id the result carries, so an audit line and a user report match.
     expect(seen).toBe(result._meta?.[CORRELATION_META_KEY]);
   });
 
   it("gives each call its own id", async () => {
-    const { client } = await connectClient(createMindVaultServer(behaviour()));
+    const { client } = await connectClient(createZentrixPayServer(behaviour()));
 
-    const first: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
-    const second: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const first: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
+    const second: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     expect(first._meta[CORRELATION_META_KEY]).not.toBe(second._meta[CORRELATION_META_KEY]);
   });
 
   it("puts the id in the error text as well", async () => {
     const { client } = await connectClient(
-      createMindVaultServer(
+      createZentrixPayServer(
         behaviour({
           dispatchTool: async () => {
             throw new Error("nope");
@@ -357,17 +357,17 @@ describe("correlation IDs (#572)", () => {
       ),
     );
 
-    const result: any = await client.callTool({ name: "mindvault_echo", arguments: {} });
+    const result: any = await client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     // A failure is the one case where a human is likely to quote it back.
     expect(result.content[0].text).toContain(result._meta[CORRELATION_META_KEY]);
   });
 
   it("does not inherit an outer id", async () => {
-    const { client } = await connectClient(createMindVaultServer(behaviour()));
+    const { client } = await connectClient(createZentrixPayServer(behaviour()));
 
     const result: any = await runWithCorrelationId("mv-outer-0001", () =>
-      client.callTool({ name: "mindvault_echo", arguments: {} }),
+      client.callTool({ name: "zentrixpay_echo", arguments: {} }),
     );
 
     expect(result._meta[CORRELATION_META_KEY]).not.toBe("mv-outer-0001");
@@ -391,7 +391,7 @@ describe("prompts", () => {
     });
 
   it("advertises them", async () => {
-    const { client } = await connectClient(createMindVaultServer(withPrompts()));
+    const { client } = await connectClient(createZentrixPayServer(withPrompts()));
 
     const { prompts } = await client.listPrompts();
 
@@ -399,7 +399,7 @@ describe("prompts", () => {
   });
 
   it("resolves one with its arguments", async () => {
-    const { client } = await connectClient(createMindVaultServer(withPrompts()));
+    const { client } = await connectClient(createZentrixPayServer(withPrompts()));
 
     const result: any = await client.getPrompt({
       name: "publish_flow",
@@ -411,7 +411,7 @@ describe("prompts", () => {
   });
 
   it("registers no prompt handlers when none are supplied", async () => {
-    const { client } = await connectClient(createMindVaultServer(behaviour()));
+    const { client } = await connectClient(createZentrixPayServer(behaviour()));
 
     await expect(client.listPrompts()).rejects.toThrow();
   });
@@ -421,7 +421,7 @@ describe("startServer", () => {
   it("connects to the given transport", async () => {
     const [, serverTransport] = InMemoryTransport.createLinkedPair();
 
-    const running = await startServer(createMindVaultServer(behaviour()), serverTransport as never);
+    const running = await startServer(createZentrixPayServer(behaviour()), serverTransport as never);
 
     expect(running.stopped).toBe(false);
     await running.shutdown("test");
@@ -429,7 +429,7 @@ describe("startServer", () => {
 
   it("runs the shutdown hook", async () => {
     const onShutdown = vi.fn();
-    const running = await startServer(createMindVaultServer(behaviour()), fakeTransport(), {
+    const running = await startServer(createZentrixPayServer(behaviour()), fakeTransport(), {
       onShutdown,
     });
 
@@ -440,7 +440,7 @@ describe("startServer", () => {
 
   it("is idempotent", async () => {
     const onShutdown = vi.fn();
-    const running = await startServer(createMindVaultServer(behaviour()), fakeTransport(), {
+    const running = await startServer(createZentrixPayServer(behaviour()), fakeTransport(), {
       onShutdown,
     });
 
@@ -453,7 +453,7 @@ describe("startServer", () => {
   });
 
   it("reports that it stopped", async () => {
-    const running = await startServer(createMindVaultServer(behaviour()), fakeTransport());
+    const running = await startServer(createZentrixPayServer(behaviour()), fakeTransport());
 
     await running.shutdown("manual");
 
@@ -463,7 +463,7 @@ describe("startServer", () => {
   it("shuts down when the transport closes", async () => {
     const onShutdown = vi.fn();
     const transport = fakeTransport();
-    await startServer(createMindVaultServer(behaviour()), transport, { onShutdown });
+    await startServer(createZentrixPayServer(behaviour()), transport, { onShutdown });
 
     transport.onclose?.();
     await new Promise((resolve) => setTimeout(resolve, 5));
@@ -474,7 +474,7 @@ describe("startServer", () => {
   it("shuts down on a transport error", async () => {
     const onShutdown = vi.fn();
     const transport = fakeTransport();
-    await startServer(createMindVaultServer(behaviour()), transport, { onShutdown });
+    await startServer(createZentrixPayServer(behaviour()), transport, { onShutdown });
 
     transport.onerror?.(new Error("broken pipe"));
     await new Promise((resolve) => setTimeout(resolve, 5));
@@ -484,7 +484,7 @@ describe("startServer", () => {
 
   it("still closes when the shutdown hook throws", async () => {
     const onExit = vi.fn();
-    const running = await startServer(createMindVaultServer(behaviour()), fakeTransport(), {
+    const running = await startServer(createZentrixPayServer(behaviour()), fakeTransport(), {
       onShutdown: () => {
         throw new Error("hook failed");
       },
@@ -499,7 +499,7 @@ describe("startServer", () => {
 
   it("does not exit the process by default", async () => {
     const exit = vi.spyOn(process, "exit").mockImplementation((() => undefined) as never);
-    const running = await startServer(createMindVaultServer(behaviour()), fakeTransport());
+    const running = await startServer(createZentrixPayServer(behaviour()), fakeTransport());
 
     await running.shutdown("manual");
 
@@ -510,7 +510,7 @@ describe("startServer", () => {
 
   it("exits when asked to", async () => {
     const exit = vi.spyOn(process, "exit").mockImplementation((() => undefined) as never);
-    const running = await startServer(createMindVaultServer(behaviour()), fakeTransport(), {
+    const running = await startServer(createZentrixPayServer(behaviour()), fakeTransport(), {
       exitOnShutdown: true,
     });
 
@@ -522,7 +522,7 @@ describe("startServer", () => {
 
   it("uses exit code 0 for a non-interrupt reason", async () => {
     const exit = vi.spyOn(process, "exit").mockImplementation((() => undefined) as never);
-    const running = await startServer(createMindVaultServer(behaviour()), fakeTransport(), {
+    const running = await startServer(createZentrixPayServer(behaviour()), fakeTransport(), {
       exitOnShutdown: true,
     });
 
@@ -535,7 +535,7 @@ describe("startServer", () => {
   it("does not install signal handlers unless asked", async () => {
     const before = process.listenerCount("SIGINT");
 
-    const running = await startServer(createMindVaultServer(behaviour()), fakeTransport());
+    const running = await startServer(createZentrixPayServer(behaviour()), fakeTransport());
 
     // A library that grabs SIGINT from its host is a bad neighbour.
     expect(process.listenerCount("SIGINT")).toBe(before);
@@ -545,7 +545,7 @@ describe("startServer", () => {
   it("installs signal handlers on request", async () => {
     const before = process.listenerCount("SIGTERM");
 
-    const running = await startServer(createMindVaultServer(behaviour()), fakeTransport(), {
+    const running = await startServer(createZentrixPayServer(behaviour()), fakeTransport(), {
       handleSignals: true,
     });
 
@@ -599,16 +599,16 @@ describe("transport independence", () => {
   });
 
   it("serves two independent instances at once", async () => {
-    const first = await connectClient(createMindVaultServer(behaviour()));
+    const first = await connectClient(createZentrixPayServer(behaviour()));
     const second = await connectClient(
-      createMindVaultServer(behaviour({ dispatchTool: async () => "second" })),
+      createZentrixPayServer(behaviour({ dispatchTool: async () => "second" })),
     );
 
     const a: any = await first.client.callTool({
-      name: "mindvault_echo",
+      name: "zentrixpay_echo",
       arguments: { text: "1" },
     });
-    const b: any = await second.client.callTool({ name: "mindvault_echo", arguments: {} });
+    const b: any = await second.client.callTool({ name: "zentrixpay_echo", arguments: {} });
 
     expect(a.content[0].text).toBe("echo: 1");
     expect(b.content[0].text).toBe("second");

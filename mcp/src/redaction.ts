@@ -1,5 +1,5 @@
 /**
- * Safe secret redaction utility for MindVault MCP.
+ * Safe secret redaction utility for ZentrixPay MCP.
  *
  * Centralizes redaction for secret keys, API keys, payment headers, auth entries,
  * and bearer tokens to prevent accidental logging of sensitive information.

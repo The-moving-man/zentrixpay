@@ -1,5 +1,5 @@
 /**
- * Dry-run mode for MindVault MCP server.
+ * Dry-run mode for ZentrixPay MCP server.
  *
  * Validates inputs and shows intended network, endpoint, resource id, and required
  * wallet state without submitting payment or transactions. Errors during validation
@@ -236,11 +236,11 @@ export function dryRunPublish(
   }
   if (hasWallet && usdcBalance !== null && !hasLiveFee) {
     warnings.push(
-      "Balance was read but the fee was not, so affordability could not be determined. Check with mindvault_agent_status.",
+      "Balance was read but the fee was not, so affordability could not be determined. Check with zentrixpay_agent_status.",
     );
   }
   if (!hasApiKey) {
-    warnings.push("No publisher API key in the active profile; run mindvault_register first.");
+    warnings.push("No publisher API key in the active profile; run zentrixpay_register first.");
   }
 
   return {
@@ -299,7 +299,7 @@ export function dryRunBuy(
     intentions: {
       network,
       endpoint: `GET ${baseUrl}/resources/${resourceId} (with x402 payment proof)`,
-      estimatedPrice: estimatedPrice ?? "Fetch from mindvault_preview before buying",
+      estimatedPrice: estimatedPrice ?? "Fetch from zentrixpay_preview before buying",
       requiredWalletState: {
         wallet: hasWallet,
         usdcBalance: "Must be >= estimated price",
@@ -350,7 +350,7 @@ export function dryRunOnchain(
       requiredWalletState: {
         wallet: hasWallet,
         publisherApiKey: hasApiKey,
-        xlmForFees: "~0.001 XLM per invocation (check with mindvault_wallet_info)",
+        xlmForFees: "~0.001 XLM per invocation (check with zentrixpay_wallet_info)",
       },
     },
     steps: idVal.valid

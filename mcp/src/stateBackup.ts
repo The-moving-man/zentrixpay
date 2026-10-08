@@ -1,5 +1,5 @@
 /**
- * Encrypted local-state backup and restore for the MindVault MCP server.
+ * Encrypted local-state backup and restore for the ZentrixPay MCP server.
  *
  * State holds credentials (wallet secret keys, publisher API keys), so a backup
  * must never leak plaintext secrets. This module encrypts the persisted
@@ -29,7 +29,7 @@ import { homedir } from "os";
 import { dirname, join } from "path";
 import { STATE_VERSION, type ProfileState, type WalletProfile } from "./profiles.js";
 
-const STATE_DIR = join(homedir(), ".mindvault");
+const STATE_DIR = join(homedir(), ".zentrixpay");
 const STATE_FILE = join(STATE_DIR, "state.json");
 const BACKUP_DIR = join(STATE_DIR, "backups");
 
@@ -90,7 +90,7 @@ export function scanPersistedStateSecrets(raw: unknown): PersistedStateSecretMat
  */
 export function readPersistedState(): ProfileState {
   if (!existsSync(STATE_FILE)) {
-    throw new StateBackupError("No state file found. Run mindvault_setup_wallet first.");
+    throw new StateBackupError("No state file found. Run zentrixpay_setup_wallet first.");
   }
   try {
     const raw = readFileSync(STATE_FILE, "utf-8");

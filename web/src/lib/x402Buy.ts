@@ -13,7 +13,7 @@ import { decodePaymentResponseHeader, wrapFetchWithPayment, x402Client } from "@
 import type { Network } from "@x402/fetch";
 import { ExactStellarScheme } from "@x402/stellar/exact/client";
 import type { ClientStellarSigner } from "@x402/stellar";
-import { networks, type NetworkPreset } from "@mindvault/registry-client";
+import { networks, type NetworkPreset } from "@zentrixpay/registry-client";
 import { explorerTxUrl } from "./stellarExplorer.js";
 
 /** Resolve the deployment network the web app targets (defaults to testnet). */

@@ -132,22 +132,22 @@ describe("retryPolicyForTool", () => {
   it("applies an override only to the named tool", () => {
     const env = {
       [RETRY_ENV_VARS.attempts]: "3",
-      MINDVAULT_RETRY_ATTEMPTS_MINDVAULT_BROWSE: "5",
-      MINDVAULT_RETRY_BASE_DELAY_MS_MINDVAULT_BROWSE: "10",
+      ZENTRIXPAY_RETRY_ATTEMPTS_ZENTRIXPAY_BROWSE: "5",
+      ZENTRIXPAY_RETRY_BASE_DELAY_MS_ZENTRIXPAY_BROWSE: "10",
     };
-    expect(retryPolicyForTool("mindvault_browse", env)).toEqual({
+    expect(retryPolicyForTool("zentrixpay_browse", env)).toEqual({
       attempts: 5,
       baseDelayMs: 10,
       maxDelayMs: DEFAULT_RETRY_POLICY.maxDelayMs,
     });
-    expect(retryPolicyForTool("mindvault_search", env).attempts).toBe(3);
+    expect(retryPolicyForTool("zentrixpay_search", env).attempts).toBe(3);
   });
 
   it("falls back to the global policy for invalid tool overrides", () => {
     expect(
-      retryPolicyForTool("mindvault_browse", {
+      retryPolicyForTool("zentrixpay_browse", {
         [RETRY_ENV_VARS.attempts]: "4",
-        MINDVAULT_RETRY_ATTEMPTS_MINDVAULT_BROWSE: "0",
+        ZENTRIXPAY_RETRY_ATTEMPTS_ZENTRIXPAY_BROWSE: "0",
       }),
     ).toMatchObject({ attempts: 4 });
   });

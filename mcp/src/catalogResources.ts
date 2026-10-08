@@ -1,5 +1,5 @@
 /**
- * MCP `resources` support for the MindVault catalog (#545).
+ * MCP `resources` support for the ZentrixPay catalog (#545).
  *
  * The server advertises the `resources` capability alongside `tools` so agents
  * can discover catalog entries with `resources/list` and read their **public**
@@ -7,11 +7,11 @@
  *
  * URI contract:
  *
- *   mindvault://resource/<id>
+ *   zentrixpay://resource/<id>
  *
  * `resources/list` maps every catalog entry returned by `GET /resources` to a
  * stable URI. `resources/read` resolves the URI to the entry's public metadata
- * via `GET /resources/<id>/meta` — the same endpoint `mindvault_preview` uses,
+ * via `GET /resources/<id>/meta` — the same endpoint `zentrixpay_preview` uses,
  * so gated content (the paid access payload) is never exposed. Unknown URIs,
  * missing entries, and unreachable backends fail with deterministic, agent-safe
  * errors.
@@ -27,7 +27,7 @@ import { BASE_URL, jsonFetch } from "./runtime.js";
 import { mapHttpError, mcpError } from "./errorMapping.js";
 
 /** URI scheme prefix shared by every catalog resource. */
-export const CATALOG_RESOURCE_SCHEME = "mindvault";
+export const CATALOG_RESOURCE_SCHEME = "zentrixpay";
 export const CATALOG_RESOURCE_HOST = "resource";
 export const CATALOG_RESOURCE_MIME = "application/json";
 
@@ -41,7 +41,7 @@ export type ParsedCatalogResourceUri =
   | { ok: false; reason: string };
 
 /**
- * Parse a `mindvault://resource/<id>` URI. Anything else — a different scheme,
+ * Parse a `zentrixpay://resource/<id>` URI. Anything else — a different scheme,
  * host, or a missing id — fails deterministically so `resources/read` can reply
  * with a stable invalid-params error instead of guessing.
  */
@@ -86,7 +86,7 @@ export function toCatalogResource(entry: unknown): Resource {
 
 /**
  * The public metadata payload served by `resources/read`. Deliberately mirrors
- * `mindvault_preview`: id, title, description, price, type, verification
+ * `zentrixpay_preview`: id, title, description, price, type, verification
  * status, and access URL — never the paid content payload.
  */
 export function catalogResourceContents(meta: unknown, uri: string): TextResourceContents {
@@ -133,7 +133,7 @@ export async function listCatalogResources(): Promise<Resource[]> {
 }
 
 /**
- * Resolve a `mindvault://resource/<id>` URI to the entry's public metadata.
+ * Resolve a `zentrixpay://resource/<id>` URI to the entry's public metadata.
  *
  * Error contract (deterministic, agent-safe):
  * - malformed/unknown URI        → McpError InvalidParams
@@ -150,7 +150,7 @@ export async function readCatalogResource(uri: unknown): Promise<TextResourceCon
     if (res.status === 404) {
       throw new McpError(
         ErrorCode.InvalidParams,
-        `Resource "${parsed.resourceId}" not found. Confirm the id from mindvault_browse or mindvault_search.`,
+        `Resource "${parsed.resourceId}" not found. Confirm the id from zentrixpay_browse or zentrixpay_search.`,
       );
     }
     throw mcpError(

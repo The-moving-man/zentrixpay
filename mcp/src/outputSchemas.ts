@@ -240,7 +240,7 @@ const MUTATION_SUMMARY_SCHEMA = {
 } as const;
 
 /**
- * The settlement-confirmation block `mindvault_buy` adds to its summary when
+ * The settlement-confirmation block `zentrixpay_buy` adds to its summary when
  * wait is set (#888): whether the payment transaction was polled, its last
  * status, and whether it reached a terminal status before the deadline.
  */
@@ -278,7 +278,7 @@ const BUY_SUMMARY_SCHEMA = {
   },
   required: [...MUTATION_SUMMARY_SCHEMA.required, "settlement"],
   description:
-    "mindvault_buy result: the purchase diff plus a settlement-confirmation block describing how far the payment transaction got before returning.",
+    "zentrixpay_buy result: the purchase diff plus a settlement-confirmation block describing how far the payment transaction got before returning.",
 } as const;
 
 export const PUBLISH_BUY_OUTPUT_SCHEMA = {
@@ -405,7 +405,7 @@ export const PURCHASE_HISTORY_OUTPUT_SCHEMA = {
           title: { type: "string" },
           profile: { type: "string" },
           // Pre-resolved Stellar Expert URL for the settlement transaction.
-          // Null when txHash was not recorded. Pass txHash to mindvault_tx_status
+          // Null when txHash was not recorded. Pass txHash to zentrixpay_tx_status
           // to check live on-chain settlement status.
           explorerUrl: { type: ["string", "null"] },
         },
@@ -707,27 +707,36 @@ export const PUBLISH_BATCH_OUTPUT_SCHEMA = {
 
 /** Tools that must stay text-only (no schema, no structuredContent). */
 export const TEXT_ONLY_TOOLS = [
-  "mindvault_repair_sponsored_account",
-  "mindvault_terms",
-  "mindvault_check_bindings",
-  "mindvault_reset",
-  "mindvault_backup_state",
-  "mindvault_restore_state",
-  "mindvault_verify_install",
-  "mindvault_registry_health",
-  "mindvault_check_state_permissions",
-  "mindvault_register",
-  "mindvault_rotate_publisher_key",
-  "mindvault_set_tags",
-  "mindvault_prewarm_catalog",
-  "mindvault_client_config",
-  "mindvault_mainnet_banner",
-  "mindvault_switch_network_profile",
-  "mindvault_resource_provenance",
-  "mindvault_resource_change_log",
+  // Pay-per-call API tools return their JSON as text.
+  "zentrixpay_list_apis",
+  "zentrixpay_api_info",
+  "zentrixpay_call",
+  "zentrixpay_register_api",
+  "zentrixpay_update_api",
+  "zentrixpay_verify_api_ownership",
+  "zentrixpay_my_apis",
+  "zentrixpay_api_stats",
+  "zentrixpay_repair_sponsored_account",
+  "zentrixpay_terms",
+  "zentrixpay_check_bindings",
+  "zentrixpay_reset",
+  "zentrixpay_backup_state",
+  "zentrixpay_restore_state",
+  "zentrixpay_verify_install",
+  "zentrixpay_registry_health",
+  "zentrixpay_check_state_permissions",
+  "zentrixpay_register",
+  "zentrixpay_rotate_publisher_key",
+  "zentrixpay_set_tags",
+  "zentrixpay_prewarm_catalog",
+  "zentrixpay_client_config",
+  "zentrixpay_mainnet_banner",
+  "zentrixpay_switch_network_profile",
+  "zentrixpay_resource_provenance",
+  "zentrixpay_resource_change_log",
 ] as const;
 
-/** Output schema for mindvault_pending_transfer. */
+/** Output schema for zentrixpay_pending_transfer. */
 export const PENDING_TRANSFER_OUTPUT_SCHEMA = {
   type: "object",
   properties: {
@@ -739,7 +748,7 @@ export const PENDING_TRANSFER_OUTPUT_SCHEMA = {
   required: ["resourceId", "found", "message"],
 } as const;
 
-/** Output schema for mindvault_batch_catalog_lookup. */
+/** Output schema for zentrixpay_batch_catalog_lookup. */
 export const BATCH_CATALOG_LOOKUP_OUTPUT_SCHEMA = {
   type: "object",
   properties: {
@@ -752,7 +761,7 @@ export const BATCH_CATALOG_LOOKUP_OUTPUT_SCHEMA = {
   required: ["requested", "found", "missing", "items"],
 } as const;
 
-/** Output schema for mindvault_preview_metadata_hash. */
+/** Output schema for zentrixpay_preview_metadata_hash. */
 export const METADATA_HASH_PREVIEW_OUTPUT_SCHEMA = {
   type: "object",
   properties: {
@@ -764,7 +773,7 @@ export const METADATA_HASH_PREVIEW_OUTPUT_SCHEMA = {
   required: ["resourceId"],
 } as const;
 
-/** Output schema for mindvault_publish_template. */
+/** Output schema for zentrixpay_publish_template. */
 export const PUBLISH_TEMPLATE_OUTPUT_SCHEMA = {
   type: "object",
   properties: {
@@ -775,7 +784,7 @@ export const PUBLISH_TEMPLATE_OUTPUT_SCHEMA = {
   required: ["resourceType", "template"],
 } as const;
 
-/** Output schema for mindvault_subscribe_resource. */
+/** Output schema for zentrixpay_subscribe_resource. */
 export const RESOURCE_SUBSCRIPTION_OUTPUT_SCHEMA = {
   type: "object",
   properties: {

@@ -19,7 +19,7 @@
 **Checklist**
 
 - [ ] PR title follows Conventional Commits (`feat:`, `fix:`, `chore:`, etc.)
-- [ ] Build passes (`pnpm build:server` / `pnpm --filter @mindvault/web build`)
+- [ ] Build passes (`pnpm build:server` / `pnpm --filter @zentrixpay/web build`)
 - [ ] Tests pass (`pnpm test`)
 - [ ] Contract changes tested (`pnpm contract:test`)
 - [ ] No secrets committed (`.env` is gitignored; use `.env.example` for placeholders)

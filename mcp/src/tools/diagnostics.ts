@@ -1,4 +1,4 @@
-import { checkContractBindings } from "@mindvault/registry-client";
+import { checkContractBindings } from "@zentrixpay/registry-client";
 import {
   activeProfile,
   activeProfileName,
@@ -64,7 +64,7 @@ async function checkDependency(
 export async function registryHealth(): Promise<string> {
   const deps: DependencyStatus[] = [];
 
-  deps.push(await checkDependency("MindVault API", `${BASE_URL}/resources`));
+  deps.push(await checkDependency("ZentrixPay API", `${BASE_URL}/resources`));
   deps.push(await checkDependency("Horizon", `${HORIZON_URL}`));
 
   deps.push(
@@ -128,7 +128,7 @@ export async function importWallet(args: {
   }
   if (!secretKey) {
     throw new Error(
-      "No secret key provided. Pass secretKey or set MINDVAULT_AGENT_SECRET in the environment.",
+      "No secret key provided. Pass secretKey or set ZENTRIXPAY_AGENT_SECRET in the environment.",
     );
   }
 
@@ -169,7 +169,7 @@ export async function rotatePublisherKey(profileArg?: string): Promise<string> {
   const wallet = requireWallet();
   const oldApiKey = profiles[target]?.apiKey;
   if (!oldApiKey) {
-    throw new Error(`No publisher API key in profile "${target}". Run mindvault_register first.`);
+    throw new Error(`No publisher API key in profile "${target}". Run zentrixpay_register first.`);
   }
 
   const res = await jsonFetch(`${BASE_URL}/publishers/rotate-key`, {
@@ -279,7 +279,7 @@ export function toolMetrics(reset: boolean): string {
       {
         enabled: false,
         message:
-          "Metrics are disabled. Set MINDVAULT_METRICS=1 (or true/yes/on) and restart the server to collect tool-level metrics.",
+          "Metrics are disabled. Set ZENTRIXPAY_METRICS=1 (or true/yes/on) and restart the server to collect tool-level metrics.",
       },
       null,
       2,

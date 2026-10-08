@@ -41,7 +41,7 @@ describe("npm package tarball smoke", () => {
       encoding: "utf-8",
     });
     const pkg = JSON.parse(json);
-    expect(pkg.name).toBe("@mindvault/mcp");
+    expect(pkg.name).toBe("@zentrixpay/mcp");
     expect(pkg.version).toBeDefined();
     expect(pkg.main).toBe("dist/index.js");
   });

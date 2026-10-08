@@ -1,5 +1,5 @@
 /**
- * Pre-publish checks for the @mindvault/mcp package.
+ * Pre-publish checks for the @zentrixpay/mcp package.
  *
  * Publishing an MCP server is easy to get subtly wrong: a `bin` entry that
  * points at a file the tarball does not contain, a stale `dist/` built before
@@ -160,7 +160,7 @@ export function checkBinEntrypoint(snapshot: PackageSnapshot): CheckResult[] {
     return [
       fail(
         "bin:declared",
-        'no "bin" entry — an MCP server should be launchable as a command (e.g. { "mindvault-mcp": "dist/index.js" })',
+        'no "bin" entry — an MCP server should be launchable as a command (e.g. { "zentrixpay-mcp": "dist/index.js" })',
       ),
     ];
   }

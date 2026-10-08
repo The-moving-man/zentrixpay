@@ -1,5 +1,5 @@
 {
-  "name": "@mindvault/web",
+  "name": "@zentrixpay/web",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mindvault/registry-client": "workspace:*",
+    "@zentrixpay/registry-client": "workspace:*",
     "@sentry/react": "^10.62.0",
     "@stellar/freighter-api": "^6.0.1",
     "@stellar/stellar-sdk": "^15.0.1",

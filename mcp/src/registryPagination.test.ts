@@ -14,17 +14,17 @@ describe("registry list pagination bounds", () => {
   });
 
   it("accepts omitted start and limit", () => {
-    expect(() => validateToolArgs("mindvault_registry_list", {})).not.toThrow();
+    expect(() => validateToolArgs("zentrixpay_registry_list", {})).not.toThrow();
   });
 
   it("rejects limit above the contract cap", () => {
-    expect(() => validateToolArgs("mindvault_registry_list", { limit: 21 })).toThrow(
+    expect(() => validateToolArgs("zentrixpay_registry_list", { limit: 21 })).toThrow(
       ToolValidationError,
     );
   });
 
   it("rejects negative start", () => {
-    expect(() => validateToolArgs("mindvault_registry_list", { start: -1 })).toThrow(
+    expect(() => validateToolArgs("zentrixpay_registry_list", { start: -1 })).toThrow(
       ToolValidationError,
     );
   });

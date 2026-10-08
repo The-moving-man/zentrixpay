@@ -33,20 +33,20 @@ jobs:
       - run: pnpm exec eslint "server/src/**/*.{ts,tsx}" "web/src/**/*.{ts,tsx}" "packages/**/*.{ts,tsx}" "mcp/src/**/*.{ts,tsx}"
       - run: pnpm exec prettier --check "server/**/*.{ts,tsx,js,json,md}" "web/**/*.{ts,tsx,js,json,md}" "packages/**/*.{ts,tsx,js,json,md}" "mcp/**/*.{ts,tsx,js,json,md}"
       - run: pnpm run build:registry-client
-      - run: pnpm --filter @mindvault/server typecheck
-      - run: pnpm --filter @mindvault/server build
-      - run: pnpm --filter @mindvault/web build
+      - run: pnpm --filter @zentrixpay/server typecheck
+      - run: pnpm --filter @zentrixpay/server build
+      - run: pnpm --filter @zentrixpay/web build
       # Build the MCP server, then start it the way an agent client does
       # (node dist/index.js over stdio) and drive fixture-backed tool calls.
       # Catches an install that compiles and packs but cannot boot or serve —
       # the unit suites never start the process, so nothing else would.
-      - run: pnpm --filter @mindvault/mcp build
+      - run: pnpm --filter @zentrixpay/mcp build
       # The tool reference and summary are generated from mcp/src/tools.ts; a
       # tool change without a regenerate leaves docs that describe the wrong
       # surface. Fails when either committed file differs from what the
       # generator writes (after the same prettier pass the commit hook runs).
-      - run: pnpm --filter @mindvault/mcp check-tool-docs
-      - run: pnpm --filter @mindvault/mcp smoke:install
+      - run: pnpm --filter @zentrixpay/mcp check-tool-docs
+      - run: pnpm --filter @zentrixpay/mcp smoke:install
       - run: pnpm test
 
   contract-ci:

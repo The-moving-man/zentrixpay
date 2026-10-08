@@ -1,5 +1,5 @@
 /**
- * Confirmation guard for the destructive `mindvault_reset` tool.
+ * Confirmation guard for the destructive `zentrixpay_reset` tool.
  *
  * Reset deletes wallet secret keys and publisher API keys from memory and disk.
  * An agent that misreads a prompt can trigger it in a single tool call, and the
@@ -93,10 +93,10 @@ export function formatResetPreview(scope: ResetScope): string {
   return [
     `Reset NOT performed — confirmation required.`,
     `This would permanently remove ${describeTarget(scope)}.`,
-    `Wallet secret keys cannot be recovered once deleted; back them up first with mindvault_backup_state.`,
+    `Wallet secret keys cannot be recovered once deleted; back them up first with zentrixpay_backup_state.`,
     `State file: ${scope.stateFile}`,
     ``,
-    `To proceed, call mindvault_reset again with confirm: true` +
+    `To proceed, call zentrixpay_reset again with confirm: true` +
       `${scope.all ? " and all: true" : ""}.`,
   ].join("\n");
 }

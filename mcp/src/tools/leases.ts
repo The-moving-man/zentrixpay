@@ -1,5 +1,5 @@
 /**
- * Time-limited access leases (`mindvault_buy_lease`, `mindvault_lease_status`).
+ * Time-limited access leases (`zentrixpay_buy_lease`, `zentrixpay_lease_status`).
  *
  * A lease is an on-chain entitlement recorded in the `vault-registry`
  * contract: "holder may access resource until expiry_ledger". Buying one from
@@ -9,7 +9,7 @@
  *   2. call `buy_lease` with the payment hash, which records the lease as
  *      `Pending` until a settler confirms the transfer with `settle_lease`.
  *
- * `mindvault_lease_status` reads `get_lease` / `lease_is_active` so an agent
+ * `zentrixpay_lease_status` reads `get_lease` / `lease_is_active` so an agent
  * can check its window before re-buying. Both tools honour mock mode.
  */
 
@@ -18,7 +18,7 @@ import {
   Errors as RegistryErrors,
   LeaseTier,
   type Lease,
-} from "@mindvault/registry-client";
+} from "@zentrixpay/registry-client";
 import {
   _isMock,
   NETWORK,
@@ -287,7 +287,7 @@ export async function buyLease(
       paymentTxHash: payment.txHash,
       paymentExplorerUrl: explorerTxUrl(payment.txHash),
       lease: leaseView(lease),
-      next: "The lease is Pending until a settler confirms the payment; poll mindvault_lease_status until it reports active.",
+      next: "The lease is Pending until a settler confirms the payment; poll zentrixpay_lease_status until it reports active.",
     },
     null,
     2,

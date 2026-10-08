@@ -1,9 +1,9 @@
 {
-  "name": "@mindvault/registry-client",
+  "name": "@zentrixpay/registry-client",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "TypeScript client for the MindVault vault-registry Soroban contract on Stellar.",
+  "description": "TypeScript client for the ZentrixPay vault-registry Soroban contract on Stellar.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -24,7 +24,7 @@
   "keywords": [
     "stellar",
     "soroban",
-    "mindvault",
+    "zentrixpay",
     "vault-registry"
   ],
   "license": "MIT",

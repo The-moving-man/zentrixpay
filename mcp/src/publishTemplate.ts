@@ -1,11 +1,11 @@
 /**
- * Publish templates for known MindVault resource types.
+ * Publish templates for known ZentrixPay resource types.
  *
- * `mindvault_publish_template` is a read-only helper that returns a pre-filled
+ * `zentrixpay_publish_template` is a read-only helper that returns a pre-filled
  * publish specification (metadata pointer hint, canonical discovery tags, and a
  * suggested USDC price) for a known resource type.  The agent reviews the
  * result and passes the fields — overriding any it wants — directly to
- * `mindvault_publish`.
+ * `zentrixpay_publish`.
  *
  * Supported resource types: dataset | code | prompt | model
  */
@@ -24,7 +24,7 @@ export const KNOWN_RESOURCE_TYPES: readonly KnownResourceType[] = [
  *
  * - `metadataPointer`: canonical format hint for the on-chain metadata field.
  *   The placeholder `<HASH>` must be replaced with the real content hash or
- *   IPFS/Arweave CID before calling `mindvault_publish`.
+ *   IPFS/Arweave CID before calling `zentrixpay_publish`.
  * - `tags`: 1–8 lowercase discovery tags that match the type's domain.
  * - `suggestedPrice`: a USDC decimal string reflecting the typical value tier
  *   for this content category.
@@ -106,7 +106,7 @@ export interface PublishTemplateResult {
  *
  * Caller-supplied values win over template defaults.  Fields that still
  * contain placeholder text are listed in `nextSteps` so the agent knows what
- * to fill in before calling `mindvault_publish`.
+ * to fill in before calling `zentrixpay_publish`.
  */
 export function applyPublishTemplate(input: PublishTemplateInput): PublishTemplateResult {
   const template = RESOURCE_TYPE_TEMPLATES[input.resourceType];
@@ -121,7 +121,7 @@ export function applyPublishTemplate(input: PublishTemplateInput): PublishTempla
   const nextSteps: string[] = [];
 
   if (!title) {
-    nextSteps.push("Supply a title before calling mindvault_publish.");
+    nextSteps.push("Supply a title before calling zentrixpay_publish.");
   }
 
   if (metadataPointer.includes("<HASH>") || metadataPointer.includes("<CID>")) {
@@ -132,7 +132,7 @@ export function applyPublishTemplate(input: PublishTemplateInput): PublishTempla
 
   if (nextSteps.length === 0) {
     nextSteps.push(
-      "All required fields are filled — pass these values to mindvault_publish to proceed.",
+      "All required fields are filled — pass these values to zentrixpay_publish to proceed.",
     );
   }
 

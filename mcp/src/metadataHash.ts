@@ -1,5 +1,5 @@
 /**
- * Metadata hash (digest) validation for the MindVault MCP server.
+ * Metadata hash (digest) validation for the ZentrixPay MCP server.
  *
  * Resources anchor their off-chain content in the vault registry through a
  * digest: the server writes `{ title, description, contentHash }` into the

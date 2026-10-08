@@ -1,5 +1,5 @@
 /**
- * Unit tests for the mindvault_reset confirmation guard (#406).
+ * Unit tests for the zentrixpay_reset confirmation guard (#406).
  *
  * Covers the pure decision/formatting layer. The wiring — that an unconfirmed
  * call leaves credentials intact and a confirmed one clears them — is asserted
@@ -23,7 +23,7 @@ function scope(overrides: Partial<ResetScope> = {}): ResetScope {
     profileNames: ["default"],
     hasWallet: true,
     hasApiKey: true,
-    stateFile: "/home/agent/.mindvault/state.json",
+    stateFile: "/home/agent/.zentrixpay/state.json",
     ...overrides,
   };
 }
@@ -90,7 +90,7 @@ describe("reset confirmation vocabulary (#836)", () => {
   it("does not inherit another vocabulary's widening", () => {
     // mock mode's "on" is truthy there and must not be truthy here. This is the
     // regression the issue describes: one shared helper, two blast radii.
-    expect(mockEnabledFromEnv({ MINDVAULT_MOCK: "on" } as NodeJS.ProcessEnv)).toBe(true);
+    expect(mockEnabledFromEnv({ ZENTRIXPAY_MOCK: "on" } as NodeJS.ProcessEnv)).toBe(true);
     expect(isResetConfirmed("on")).toBe(false);
   });
 
@@ -135,8 +135,8 @@ describe("formatResetPreview", () => {
 
   it("includes the state file path and the backup escape hatch", () => {
     const preview = formatResetPreview(scope());
-    expect(preview).toContain("/home/agent/.mindvault/state.json");
-    expect(preview).toContain("mindvault_backup_state");
+    expect(preview).toContain("/home/agent/.zentrixpay/state.json");
+    expect(preview).toContain("zentrixpay_backup_state");
   });
 
   it("is deterministic for a given scope", () => {

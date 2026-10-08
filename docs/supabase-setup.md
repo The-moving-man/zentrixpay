@@ -1,13 +1,13 @@
 # Supabase Setup Walkthrough
 
-This guide walks you through configuring a Supabase project for MindVault local development — from project creation to running your first migration. By the end, you will have a working Postgres database and a Storage bucket ready for the MindVault server.
+This guide walks you through configuring a Supabase project for ZentrixPay local development — from project creation to running your first migration. By the end, you will have a working Postgres database and a Storage bucket ready for the ZentrixPay server.
 
 ---
 
 ## Prerequisites
 
 - A free [Supabase](https://supabase.com) account
-- The MindVault repository cloned and dependencies installed (`pnpm install`)
+- The ZentrixPay repository cloned and dependencies installed (`pnpm install`)
 - Node.js 20+ and pnpm available on your PATH
 
 ---
@@ -17,7 +17,7 @@ This guide walks you through configuring a Supabase project for MindVault local 
 1. Go to [supabase.com/dashboard](https://supabase.com/dashboard) and click **New project**.
 2. Choose your organization (or create one).
 3. Fill in the project details:
-   - **Name**: e.g. `mindvault-dev`
+   - **Name**: e.g. `zentrixpay-dev`
    - **Database password**: choose a strong password — you'll need it for the connection string
    - **Region**: pick the region closest to you for lowest latency
 4. Click **Create new project** and wait for provisioning (~30 seconds).
@@ -37,7 +37,7 @@ postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.co
 ```
 
 > [!IMPORTANT]
-> Use the **Transaction (port 6543)** pooler URL, not the direct connection (port 5432). The transaction pooler is recommended for serverless and short-lived connections like MindVault's Express server.
+> Use the **Transaction (port 6543)** pooler URL, not the direct connection (port 5432). The transaction pooler is recommended for serverless and short-lived connections like ZentrixPay's Express server.
 
 Replace `[password]` with the database password you chose during project creation.
 
@@ -61,7 +61,7 @@ From the same **API** settings page, expand **Project API keys** and copy the **
 > - **Never share it** in Slack, Discord, or GitHub issues
 > - **Rotate it** immediately if you suspect it has been leaked (Settings → API → Regenerate)
 >
-> MindVault uses the service role key server-side only — in `supabaseStorage.ts` for file uploads/downloads and implicitly via `DATABASE_URL` for Drizzle ORM queries.
+> ZentrixPay uses the service role key server-side only — in `supabaseStorage.ts` for file uploads/downloads and implicitly via `DATABASE_URL` for Drizzle ORM queries.
 
 ---
 
@@ -97,12 +97,12 @@ SUPABASE_STORAGE_BUCKET=resources
 
 ## 4. Create the Storage Bucket
 
-MindVault stores uploaded file resources (PDFs, datasets, etc.) in Supabase Storage. You need to create the bucket manually:
+ZentrixPay stores uploaded file resources (PDFs, datasets, etc.) in Supabase Storage. You need to create the bucket manually:
 
 1. In the Supabase dashboard, go to **Storage** (left sidebar).
 2. Click **New bucket**.
 3. Set the bucket name to **`resources`** (must match `SUPABASE_STORAGE_BUCKET` in your `.env`).
-4. Leave **Public bucket** toggled **off** — MindVault serves files through its own paywalled API, not via public Supabase URLs.
+4. Leave **Public bucket** toggled **off** — ZentrixPay serves files through its own paywalled API, not via public Supabase URLs.
 5. Optionally set a file size limit (the server defaults to 50 MB via `MAX_FILE_SIZE_MB`).
 6. Click **Create bucket**.
 
@@ -138,7 +138,7 @@ This creates the following tables in your Supabase database:
 Open the **Table Editor** in your Supabase dashboard. You should see all four tables listed. You can also use Drizzle Studio for a local view:
 
 ```bash
-pnpm --filter @mindvault/server db:studio
+pnpm --filter @zentrixpay/server db:studio
 ```
 
 This opens a browser-based UI at `https://local.drizzle.studio` showing your tables and data.
@@ -168,7 +168,7 @@ pnpm dev:server
 You should see:
 
 ```
-MindVault server started { port: 4021, network: "stellar:testnet" }
+ZentrixPay server started { port: 4021, network: "stellar:testnet" }
 ```
 
 Test the database connection by hitting the health endpoint:
@@ -215,8 +215,8 @@ Before going beyond local development, verify:
 
 - [ ] `server/.env` is listed in `.gitignore` (it is by default)
 - [ ] The service role key is **not** in any committed file, CI log, or browser bundle
-- [ ] Row Level Security (RLS) is enabled on all tables if you ever expose the `anon` key (not required for MindVault's server-side architecture)
-- [ ] The storage bucket is **private** (not public) — MindVault controls access via x402 paywalls
+- [ ] Row Level Security (RLS) is enabled on all tables if you ever expose the `anon` key (not required for ZentrixPay's server-side architecture)
+- [ ] The storage bucket is **private** (not public) — ZentrixPay controls access via x402 paywalls
 
 ---
 

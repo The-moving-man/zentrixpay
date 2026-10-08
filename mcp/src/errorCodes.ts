@@ -109,7 +109,7 @@ export const ERROR_CODES: Record<ErrorCode, ErrorCodeSpec> = {
     "timeout",
     "safe",
     "The request exceeded its configured deadline.",
-    "Retry, or raise the relevant MINDVAULT_*_TIMEOUT_MS for a legitimately slow endpoint.",
+    "Retry, or raise the relevant ZENTRIXPAY_*_TIMEOUT_MS for a legitimately slow endpoint.",
   ),
   MV_RATE_LIMITED: spec(
     "MV_RATE_LIMITED",
@@ -144,7 +144,7 @@ export const ERROR_CODES: Record<ErrorCode, ErrorCodeSpec> = {
     "not_found",
     "unsafe",
     "The referenced resource does not exist.",
-    "Confirm the id with mindvault_browse or mindvault_search before retrying.",
+    "Confirm the id with zentrixpay_browse or zentrixpay_search before retrying.",
   ),
   MV_CONFLICT: spec(
     "MV_CONFLICT",
@@ -158,7 +158,7 @@ export const ERROR_CODES: Record<ErrorCode, ErrorCodeSpec> = {
     "auth",
     "unsafe",
     "The call needs a credential and none was presented.",
-    "Run mindvault_register, or switch to a profile that holds a credential.",
+    "Run zentrixpay_register, or switch to a profile that holds a credential.",
   ),
   MV_AUTH_REJECTED: spec(
     "MV_AUTH_REJECTED",
@@ -172,7 +172,7 @@ export const ERROR_CODES: Record<ErrorCode, ErrorCodeSpec> = {
     "auth",
     "unsafe",
     "The stored publisher API key is no longer accepted — revoked, rotated elsewhere, or its publisher record was removed.",
-    "The stored key cannot be revived: run mindvault_register for a new one, or restore a backup that holds a valid key.",
+    "The stored key cannot be revived: run zentrixpay_register for a new one, or restore a backup that holds a valid key.",
   ),
   MV_CLOCK_SKEW: spec(
     "MV_CLOCK_SKEW",
@@ -186,7 +186,7 @@ export const ERROR_CODES: Record<ErrorCode, ErrorCodeSpec> = {
     "payment",
     "unsafe",
     "The active profile has no wallet configured.",
-    "Run mindvault_setup_wallet or mindvault_import_wallet, then retry.",
+    "Run zentrixpay_setup_wallet or zentrixpay_import_wallet, then retry.",
   ),
   MV_PAYMENT_REQUIRED: spec(
     "MV_PAYMENT_REQUIRED",
@@ -200,14 +200,14 @@ export const ERROR_CODES: Record<ErrorCode, ErrorCodeSpec> = {
     "payment",
     "conditional",
     "A payment was attempted and did not complete successfully.",
-    "Do NOT blindly retry — check mindvault_purchase_history and mindvault_tx_status first; the payment may have settled.",
+    "Do NOT blindly retry — check zentrixpay_purchase_history and zentrixpay_tx_status first; the payment may have settled.",
   ),
   MV_PAYMENT_CEILING_EXCEEDED: spec(
     "MV_PAYMENT_CEILING_EXCEEDED",
     "payment",
     "safe",
     "The price exceeds the configured auto-pay ceiling, so no payment was attempted.",
-    "No funds moved. Pass maxAutoPayUsdc at least as large as the price, or raise MINDVAULT_MAX_AUTO_PAY_USDC.",
+    "No funds moved. Pass maxAutoPayUsdc at least as large as the price, or raise ZENTRIXPAY_MAX_AUTO_PAY_USDC.",
   ),
   MV_INSUFFICIENT_FUNDS: spec(
     "MV_INSUFFICIENT_FUNDS",
@@ -221,21 +221,21 @@ export const ERROR_CODES: Record<ErrorCode, ErrorCodeSpec> = {
     "validation",
     "unsafe",
     "A mainnet mutation or payment was attempted without explicit confirmation.",
-    "Pass confirmMainnet: true, or set MINDVAULT_ALLOW_MAINNET=1 for the session.",
+    "Pass confirmMainnet: true, or set ZENTRIXPAY_ALLOW_MAINNET=1 for the session.",
   ),
   MV_CONTRACT_ERROR: spec(
     "MV_CONTRACT_ERROR",
     "contract",
     "unsafe",
     "The vault-registry contract rejected the call or is not the expected contract.",
-    "Verify the contract id and network with mindvault_registry_info, then retry.",
+    "Verify the contract id and network with zentrixpay_registry_info, then retry.",
   ),
   MV_STATE_CORRUPT: spec(
     "MV_STATE_CORRUPT",
     "unknown",
     "unsafe",
     "The local state file could not be read as valid state.",
-    "The corrupt file is quarantined. Restore with mindvault_restore_state, or set up the wallet again.",
+    "The corrupt file is quarantined. Restore with zentrixpay_restore_state, or set up the wallet again.",
   ),
   MV_STATE_LOCKED: spec(
     "MV_STATE_LOCKED",
@@ -391,7 +391,7 @@ export function errorCodeFor(error: unknown, mapped?: MappedError | null): Error
  * action stay where clients already look for them.
  */
 export interface ToolErrorPayload {
-  schema: "mindvault.error/v1";
+  schema: "zentrixpay.error/v1";
   code: ErrorCode;
   category: ErrorCategory;
   source: ErrorSource | null;
@@ -415,7 +415,7 @@ export function toolErrorPayload(input: {
   const meta = specFor(code);
 
   return {
-    schema: "mindvault.error/v1",
+    schema: "zentrixpay.error/v1",
     code,
     category: meta.category,
     source: input.mapped?.source ?? null,

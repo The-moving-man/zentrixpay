@@ -23,7 +23,7 @@ const otlpEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 if (otlpEndpoint) {
   const sdk = new NodeSDK({
     resource: resourceFromAttributes({
-      [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME ?? "mindvault-server",
+      [ATTR_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME ?? "zentrixpay-server",
     }),
     traceExporter: new OTLPTraceExporter({ url: otlpEndpoint }),
     instrumentations: [

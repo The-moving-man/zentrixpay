@@ -1,6 +1,6 @@
 # MCP Tool Arguments — Validation Contract
 
-Every MindVault MCP tool validates its arguments against an explicit schema
+Every ZentrixPay MCP tool validates its arguments against an explicit schema
 before it does any work. Nothing reaches a handler — no HTTP request, no
 payment signature, no state write — until the whole argument bag has passed.
 
@@ -37,7 +37,7 @@ A rejected call comes back as a normal MCP tool result with `isError: true` and
 a single text block:
 
 ```
-Error: Invalid arguments for mindvault_publish: price is malformed. Expected a
+Error: Invalid arguments for zentrixpay_publish: price is malformed. Expected a
 non-negative decimal amount in USDC, e.g. "5.00". externalUrl is required.
 Expected an http(s) URL, e.g. https://example.com/data.json.
 ```
@@ -45,7 +45,7 @@ Expected an http(s) URL, e.g. https://example.com/data.json.
 An unrecognized tool name is reported the same way:
 
 ```
-Error: Unknown tool: mindvault_by. Available tools: mindvault_agent_status, mindvault_backup_state, …
+Error: Unknown tool: zentrixpay_by. Available tools: zentrixpay_agent_status, zentrixpay_backup_state, …
 ```
 
 Each issue carries a stable code (`unknown_argument`, `missing_required`,
@@ -58,64 +58,64 @@ that want to branch on the failure rather than parse prose.
 ## Per-tool arguments
 
 `confirmMainnet` (flag, optional) is accepted by every mutating tool and is
-**required on mainnet** unless `MINDVAULT_ALLOW_MAINNET=1` is set on the server
+**required on mainnet** unless `ZENTRIXPAY_ALLOW_MAINNET=1` is set on the server
 — see [mainnet guardrails](mainnet-deployment-checklist.md).
 
 | Tool                           | Argument               | Required | Accepted values                                           |
 | ------------------------------ | ---------------------- | -------- | --------------------------------------------------------- |
-| `mindvault_setup_wallet`       | `profile`              | no       | letters, digits, dot, dash, underscore (1–64)             |
-| `mindvault_wallet_info`        | —                      | —        | takes no arguments                                        |
-| `mindvault_use_profile`        | `name`                 | yes      | letters, digits, dot, dash, underscore (1–64)             |
-| `mindvault_list_profiles`      | —                      | —        | takes no arguments                                        |
-| `mindvault_browse`             | `query`                | no       | keyword search; matches title or description              |
+| `zentrixpay_setup_wallet`       | `profile`              | no       | letters, digits, dot, dash, underscore (1–64)             |
+| `zentrixpay_wallet_info`        | —                      | —        | takes no arguments                                        |
+| `zentrixpay_use_profile`        | `name`                 | yes      | letters, digits, dot, dash, underscore (1–64)             |
+| `zentrixpay_list_profiles`      | —                      | —        | takes no arguments                                        |
+| `zentrixpay_browse`             | `query`                | no       | keyword search; matches title or description              |
 |                                | `minPrice`, `maxPrice` | no       | inclusive numeric USDC bounds; `"0.50"` equals `"0.5"`    |
 |                                | `verificationStatus`   | no       | `pending`, `verified`, `rejected`, `skipped`              |
 |                                | `resourceType`         | no       | `file`, `link`                                            |
 |                                | `owner`                | no       | publisher name or wallet                                  |
 |                                | `tags`                 | no       | comma-separated; all tags match case-insensitively        |
 |                                | `listed`               | no       | boolean; public catalog results are listed only           |
-| `mindvault_search`             | `query`                | no       | keyword search; required when no other filter is supplied |
+| `zentrixpay_search`             | `query`                | no       | keyword search; required when no other filter is supplied |
 |                                | `minPrice`, `maxPrice` | no       | inclusive numeric USDC bounds; `"0.50"` equals `"0.5"`    |
 |                                | `verificationStatus`   | no       | `pending`, `verified`, `rejected`, `skipped`              |
 |                                | `resourceType`         | no       | `file`, `link`                                            |
 |                                | `owner`                | no       | publisher name or wallet                                  |
 |                                | `tags`                 | no       | comma-separated; all tags match case-insensitively        |
 |                                | `listed`               | no       | boolean; public catalog results are listed only           |
-| `mindvault_preview`            | `resourceId`           | yes      | letters, digits, dot, dash, underscore (≤128)             |
-| `mindvault_register`           | `name`                 | yes      | 1–128 characters                                          |
+| `zentrixpay_preview`            | `resourceId`           | yes      | letters, digits, dot, dash, underscore (≤128)             |
+| `zentrixpay_register`           | `name`                 | yes      | 1–128 characters                                          |
 |                                | `email`                | yes      | email address (≤254)                                      |
 |                                | `walletAddress`        | no       | Stellar public key (`G…`, 56 chars)                       |
-| `mindvault_publish`            | `title`                | yes      | 1–256 characters                                          |
+| `zentrixpay_publish`            | `title`                | yes      | 1–256 characters                                          |
 |                                | `description`          | no       | ≤2048 characters                                          |
 |                                | `price`                | yes      | decimal USDC string                                       |
 |                                | `externalUrl`          | yes      | `http(s)://…` (≤2048)                                     |
-| `mindvault_buy`                | `resourceId`           | yes      | resource id                                               |
+| `zentrixpay_buy`                | `resourceId`           | yes      | resource id                                               |
 |                                | `maxAutoPayUsdc`       | no       | explicit USDC ceiling override for this purchase          |
-| `mindvault_register_onchain`   | `resourceId`           | yes      | resource id                                               |
-| `mindvault_update_metadata`    | `resourceId`           | yes      | resource id                                               |
+| `zentrixpay_register_onchain`   | `resourceId`           | yes      | resource id                                               |
+| `zentrixpay_update_metadata`    | `resourceId`           | yes      | resource id                                               |
 |                                | `metadata`             | yes      | pointer (ipfs://, ar://, http(s)://, etc. ≤512)           |
-| `mindvault_set_price`          | `resourceId`           | yes      | resource id                                               |
+| `zentrixpay_set_price`          | `resourceId`           | yes      | resource id                                               |
 |                                | `price`                | yes      | decimal USDC amount (e.g. `"10.00"`)                      |
-| `mindvault_transfer_ownership` | `resourceId`           | yes      | resource id                                               |
+| `zentrixpay_transfer_ownership` | `resourceId`           | yes      | resource id                                               |
 |                                | `newCreator`           | yes      | Stellar public key (`G…`, 56 chars)                       |
-| `mindvault_set_listed`         | `resourceId`           | yes      | resource id                                               |
+| `zentrixpay_set_listed`         | `resourceId`           | yes      | resource id                                               |
 |                                | `listed`               | yes      | boolean (`true`/`false`)                                  |
-| `mindvault_agent_status`       | —                      | —        | takes no arguments                                        |
-| `mindvault_registry_info`      | —                      | —        | takes no arguments                                        |
-| `mindvault_network_profile`    | —                      | —        | takes no arguments                                        |
-| `mindvault_check_bindings`     | —                      | —        | takes no arguments                                        |
-| `mindvault_verify_install`     | —                      | —        | takes no arguments                                        |
-| `mindvault_check_consistency`  | `resourceId`           | yes      | resource id                                               |
+| `zentrixpay_agent_status`       | —                      | —        | takes no arguments                                        |
+| `zentrixpay_registry_info`      | —                      | —        | takes no arguments                                        |
+| `zentrixpay_network_profile`    | —                      | —        | takes no arguments                                        |
+| `zentrixpay_check_bindings`     | —                      | —        | takes no arguments                                        |
+| `zentrixpay_verify_install`     | —                      | —        | takes no arguments                                        |
+| `zentrixpay_check_consistency`  | `resourceId`           | yes      | resource id                                               |
 |                                | `expectedMetadataHash` | no       | [metadata digest](mcp-metadata-hash.md)                   |
-| `mindvault_registry_lookup`    | `resourceId`           | yes      | resource id                                               |
-| `mindvault_registry_list`      | `start`                | no       | integer ≥ 0 (default 0)                                   |
+| `zentrixpay_registry_lookup`    | `resourceId`           | yes      | resource id                                               |
+| `zentrixpay_registry_list`      | `start`                | no       | integer ≥ 0 (default 0)                                   |
 |                                | `limit`                | no       | integer 1–20 (default 20; contract cap)                   |
-| `mindvault_tx_status`          | `txHash`               | yes      | sha256 digest (64 hex chars)                              |
-| `mindvault_reset`              | `all`                  | no       | flag — clears every profile                               |
-| `mindvault_backup_state`       | `passphrase`           | yes      | 8–512 characters                                          |
-| `mindvault_restore_state`      | `blob`                 | yes      | backup blob (`v1:…`)                                      |
+| `zentrixpay_tx_status`          | `txHash`               | yes      | sha256 digest (64 hex chars)                              |
+| `zentrixpay_reset`              | `all`                  | no       | flag — clears every profile                               |
+| `zentrixpay_backup_state`       | `passphrase`           | yes      | 8–512 characters                                          |
+| `zentrixpay_restore_state`      | `blob`                 | yes      | backup blob (`v1:…`)                                      |
 |                                | `passphrase`           | yes      | 8–512 characters                                          |
-| `mindvault_metrics`            | `reset`                | no       | flag — clears counters after reading                      |
+| `zentrixpay_metrics`            | `reset`                | no       | flag — clears counters after reading                      |
 
 ### Why resource ids are restricted
 
@@ -147,18 +147,18 @@ Two tools used to answer an invalid call with a friendly sentence instead of an
 error. They now fail like every other invalid call, so an agent can rely on
 `isError` rather than string-matching prose:
 
-- `mindvault_search` with an empty `query` → `Invalid arguments…` (was
+- `zentrixpay_search` with an empty `query` → `Invalid arguments…` (was
   `"Provide a non-empty search query."`)
-- `mindvault_tx_status` with an empty `txHash` → `Invalid arguments…` (was
+- `zentrixpay_tx_status` with an empty `txHash` → `Invalid arguments…` (was
   `"Provide a transaction hash to look up."`)
 
 Valid calls are unaffected.
 
-### `mindvault_publish_template`
+### `zentrixpay_publish_template`
 
 This tool is **read-only** — it makes no API calls, no payments, and touches no
 wallet state. It returns a pre-filled publish spec (JSON) that an agent can
-review and override before passing to `mindvault_publish`.
+review and override before passing to `zentrixpay_publish`.
 
 Key points:
 
@@ -171,4 +171,4 @@ Key points:
   (`ipfs://`, `ar://`, `http(s)://`, `sha256:`, `sha-256:`, or `0x`). The
   type-default pointer (e.g. `sha256:<HASH>`) is a format hint, not a valid
   pointer, and must be replaced with a real hash or CID before calling
-  `mindvault_publish`.
+  `zentrixpay_publish`.

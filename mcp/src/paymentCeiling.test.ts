@@ -6,7 +6,7 @@ import {
 } from "./paymentCeiling.js";
 import { MIN_USDC_BALANCE, MIN_NATIVE_XLM, assertMinimumBalance } from "./paymentPreflight.js";
 
-const env = { MINDVAULT_MAX_AUTO_PAY_USDC: "5" } as NodeJS.ProcessEnv;
+const env = { ZENTRIXPAY_MAX_AUTO_PAY_USDC: "5" } as NodeJS.ProcessEnv;
 
 describe("automatic x402 payment ceiling", () => {
   it("uses a documented 10 USDC default", () => {
@@ -23,7 +23,7 @@ describe("automatic x402 payment ceiling", () => {
 
   it("blocks a payment above the ceiling until that call explicitly overrides it", () => {
     expect(() => assertAutoPaymentWithinCeiling({ price: "5.01", env })).toThrow(
-      'Purchase requires 5.01 USDC, which exceeds the automatic payment ceiling of 5 USDC. To authorize this purchase, call mindvault_buy with maxAutoPayUsdc: "5.01"',
+      'Purchase requires 5.01 USDC, which exceeds the automatic payment ceiling of 5 USDC. To authorize this purchase, call zentrixpay_buy with maxAutoPayUsdc: "5.01"',
     );
     expect(() =>
       assertAutoPaymentWithinCeiling({ price: "5.01", maxAutoPayUsdc: "5.01", env }),
@@ -36,7 +36,7 @@ describe("transaction fee ceiling", () => {
     expect(() =>
       assertTransactionFeeWithinCeiling({
         feeStroops: "100",
-        env: { MINDVAULT_MAX_AUTO_FEE_STROOPS: "100" },
+        env: { ZENTRIXPAY_MAX_AUTO_FEE_STROOPS: "100" },
       }),
     ).not.toThrow();
   });
@@ -45,7 +45,7 @@ describe("transaction fee ceiling", () => {
     expect(() =>
       assertTransactionFeeWithinCeiling({
         feeStroops: "101",
-        env: { MINDVAULT_MAX_AUTO_FEE_STROOPS: "100" },
+        env: { ZENTRIXPAY_MAX_AUTO_FEE_STROOPS: "100" },
       }),
     ).toThrow(/exceeds/);
   });

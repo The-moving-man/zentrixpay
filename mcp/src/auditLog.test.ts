@@ -27,7 +27,7 @@ describe("auditLog – initialization and control", () => {
   });
 
   it("can be enabled via environment variable", () => {
-    initAuditLogging({ MINDVAULT_AUDIT_LOG: "1" });
+    initAuditLogging({ ZENTRIXPAY_AUDIT_LOG: "1" });
     expect(isAuditLogEnabled()).toBe(true);
   });
 
@@ -56,10 +56,10 @@ describe("auditLog – tool operation logging", () => {
   });
 
   it("logs tool start with tool name", () => {
-    logToolStart("mindvault_publish");
+    logToolStart("zentrixpay_publish");
     expect(console.error).toHaveBeenCalled();
     const logged = JSON.parse((console.error as any).mock.calls[0][0]);
-    expect(logged.toolName).toBe("mindvault_publish");
+    expect(logged.toolName).toBe("zentrixpay_publish");
     expect(logged.status).toBe("start");
     expect(logged.timestamp).toBeDefined();
   });
@@ -70,7 +70,7 @@ describe("auditLog – tool operation logging", () => {
       secretKey: "S1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ABCDEF",
       apiKey: "sk_live_1234567890",
     };
-    logToolStart("mindvault_publish", args);
+    logToolStart("zentrixpay_publish", args);
     const logged = JSON.parse((console.error as any).mock.calls[0][0]);
     expect(logged.details.title).toBe("Test");
     expect(logged.details.secretKey).toBe("[REDACTED]");
@@ -78,7 +78,7 @@ describe("auditLog – tool operation logging", () => {
   });
 
   it("logs tool success with duration and resource info", () => {
-    logToolSuccess("mindvault_publish", 1500, {
+    logToolSuccess("zentrixpay_publish", 1500, {
       resourceId: "res-001",
       txHash: "abc123",
       network: "stellar:testnet",
@@ -93,7 +93,7 @@ describe("auditLog – tool operation logging", () => {
 
   it("logs tool error with duration and context", () => {
     const error = new Error("Payment failed");
-    logToolError("mindvault_buy", 800, error, {
+    logToolError("zentrixpay_buy", 800, error, {
       resourceId: "res-001",
       errorCategory: "payment",
       httpStatus: 402,
@@ -109,7 +109,7 @@ describe("auditLog – tool operation logging", () => {
 
   it("redacts secret keys in error messages", () => {
     const error = new Error("Failed: S1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890ABCDEF");
-    logToolError("mindvault_setup_wallet", 500, error);
+    logToolError("zentrixpay_setup_wallet", 500, error);
     const logged = JSON.parse((console.error as any).mock.calls[0][0]);
     expect(logged.message).not.toContain("S1234567890");
     expect(logged.message).toContain("[REDACTED]");
@@ -308,8 +308,8 @@ describe("auditLog – disabled logging produces no output", () => {
   });
 
   it("does not log when disabled", () => {
-    logToolStart("mindvault_publish");
-    logToolSuccess("mindvault_publish", 1000);
+    logToolStart("zentrixpay_publish");
+    logToolSuccess("zentrixpay_publish", 1000);
     logNetworkRequest("GET", "https://example.com", "api", 200, 100);
     expect(console.error).not.toHaveBeenCalled();
   });

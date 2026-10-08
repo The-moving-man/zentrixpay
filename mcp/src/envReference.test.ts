@@ -72,7 +72,7 @@ describe("env var reference inventory — completeness", () => {
       (name) => !NON_OPERATOR_VARS.has(name) && !documented.has(name) && !findEnvVarDoc(name),
     );
     // findEnvVarDoc resolves concrete per-tool names (e.g.
-    // MINDVAULT_RETRY_ATTEMPTS_MINDVAULT_BROWSE) to the <TOOL> pattern row.
+    // ZENTRIXPAY_RETRY_ATTEMPTS_ZENTRIXPAY_BROWSE) to the <TOOL> pattern row.
     expect(missing, `undocumented variables: ${missing.join(", ")}`).toEqual([]);
   });
 
@@ -105,12 +105,12 @@ describe("env var reference inventory — completeness", () => {
 
 describe("env var reference inventory — truthfulness", () => {
   it("sources the mainnet policy default from the guardrail module", () => {
-    const doc = findEnvVarDoc("MINDVAULT_ALLOW_MAINNET");
+    const doc = findEnvVarDoc("ZENTRIXPAY_ALLOW_MAINNET");
     expect(doc?.default).toBe(DEFAULT_MAINNET_MUTATION_POLICY);
   });
 
   it("sources the paid-confirmation default from its module", () => {
-    const doc = findEnvVarDoc("MINDVAULT_CONFIRM_PAID_OPERATIONS");
+    const doc = findEnvVarDoc("ZENTRIXPAY_CONFIRM_PAID_OPERATIONS");
     expect(doc?.default).toBe(DEFAULT_PAID_CONFIRMATION_POLICY);
     expect(doc?.values).toContain("off");
     expect(doc?.values).toContain("usdc");
@@ -118,16 +118,16 @@ describe("env var reference inventory — truthfulness", () => {
   });
 
   it("sources the auto-pay ceiling from its module", () => {
-    const doc = findEnvVarDoc("MINDVAULT_MAX_AUTO_PAY_USDC");
+    const doc = findEnvVarDoc("ZENTRIXPAY_MAX_AUTO_PAY_USDC");
     expect(doc?.default).toContain(DEFAULT_MAX_AUTO_PAY_USDC);
   });
 
   it("sources the retry policy defaults from their module", () => {
-    const doc = findEnvVarDoc("MINDVAULT_RETRY_ATTEMPTS");
+    const doc = findEnvVarDoc("ZENTRIXPAY_RETRY_ATTEMPTS");
     expect(doc?.default).toBe(`${DEFAULT_RETRY_POLICY.attempts}`);
-    const base = findEnvVarDoc("MINDVAULT_RETRY_BASE_DELAY_MS");
+    const base = findEnvVarDoc("ZENTRIXPAY_RETRY_BASE_DELAY_MS");
     expect(base?.default).toBe(`${DEFAULT_RETRY_POLICY.baseDelayMs} (ms)`);
-    const max = findEnvVarDoc("MINDVAULT_RETRY_MAX_DELAY_MS");
+    const max = findEnvVarDoc("ZENTRIXPAY_RETRY_MAX_DELAY_MS");
     expect(max?.default).toBe(`${DEFAULT_RETRY_POLICY.maxDelayMs} (ms)`);
   });
 
@@ -138,13 +138,13 @@ describe("env var reference inventory — truthfulness", () => {
       ["SOROBAN", "soroban"],
       ["PAYMENT", "payment"],
     ] as const) {
-      const doc = findEnvVarDoc(`MINDVAULT_${suffix}_TIMEOUT_MS`);
+      const doc = findEnvVarDoc(`ZENTRIXPAY_${suffix}_TIMEOUT_MS`);
       expect(doc?.default).toBe(`${DEFAULT_TIMEOUTS[service]} (ms)`);
     }
   });
 
   it("documents the #606 fail-safe value table", () => {
-    const doc = findEnvVarDoc("MINDVAULT_ALLOW_MAINNET");
+    const doc = findEnvVarDoc("ZENTRIXPAY_ALLOW_MAINNET");
     expect(doc?.values).toEqual([
       "unset/0/false/no/off → per-call-confirm",
       "1/true/yes → allow-all",

@@ -41,7 +41,7 @@ vi.mock("@x402/fetch", () => ({
   }),
 }));
 
-vi.mock("@mindvault/registry-client", async (importOriginal) => {
+vi.mock("@zentrixpay/registry-client", async (importOriginal) => {
   const actual = (await importOriginal()) as any;
   return {
     ...actual,
@@ -53,7 +53,7 @@ vi.mock("@mindvault/registry-client", async (importOriginal) => {
   };
 });
 
-import { Errors as RegistryErrors } from "@mindvault/registry-client";
+import { Errors as RegistryErrors } from "@zentrixpay/registry-client";
 import {
   browse,
   buy,
@@ -101,8 +101,8 @@ describe("network failure", () => {
 
     const message = await browse().catch((e) => e.message);
     expectMappedShape(message);
-    expect(message).toContain("Source: MindVault API");
-    expect(message).toContain("MindVault API request failed");
+    expect(message).toContain("Source: ZentrixPay API");
+    expect(message).toContain("ZentrixPay API request failed");
   });
 
   it("attributes a Horizon outage to Horizon, not the API", async () => {
@@ -121,7 +121,7 @@ describe("network failure", () => {
 
     const message = await browse().catch((e) => e.message);
     expect(message).toContain("Category: timeout");
-    expect(message).toContain("MINDVAULT_HTTP_TIMEOUT_MS");
+    expect(message).toContain("ZENTRIXPAY_HTTP_TIMEOUT_MS");
   });
 });
 
@@ -154,7 +154,7 @@ describe("HTTP failures from the API", () => {
 
     const message = await preview("missing").catch((e) => e.message);
     expect(message).toContain("Category: not_found");
-    expect(message).toContain("mindvault_search");
+    expect(message).toContain("zentrixpay_search");
   });
 });
 
@@ -192,7 +192,7 @@ describe("402 payment failure", () => {
     expect(message).toContain("Source: x402 payment");
     expect(message).toContain("Category: payment");
     expect(message).toContain("HTTP 402");
-    expect(message).toContain("mindvault_wallet_info");
+    expect(message).toContain("zentrixpay_wallet_info");
     expectMappedShape(message);
   });
 });
@@ -232,7 +232,7 @@ describe("contract NotFound", () => {
 
     expect(parsed.found).toBe(false);
     expect(parsed.next).toContain("not registered on-chain");
-    expect(parsed.next).toContain("mindvault_register_onchain");
+    expect(parsed.next).toContain("zentrixpay_register_onchain");
   });
 
   it("maps any other contract rejection to a thrown contract error", async () => {

@@ -36,10 +36,9 @@ export default defineConfig(({ mode }) => {
         registerType: "autoUpdate",
         includeAssets: ["icon.svg"],
         manifest: {
-          name: "MindVault",
-          short_name: "MindVault",
-          description:
-            "Payment-protected vault for digital resources on Stellar using HTTP 402 and x402.",
+          name: "ZentrixPay",
+          short_name: "ZentrixPay",
+          description: "Pay-per-call APIs on Stellar using HTTP 402 and x402.",
           theme_color: "#4f46e5",
           background_color: "#ffffff",
           display: "standalone",
@@ -65,7 +64,7 @@ export default defineConfig(({ mode }) => {
               urlPattern: catalogUrlPattern,
               handler: "NetworkFirst",
               options: {
-                cacheName: "mindvault-catalog",
+                cacheName: "zentrixpay-catalog",
                 networkTimeoutSeconds: 10,
                 expiration: {
                   maxEntries: 32,

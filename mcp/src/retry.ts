@@ -37,9 +37,9 @@ export const DEFAULT_RETRY_POLICY: RetryPolicy = {
 };
 
 export const RETRY_ENV_VARS = {
-  attempts: "MINDVAULT_RETRY_ATTEMPTS",
-  baseDelayMs: "MINDVAULT_RETRY_BASE_DELAY_MS",
-  maxDelayMs: "MINDVAULT_RETRY_MAX_DELAY_MS",
+  attempts: "ZENTRIXPAY_RETRY_ATTEMPTS",
+  baseDelayMs: "ZENTRIXPAY_RETRY_BASE_DELAY_MS",
+  maxDelayMs: "ZENTRIXPAY_RETRY_MAX_DELAY_MS",
 } as const;
 
 /** HTTP statuses worth retrying: transient server and throttling conditions. */
@@ -104,7 +104,7 @@ export function retryPolicyFromEnv(env: NodeJS.ProcessEnv = process.env): RetryP
 /**
  * Resolve a retry policy for one MCP tool. Tool overrides use the global
  * variable name plus a normalized tool suffix, e.g.
- * MINDVAULT_RETRY_ATTEMPTS_MINDVAULT_BROWSE=5.
+ * ZENTRIXPAY_RETRY_ATTEMPTS_ZENTRIXPAY_BROWSE=5.
  */
 export function retryPolicyForTool(
   toolName: string,

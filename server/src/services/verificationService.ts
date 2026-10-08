@@ -64,7 +64,7 @@ export async function checkOriginality(
     messages: [
       {
         role: "system",
-        content: `You are a content verification agent for a digital marketplace called MindVault. Your job is to verify that submitted content metadata (title, description, and resource reference) represents a legitimate digital resource that a creator would sell.
+        content: `You are a content verification agent for a digital marketplace called ZentrixPay. Your job is to verify that submitted content metadata (title, description, and resource reference) represents a legitimate digital resource that a creator would sell.
 
 You are NOT judging the full content — you are reviewing the listing metadata to determine if this appears to be a genuine resource listing.
 

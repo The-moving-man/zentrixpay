@@ -112,8 +112,8 @@ describe("schema invariants", () => {
       expect(tool.description.length).toBeGreaterThan(0);
     });
 
-    it("is named with the mindvault_ prefix", () => {
-      expect(name).toMatch(/^mindvault_[a-z0-9_]+$/);
+    it("is named with the zentrixpay_ prefix", () => {
+      expect(name).toMatch(/^zentrixpay_[a-z0-9_]+$/);
     });
   });
 });

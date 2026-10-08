@@ -58,8 +58,8 @@ describe("structured tools advertise a schema", () => {
     // TOOL_DEFINITIONS; both are defined there now, so the schemas travel with
     // the definition like every other tool's (#596).
     const byName = new Map(TOOL_DEFINITIONS.map((t) => [t.name, t]));
-    expect(byName.get("mindvault_publish_status")?.outputSchema).toBe(PUBLISH_STATUS_OUTPUT_SCHEMA);
-    expect(byName.get("mindvault_purchase_history")?.outputSchema).toBe(
+    expect(byName.get("zentrixpay_publish_status")?.outputSchema).toBe(PUBLISH_STATUS_OUTPUT_SCHEMA);
+    expect(byName.get("zentrixpay_purchase_history")?.outputSchema).toBe(
       PURCHASE_HISTORY_OUTPUT_SCHEMA,
     );
   });

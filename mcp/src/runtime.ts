@@ -3,7 +3,7 @@ import {
   normalizeX402Network,
   resolveStellarNetwork,
   X402_NETWORK_IDS,
-} from "@mindvault/registry-client";
+} from "@zentrixpay/registry-client";
 import { createEd25519Signer } from "@x402/stellar";
 import { ExactStellarScheme } from "@x402/stellar/exact/client";
 import { wrapFetchWithPayment, x402Client } from "@x402/fetch";
@@ -14,6 +14,7 @@ import {
   resolveToolDurationBudget,
 } from "./metrics.js";
 import { createMockFetch, mockEnabledFromEnv } from "./mock.js";
+import { DEFAULT_ZENTRIXPAY_URL } from "./config.js";
 import { initAuditLogging } from "./auditLog.js";
 import { safeErrorMessage } from "./redaction.js";
 import { signMutatingHeaders } from "./requestSignature.js";
@@ -54,7 +55,7 @@ import {
 const STELLAR_NETWORK = resolveStellarNetwork(process.env.STELLAR_NETWORK);
 const networkPreset = registryNetworks[STELLAR_NETWORK];
 
-const BASE_URL = process.env.MINDVAULT_URL ?? "https://mindvault-hyr3.onrender.com";
+const BASE_URL = process.env.ZENTRIXPAY_URL ?? DEFAULT_ZENTRIXPAY_URL;
 const REGISTRY_CONTRACT_ID =
   process.env.VAULT_REGISTRY_CONTRACT_ID ?? networkPreset.defaultRegistryContractId ?? "";
 const REGISTRY_NETWORK_PASSPHRASE = networkPreset.networkPassphrase;
@@ -81,12 +82,12 @@ function _isMock(): boolean {
 }
 
 export function _setMockMode(on: boolean): void {
-  if (on) process.env.MINDVAULT_MOCK = "1";
-  else delete process.env.MINDVAULT_MOCK;
+  if (on) process.env.ZENTRIXPAY_MOCK = "1";
+  else delete process.env.ZENTRIXPAY_MOCK;
 }
 
 function resolveAgentSecret(provided?: string): string | undefined {
-  return provided ?? process.env.MINDVAULT_AGENT_SECRET;
+  return provided ?? process.env.ZENTRIXPAY_AGENT_SECRET;
 }
 
 const httpFetch: typeof fetch = MOCK
@@ -99,7 +100,7 @@ const USER_AGENT = resolveUserAgent(process.env);
 
 const logRetry = process.env.VITEST
   ? undefined
-  : (info: RetryAttemptInfo) => console.error(`MindVault MCP: ${formatRetryLog(info)}`);
+  : (info: RetryAttemptInfo) => console.error(`ZentrixPay MCP: ${formatRetryLog(info)}`);
 
 function httpRetryOptions(label: string) {
   return {
@@ -216,7 +217,7 @@ function saveState(): void {
     };
     writeAtomically(STATE_FILE, JSON.stringify(state, null, 2), 0o600);
   } catch (err) {
-    console.error("MindVault MCP: failed to persist state:", safeErrorMessage(err));
+    console.error("ZentrixPay MCP: failed to persist state:", safeErrorMessage(err));
   }
 }
 
@@ -245,7 +246,7 @@ function timeoutServiceForUrl(url: string): TimeoutService {
 }
 
 const SERVICE_OPERATION: Record<ErrorSource, string> = {
-  api: "MindVault API request failed",
+  api: "ZentrixPay API request failed",
   horizon: "Horizon request failed",
   soroban: "Soroban RPC request failed",
   sponsored: "Sponsored-account request failed",
@@ -302,7 +303,7 @@ function requireWallet(): AgentWallet {
   const wallet = currentWallet();
   if (!wallet) {
     throw new Error(
-      `No wallet in profile "${activeProfileName}". Run mindvault_setup_wallet first.`,
+      `No wallet in profile "${activeProfileName}". Run zentrixpay_setup_wallet first.`,
     );
   }
   return wallet;
@@ -316,7 +317,7 @@ function requireApiKey(): string {
   const apiKey = currentApiKey();
   if (!apiKey) {
     throw new Error(
-      `Not registered in profile "${activeProfileName}". Run mindvault_register first.`,
+      `Not registered in profile "${activeProfileName}". Run zentrixpay_register first.`,
     );
   }
   return apiKey;

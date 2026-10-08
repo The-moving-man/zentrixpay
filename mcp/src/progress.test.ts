@@ -37,7 +37,7 @@ vi.mock("@x402/fetch", () => ({
   }),
 }));
 
-vi.mock("@mindvault/registry-client", async (importOriginal) => {
+vi.mock("@zentrixpay/registry-client", async (importOriginal) => {
   const actual = (await importOriginal()) as any;
   return {
     ...actual,

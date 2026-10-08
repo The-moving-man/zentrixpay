@@ -1,13 +1,13 @@
 /**
  * Settlement confirmation for x402 purchases (#888).
  *
- * `mindvault_buy` submits a payment and returns as soon as the payment
+ * `zentrixpay_buy` submits a payment and returns as soon as the payment
  * response comes back. The payment transaction still has to settle on-chain
  * before the receipt is final, and an agent that moves straight on can end up
  * reasoning from a transaction Soroban has not committed yet. These helpers
  * poll `getTransaction` over Soroban RPC until the payment transaction reaches
  * a terminal status (`SUCCESS` or `FAILED`), or the caller's deadline passes,
- * so `mindvault_buy` can confirm settlement before handing the summary back.
+ * so `zentrixpay_buy` can confirm settlement before handing the summary back.
  *
  * The module is pure: polling, clamping, and message formatting never touch
  * I/O or server state, so the surprising parts (timeouts, intervals, terminal
@@ -79,7 +79,7 @@ export function normalizeSettlementIntervalMs(raw: unknown): number {
 }
 
 /**
- * The `settlement` block a `mindvault_buy` summary carries. `polled` is true
+ * The `settlement` block a `zentrixpay_buy` summary carries. `polled` is true
  * whenever the buy actually waited on the transaction; `skipped` is true only
  * when the caller asked to wait but no transaction hash was available to poll.
  */
@@ -98,7 +98,7 @@ export interface SettlementSnapshot {
 /** Message explaining a settlement that could not be confirmed the way asked. */
 export function skippedSettlementMessage(reason: "no-tx-hash" | "no-wait"): string {
   if (reason === "no-tx-hash") {
-    return "The payment response included no transaction hash, so on-chain settlement could not be polled. Re-check with mindvault_tx_status once a hash is available.";
+    return "The payment response included no transaction hash, so on-chain settlement could not be polled. Re-check with zentrixpay_tx_status once a hash is available.";
   }
   return "Settlement not checked. Pass wait: true to poll until the payment transaction settles.";
 }
@@ -135,7 +135,7 @@ export function buildSettlementSnapshot(input: {
 
   let message: string;
   if (timedOut && !settled) {
-    message = `Reached the settlement deadline without a terminal status (last status: ${tx.status}). Re-check with mindvault_tx_status on ${tx.hash}.`;
+    message = `Reached the settlement deadline without a terminal status (last status: ${tx.status}). Re-check with zentrixpay_tx_status on ${tx.hash}.`;
   } else if (success) {
     message = `Payment settled on-chain (status: SUCCESS) after ${attempts} check${
       attempts === 1 ? "" : "s"

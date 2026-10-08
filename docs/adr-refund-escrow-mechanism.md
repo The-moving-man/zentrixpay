@@ -1,4 +1,4 @@
-# ADR: Refund and Escrow Mechanisms for MindVault
+# ADR: Refund and Escrow Mechanisms for ZentrixPay
 
 | Field       | Value                                              |
 |-------------|------------------------------------------------------|
@@ -11,7 +11,7 @@
 
 ## Context
 
-MindVault currently uses the **x402 protocol** for resource access payments. When a buyer requests a paywalled resource (`GET /resources/:id`), the server returns an HTTP 402 with payment details. The buyer signs a Soroban USDC authorization entry, retries with the signed proof, and the server settles via the x402 facilitator. USDC moves **directly from buyer to creator** — MindVault never custodies funds.
+ZentrixPay currently uses the **x402 protocol** for resource access payments. When a buyer requests a paywalled resource (`GET /resources/:id`), the server returns an HTTP 402 with payment details. The buyer signs a Soroban USDC authorization entry, retries with the signed proof, and the server settles via the x402 facilitator. USDC moves **directly from buyer to creator** — ZentrixPay never custodies funds.
 
 This model is elegant and simple, but it provides **no mechanism for refunds, disputes, or buyer protection**. Once settled, the USDC transfer is final. If a resource is misleading, broken, or not as described, the buyer has no recourse.
 
@@ -108,7 +108,7 @@ DEPOSITED → (buyer disputes) → DISPUTED → REFUNDED | RELEASED
 
 ### Option C: Server-Mediated Partial Refunds
 
-**How it works:** Payments still settle directly to the creator via x402. The MindVault server operates a **refund pool** (a platform-controlled wallet) that can issue partial refunds to buyers when a dispute is upheld.
+**How it works:** Payments still settle directly to the creator via x402. The ZentrixPay server operates a **refund pool** (a platform-controlled wallet) that can issue partial refunds to buyers when a dispute is upheld.
 
 ```
 Buyer → pay USDC → creator (via x402, as today)
@@ -209,7 +209,7 @@ This is the pragmatic choice. It:
 - Is fully automatable for AI agents (simple REST endpoints)
 - Can be implemented as a standalone feature in the server package
 
-The main risk — platform pool insolvency — is manageable at MindVault's current scale and can be funded from a small percentage of verification fees.
+The main risk — platform pool insolvency — is manageable at ZentrixPay's current scale and can be funded from a small percentage of verification fees.
 
 **Medium-term (future milestone): Option B — On-Chain Escrow Contract**
 
@@ -228,7 +228,7 @@ Once the marketplace scales and the dispute volume justifies it, migrating to an
    - Create `POST /disputes`, `GET /disputes/:id`, `POST /disputes/:id/rule` API routes
    - Fund and configure a platform refund wallet
    - Add AI-assisted dispute review using existing OpenRouter integration
-   - Update MCP server with `mindvault_dispute` and `mindvault_dispute_status` tools
+   - Update MCP server with `zentrixpay_dispute` and `zentrixpay_dispute_status` tools
 
 2. **`feat: design vault-escrow Soroban contract (Option B)`**
    - Define escrow state machine (Deposited → Released / Disputed → Refunded)
@@ -247,7 +247,7 @@ Once the marketplace scales and the dispute volume justifies it, migrating to an
 
 - [x402 protocol spec](https://www.x402.org/)
 - [x402 payment sequence diagram](x402-sequence-diagram.md)
-- [MindVault architecture](architecture.md)
+- [ZentrixPay architecture](architecture.md)
 - [vault-registry contract source](../contract/contracts/vault-registry/src/lib.rs)
 - [Soroban SDK — persistent storage](https://soroban.stellar.org/docs/learn/persisting-data)
 - [Stellar USDC SAC](https://stellar.expert/explorer/public/asset/USDC-GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN)

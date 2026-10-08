@@ -36,9 +36,9 @@ function input(overrides: Partial<DebugBundleInput> = {}): DebugBundleInput {
   const env: NodeJS.ProcessEnv = {
     STELLAR_NETWORK: "testnet",
     VAULT_REGISTRY_CONTRACT_ID: CONTRACT,
-    MINDVAULT_AGENT_SECRET: SECRET,
-    MINDVAULT_API_KEY: "mv_live_0123456789abcdef0123456789abcdef",
-    MINDVAULT_AUDIT_LOG: "1",
+    ZENTRIXPAY_AGENT_SECRET: SECRET,
+    ZENTRIXPAY_API_KEY: "mv_live_0123456789abcdef0123456789abcdef",
+    ZENTRIXPAY_AUDIT_LOG: "1",
     AWS_SECRET_ACCESS_KEY: "unrelated-and-must-not-appear",
     PATH: "/usr/bin",
   };
@@ -60,8 +60,8 @@ function input(overrides: Partial<DebugBundleInput> = {}): DebugBundleInput {
       empty: {},
     },
     activeProfile: "default",
-    stateDir: "/home/agent/.mindvault",
-    stateFile: "/home/agent/.mindvault/state.json",
+    stateDir: "/home/agent/.zentrixpay",
+    stateFile: "/home/agent/.zentrixpay/state.json",
     statePermissions: {
       exists: true,
       mode: "0600",
@@ -88,8 +88,8 @@ function input(overrides: Partial<DebugBundleInput> = {}): DebugBundleInput {
       exists: true,
       requested: 50,
       entries: [
-        { toolName: "mindvault_buy", status: "success" },
-        { toolName: "mindvault_setup_wallet", details: { leaked: SECRET } },
+        { toolName: "zentrixpay_buy", status: "success" },
+        { toolName: "zentrixpay_setup_wallet", details: { leaked: SECRET } },
       ],
     },
     ...overrides,
@@ -97,22 +97,22 @@ function input(overrides: Partial<DebugBundleInput> = {}): DebugBundleInput {
 }
 
 describe("sanitizeEnvironment", () => {
-  it("keeps MindVault settings, masks credential-like names, drops everything else", () => {
+  it("keeps ZentrixPay settings, masks credential-like names, drops everything else", () => {
     const { environment, masked } = sanitizeEnvironment(input().env);
 
     expect(environment.STELLAR_NETWORK).toBe("testnet");
     expect(environment.VAULT_REGISTRY_CONTRACT_ID).toBe(CONTRACT);
-    expect(environment.MINDVAULT_AGENT_SECRET).toBe(REDACTED);
-    expect(environment.MINDVAULT_API_KEY).toBe(REDACTED);
+    expect(environment.ZENTRIXPAY_AGENT_SECRET).toBe(REDACTED);
+    expect(environment.ZENTRIXPAY_API_KEY).toBe(REDACTED);
     expect(environment).not.toHaveProperty("AWS_SECRET_ACCESS_KEY");
     expect(environment).not.toHaveProperty("PATH");
-    expect(masked).toEqual(["MINDVAULT_AGENT_SECRET", "MINDVAULT_API_KEY"]);
+    expect(masked).toEqual(["ZENTRIXPAY_AGENT_SECRET", "ZENTRIXPAY_API_KEY"]);
   });
 
   it("redacts a secret key that was put in a non-secret variable", () => {
-    const { environment } = sanitizeEnvironment({ MINDVAULT_URL: `https://x?${SECRET}` });
-    expect(environment.MINDVAULT_URL).not.toContain(SECRET);
-    expect(environment.MINDVAULT_URL).toContain("REDACTED");
+    const { environment } = sanitizeEnvironment({ ZENTRIXPAY_URL: `https://x?${SECRET}` });
+    expect(environment.ZENTRIXPAY_URL).not.toContain(SECRET);
+    expect(environment.ZENTRIXPAY_URL).toContain("REDACTED");
   });
 });
 
@@ -157,7 +157,7 @@ describe("collectAuditTail", () => {
   });
 
   it("reads the configured file's tail and reports absence honestly", () => {
-    dir = mkdtempSync(join(tmpdir(), "mindvault-bundle-"));
+    dir = mkdtempSync(join(tmpdir(), "zentrixpay-bundle-"));
     const file = join(dir, "audit.jsonl");
     writeFileSync(
       file,
@@ -165,11 +165,11 @@ describe("collectAuditTail", () => {
     );
     setAuditLogEnabled(true);
 
-    const present = collectAuditTail({ MINDVAULT_AUDIT_LOG_FILE: file }, 1);
+    const present = collectAuditTail({ ZENTRIXPAY_AUDIT_LOG_FILE: file }, 1);
     expect(present).toMatchObject({ enabled: true, filePath: file, exists: true, requested: 1 });
     expect(present.entries).toEqual([{ toolName: "y" }]);
 
-    const missing = collectAuditTail({ MINDVAULT_AUDIT_LOG_FILE: join(dir, "nope.jsonl") }, 5);
+    const missing = collectAuditTail({ ZENTRIXPAY_AUDIT_LOG_FILE: join(dir, "nope.jsonl") }, 5);
     expect(missing.exists).toBe(false);
     expect(missing.entries).toEqual([]);
 
@@ -191,7 +191,7 @@ describe("buildDebugBundle", () => {
     expect(text).toContain(PUBLIC);
     expect(text).toContain(CONTRACT);
     expect(bundle.auditLog.entries[1]).toEqual({
-      toolName: "mindvault_setup_wallet",
+      toolName: "zentrixpay_setup_wallet",
       details: { leaked: "S***REDACTED***" },
     });
   });
@@ -205,7 +205,7 @@ describe("buildDebugBundle", () => {
     for (const key of DEBUG_BUNDLE_OUTPUT_SCHEMA.required) {
       expect(a, `bundle has ${key}`).toHaveProperty(key);
     }
-    expect(a.sanitized.maskedEnvironment).toEqual(["MINDVAULT_AGENT_SECRET", "MINDVAULT_API_KEY"]);
+    expect(a.sanitized.maskedEnvironment).toEqual(["ZENTRIXPAY_AGENT_SECRET", "ZENTRIXPAY_API_KEY"]);
     expect(a.sanitized.rules.length).toBeGreaterThan(0);
   });
 
@@ -214,7 +214,7 @@ describe("buildDebugBundle", () => {
     expect(bundle.environment).toBeNull();
     expect(bundle.auditLog.requested).toBe(1);
     expect(bundle.auditLog.entries).toHaveLength(1);
-    expect(bundle.auditLog.entries[0].toolName).toBe("mindvault_setup_wallet");
+    expect(bundle.auditLog.entries[0].toolName).toBe("zentrixpay_setup_wallet");
 
     const none = buildDebugBundle(input(), { auditLogLines: 0, includeEnvironment: true });
     expect(none.auditLog.entries).toEqual([]);

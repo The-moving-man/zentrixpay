@@ -1,5 +1,5 @@
 import { existsSync, unlinkSync } from "fs";
-import { createRegistryClient } from "@mindvault/registry-client";
+import { createRegistryClient } from "@zentrixpay/registry-client";
 import {
   activeProfile,
   applyRestoredState,
@@ -32,7 +32,7 @@ export function backupState(passphrase: string, confirm: unknown = false): strin
       "Backup NOT performed — confirmation required.",
       "This will export every wallet secret key and publisher API key in encrypted form.",
       "Keep the passphrase separate from the backup file.",
-      "To proceed, call mindvault_backup_state again with confirm: true.",
+      "To proceed, call zentrixpay_backup_state again with confirm: true.",
     ].join("\n");
   }
   const path = exportStateFile(passphrase);
@@ -40,7 +40,7 @@ export function backupState(passphrase: string, confirm: unknown = false): strin
     "Encrypted state backup written.",
     `File: ${path}`,
     "The file is mode 0600 and contains no plaintext secrets.",
-    "Restore it with mindvault_restore_state using the file contents as blob and the same passphrase.",
+    "Restore it with zentrixpay_restore_state using the file contents as blob and the same passphrase.",
   ].join("\n");
 }
 
@@ -88,13 +88,13 @@ export function useProfile(nameArg: string): string {
       `Publisher registered: ${profile.apiKey ? "yes" : "no"}`,
     ].join("\n");
   }
-  return `Active profile: ${nameArg}\nNo wallet in this profile yet. Run mindvault_setup_wallet to create one.`;
+  return `Active profile: ${nameArg}\nNo wallet in this profile yet. Run zentrixpay_setup_wallet to create one.`;
 }
 
 export function listProfiles(): string {
   const names = Object.keys(profiles).sort();
   if (names.length === 0) {
-    return `No profiles yet. Run mindvault_setup_wallet to create one (default profile: "${DEFAULT_PROFILE}").`;
+    return `No profiles yet. Run zentrixpay_setup_wallet to create one (default profile: "${DEFAULT_PROFILE}").`;
   }
   const lines = names.map((name) => {
     const profile = profiles[name];
@@ -150,7 +150,7 @@ export async function publisherTerms(
 
   if (operation === "set") {
     if (!termsHash) throw new Error("termsHash is required for set.");
-    assertMainnetMutationAllowed(NETWORK, "mindvault_terms", { confirmMainnet });
+    assertMainnetMutationAllowed(NETWORK, "zentrixpay_terms", { confirmMainnet });
     try {
       const tx = await client.set_terms_hash(
         { creator: wallet.publicKey, terms_hash: termsHash },

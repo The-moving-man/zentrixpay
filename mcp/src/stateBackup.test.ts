@@ -26,7 +26,7 @@ import {
 } from "./stateBackup.js";
 import { STATE_VERSION, type ProfileState } from "./profiles.js";
 
-const STATE_DIR = join(homedir(), ".mindvault");
+const STATE_DIR = join(homedir(), ".zentrixpay");
 const STATE_FILE = join(STATE_DIR, "state.json");
 const PASS = "test-passphrase-ok";
 
@@ -85,7 +85,7 @@ describe("stateBackup", () => {
   });
 
   it("exports a private encrypted recovery file", () => {
-    const directory = mkdtempSync(join(tmpdir(), "mindvault-backup-"));
+    const directory = mkdtempSync(join(tmpdir(), "zentrixpay-backup-"));
     const path = exportStateFile(PASS, new Date("2026-01-02T03:04:05.000Z"), directory);
     const contents = readFileSync(path, "utf8");
     expect(path).toContain("state-2026-01-02T03-04-05-000Z.backup");
@@ -172,7 +172,7 @@ describe("stateBackup", () => {
 });
 
 describe("writeAtomically", () => {
-  const STATE_DIR = join(homedir(), ".mindvault");
+  const STATE_DIR = join(homedir(), ".zentrixpay");
   const STATE_FILE = join(STATE_DIR, "state.json");
 
   beforeEach(() => {
@@ -215,7 +215,7 @@ describe("writeAtomically", () => {
 });
 
 describe("checkStatePermissions", () => {
-  const STATE_DIR = join(homedir(), ".mindvault");
+  const STATE_DIR = join(homedir(), ".zentrixpay");
   const STATE_FILE = join(STATE_DIR, "state.json");
 
   beforeEach(() => {
@@ -272,7 +272,7 @@ describe("checkStatePermissions", () => {
 });
 
 describe("corrupted state file quarantine (#600)", () => {
-  const STATE_DIR = join(homedir(), ".mindvault");
+  const STATE_DIR = join(homedir(), ".zentrixpay");
   const STATE_FILE = join(STATE_DIR, "state.json");
 
   beforeEach(() => {
@@ -307,7 +307,7 @@ describe("corrupted state file quarantine (#600)", () => {
 });
 
 describe("legacy state preservation (#601)", () => {
-  const STATE_DIR = join(homedir(), ".mindvault");
+  const STATE_DIR = join(homedir(), ".zentrixpay");
   const STATE_FILE = join(STATE_DIR, "state.json");
   const LEGACY_FILE = `${STATE_FILE}.legacy`;
   const legacy = { wallet: { publicKey: "GPUB", secretKey: "SSECRET" }, apiKey: "legacy-key" };

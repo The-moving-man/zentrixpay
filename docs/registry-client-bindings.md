@@ -1,6 +1,6 @@
 # Registry-Client Binding Regeneration
 
-The `@mindvault/registry-client` package (`packages/registry-client/`) provides
+The `@zentrixpay/registry-client` package (`packages/registry-client/`) provides
 typed TypeScript bindings for the `vault-registry` Soroban contract. All
 consumers — `server/`, `web/`, and `mcp/` — import from this single workspace
 package instead of reaching into generated code directly.
@@ -88,14 +88,14 @@ This is also run automatically as part of `pnpm build:server` and `pnpm test`.
 All three consumers declare a workspace dependency in their `package.json`:
 
 ```json
-"@mindvault/registry-client": "workspace:*"
+"@zentrixpay/registry-client": "workspace:*"
 ```
 
 | Consumer  | Dependency declaration                        | Primary imports                                                 |
 | --------- | --------------------------------------------- | --------------------------------------------------------------- |
-| `server/` | `"@mindvault/registry-client": "workspace:*"` | `createRegistryClient`, `Client`, `Resource`, network utilities |
-| `web/`    | `"@mindvault/registry-client": "workspace:*"` | `Resource` type, Stellar Explorer helpers                       |
-| `mcp/`    | `"@mindvault/registry-client": "workspace:*"` | `createRegistryClient`, `Client`, `Resource`                    |
+| `server/` | `"@zentrixpay/registry-client": "workspace:*"` | `createRegistryClient`, `Client`, `Resource`, network utilities |
+| `web/`    | `"@zentrixpay/registry-client": "workspace:*"` | `Resource` type, Stellar Explorer helpers                       |
+| `mcp/`    | `"@zentrixpay/registry-client": "workspace:*"` | `createRegistryClient`, `Client`, `Resource`                    |
 
 Because this is a pnpm workspace dependency, `pnpm install` links the package
 automatically — no publish step is needed.
@@ -105,7 +105,7 @@ automatically — no publish step is needed.
 Consumers import from the package name, never from the generated directory:
 
 ```ts
-import { createRegistryClient, type Resource } from "@mindvault/registry-client";
+import { createRegistryClient, type Resource } from "@zentrixpay/registry-client";
 ```
 
 The package's `src/index.ts` re-exports everything from `./generated/index.js`,
@@ -142,11 +142,11 @@ against. If the deployed `vault-registry` contract is redeployed with a changed
 interface — or the bindings are upgraded without redeploying — the two drift
 apart, and calls to a missing method fail at runtime.
 
-`@mindvault/registry-client` exposes a check that compares the installed
+`@zentrixpay/registry-client` exposes a check that compares the installed
 bindings against the on-chain contract spec:
 
 ```ts
-import { checkContractBindings } from "@mindvault/registry-client";
+import { checkContractBindings } from "@zentrixpay/registry-client";
 
 const result = await checkContractBindings({
   contractId: "C…", // deployed vault-registry
@@ -170,7 +170,7 @@ network, client version, and a recommended fix:
 ### From the MCP server
 
 The MCP server runs this check as a **non-fatal warning at startup** (logged to
-stderr) and exposes it on demand as the **`mindvault_check_bindings`** tool, so
+stderr) and exposes it on demand as the **`zentrixpay_check_bindings`** tool, so
 agents and operators can validate compatibility without leaving the session.
 
 ## Further reading

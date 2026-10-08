@@ -1,6 +1,6 @@
 # Local Setup Guide
 
-This guide will walk you through setting up MindVault from a fresh clone to a running server and web app. MindVault uses **Stellar testnet** — no real funds are needed or at risk.
+This guide will walk you through setting up ZentrixPay from a fresh clone to a running server and web app. ZentrixPay uses **Stellar testnet** — no real funds are needed or at risk.
 
 ## 1. Prerequisites
 
@@ -15,7 +15,7 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 git clone https://github.com/mind-vault-1/mindvault.git
-cd mindvault
+cd zentrixpay
 
 # Install all JS/TS workspace packages
 pnpm install
@@ -23,7 +23,7 @@ pnpm install
 
 ## 3. Environment Variables & Supabase
 
-MindVault requires several environment variables to run.
+ZentrixPay requires several environment variables to run.
 
 1. Copy the example file:
    ```bash
@@ -47,7 +47,7 @@ make migrate
 
 ## 5. Stellar Testnet Setup
 
-MindVault uses the Stellar testnet for all payments and the vault registry. 
+ZentrixPay uses the Stellar testnet for all payments and the vault registry. 
 
 ### A. Deploy the vault registry contract
 The smart contract must be deployed so the server can record resources on-chain.

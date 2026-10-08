@@ -43,9 +43,9 @@ describe("TOOL_DEFINITIONS — description quality", () => {
     }
   });
 
-  it("every tool name starts with mindvault_", () => {
+  it("every tool name starts with zentrixpay_", () => {
     for (const tool of TOOL_DEFINITIONS) {
-      expect(tool.name, `unexpected tool name: ${tool.name}`).toMatch(/^mindvault_/);
+      expect(tool.name, `unexpected tool name: ${tool.name}`).toMatch(/^zentrixpay_/);
     }
   });
 

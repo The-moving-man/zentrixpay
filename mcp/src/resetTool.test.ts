@@ -1,9 +1,9 @@
 /**
- * Wiring tests for the guarded mindvault_reset tool (#406).
+ * Wiring tests for the guarded zentrixpay_reset tool (#406).
  *
  * These exercise the real `resetState` export against a temporary HOME so the
  * confirmed path can be observed clearing memory *and* disk without touching a
- * developer's actual ~/.mindvault/state.json. Mock mode keeps the import of
+ * developer's actual ~/.zentrixpay/state.json. Mock mode keeps the import of
  * index.ts free of network access.
  */
 import { existsSync } from "fs";
@@ -13,13 +13,13 @@ import { join } from "path";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 
 // Isolate agent state before the server module loads.
-process.env.MINDVAULT_MOCK = "1";
+process.env.ZENTRIXPAY_MOCK = "1";
 process.env.STELLAR_NETWORK = "testnet";
-const resetHome = mkdtempSync(join(tmpdir(), "mindvault-mcp-reset-"));
+const resetHome = mkdtempSync(join(tmpdir(), "zentrixpay-mcp-reset-"));
 process.env.HOME = resetHome;
 process.env.USERPROFILE = resetHome;
 
-const STATE_FILE = join(resetHome, ".mindvault", "state.json");
+const STATE_FILE = join(resetHome, ".zentrixpay", "state.json");
 
 const {
   resetState,
@@ -49,7 +49,7 @@ afterAll(() => {
   rmSync(resetHome, { recursive: true, force: true });
 });
 
-describe("mindvault_reset — unconfirmed", () => {
+describe("zentrixpay_reset — unconfirmed", () => {
   beforeEach(() => {
     seedPersistedProfile();
   });
@@ -88,7 +88,7 @@ describe("mindvault_reset — unconfirmed", () => {
   });
 });
 
-describe("mindvault_backup_state — confirmation", () => {
+describe("zentrixpay_backup_state — confirmation", () => {
   beforeEach(() => seedPersistedProfile());
 
   it("previews without exporting and writes an encrypted file only after confirmation", () => {
@@ -101,7 +101,7 @@ describe("mindvault_backup_state — confirmation", () => {
   });
 });
 
-describe("mindvault_reset — confirmed", () => {
+describe("zentrixpay_reset — confirmed", () => {
   beforeEach(() => {
     seedPersistedProfile();
   });

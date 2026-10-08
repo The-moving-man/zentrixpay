@@ -1,6 +1,6 @@
 # Harden state persistence against partial writes and leaked secret files
 
-This PR fixes a real data-safety bug in the MindVault MCP state persistence path. The app writes credentials to `~/.mindvault/state.json`, but the old implementation used a direct `writeFileSync()` to the target path. If that write fails mid-flight, the destination can be left truncated, and the next load silently loses wallet and API state.
+This PR fixes a real data-safety bug in the ZentrixPay MCP state persistence path. The app writes credentials to `~/.zentrixpay/state.json`, but the old implementation used a direct `writeFileSync()` to the target path. If that write fails mid-flight, the destination can be left truncated, and the next load silently loses wallet and API state.
 
 This change makes persisted state atomic, keeps secrets protected with `0600` permissions, and adds a regression test covering the failure case.
 
@@ -43,7 +43,7 @@ This fix is deterministic and safe for issue-driven contributor work: failure ca
 Ran the project-proven check:
 
 ```bash
-cd /home/semi/Documents/Drip/mindvault && corepack pnpm --filter @mindvault/registry-client build && corepack pnpm --filter @mindvault/mcp exec vitest run src/stateBackup.test.ts
+cd /home/semi/Documents/Drip/zentrixpay && corepack pnpm --filter @zentrixpay/registry-client build && corepack pnpm --filter @zentrixpay/mcp exec vitest run src/stateBackup.test.ts
 ```
 
 Result:

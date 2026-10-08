@@ -30,18 +30,18 @@ requests made underneath it:
 
 ```
 $ jq -c 'select(.correlationId == "mv-1a2b3c4d-e5f6")' audit.jsonl
-{"timestamp":"…","toolName":"mindvault_buy","status":"start","correlationId":"mv-1a2b3c4d-e5f6"}
+{"timestamp":"…","toolName":"zentrixpay_buy","status":"start","correlationId":"mv-1a2b3c4d-e5f6"}
 {"timestamp":"…","method":"GET","endpoint":"…","source":"api","correlationId":"mv-1a2b3c4d-e5f6"}
-{"timestamp":"…","toolName":"mindvault_buy","status":"error","correlationId":"mv-1a2b3c4d-e5f6"}
+{"timestamp":"…","toolName":"zentrixpay_buy","status":"error","correlationId":"mv-1a2b3c4d-e5f6"}
 ```
 
-**In the tool result's `_meta`**, under `mindvault/correlationId` — the key MCP
+**In the tool result's `_meta`**, under `zentrixpay/correlationId` — the key MCP
 reserves for out-of-band annotation:
 
 ```json
 {
   "content": [{ "type": "text", "text": "…" }],
-  "_meta": { "mindvault/correlationId": "mv-1a2b3c4d-e5f6" }
+  "_meta": { "zentrixpay/correlationId": "mv-1a2b3c4d-e5f6" }
 }
 ```
 

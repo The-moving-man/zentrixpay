@@ -1,8 +1,8 @@
 /**
  * Paid-operation confirmation policy (#594).
  *
- * Some MCP tools spend the agent's money. `mindvault_buy` transfers the
- * resource's asking price in USDC; `mindvault_publish` pays the ~$0.10 USDC
+ * Some MCP tools spend the agent's money. `zentrixpay_buy` transfers the
+ * resource's asking price in USDC; `zentrixpay_publish` pays the ~$0.10 USDC
  * x402 verification fee. Others spend only network fees, but they still debit
  * the wallet and land an irreversible transaction on-chain.
  *
@@ -19,9 +19,9 @@
  * explicit `confirmPaid: true` on every spend regardless of where the agent is
  * pointed or how cheap the resource is.
  *
- *   MINDVAULT_CONFIRM_PAID_OPERATIONS=off   (default — unchanged behaviour)
- *   MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc  (tools that spend USDC)
- *   MINDVAULT_CONFIRM_PAID_OPERATIONS=all   (also tools that spend network fees)
+ *   ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=off   (default — unchanged behaviour)
+ *   ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc  (tools that spend USDC)
+ *   ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=all   (also tools that spend network fees)
  *
  * The default is `off` on purpose. This is an opt-in belt for operators who
  * want one, not a new obstacle in front of every existing agent — a guardrail
@@ -29,7 +29,7 @@
  * which is worse than not shipping it.
  *
  * The policy composes with the other two rather than replacing them: a mainnet
- * buy above the ceiling with `MINDVAULT_CONFIRM_PAID_OPERATIONS=usdc` must
+ * buy above the ceiling with `ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=usdc` must
  * satisfy all three. Each answers a different question, so each keeps its own
  * error message.
  *
@@ -40,7 +40,7 @@
 import { isTruthyConfirm } from "./mainnetGuardrails.js";
 
 /** Environment variable selecting the confirmation policy. */
-export const PAID_CONFIRMATION_ENV_VAR = "MINDVAULT_CONFIRM_PAID_OPERATIONS";
+export const PAID_CONFIRMATION_ENV_VAR = "ZENTRIXPAY_CONFIRM_PAID_OPERATIONS";
 
 /** The tool argument that satisfies the policy for one call. */
 export const PAID_CONFIRMATION_ARG = "confirmPaid";
@@ -62,15 +62,16 @@ const POLICIES: readonly PaidConfirmationPolicy[] = ["off", "usdc", "all"];
 /**
  * Tools that spend USDC from the agent wallet.
  *
- * `mindvault_publish` pays the x402 verification fee; `mindvault_buy` pays the
+ * `zentrixpay_publish` pays the x402 verification fee; `zentrixpay_buy` pays the
  * resource's asking price. Both settle on-chain and neither can be undone.
- * `mindvault_publish_batch` pays one verification fee per item in the batch.
+ * `zentrixpay_publish_batch` pays one verification fee per item in the batch.
  */
 export const USDC_SPENDING_TOOLS = [
-  "mindvault_publish",
-  "mindvault_publish_batch",
-  "mindvault_buy",
-  "mindvault_buy_lease",
+  "zentrixpay_call",
+  "zentrixpay_publish",
+  "zentrixpay_publish_batch",
+  "zentrixpay_buy",
+  "zentrixpay_buy_lease",
 ] as const;
 
 /**
@@ -79,18 +80,18 @@ export const USDC_SPENDING_TOOLS = [
  * No USDC leaves the wallet, but XLM does and the on-chain effect is
  * permanent — which is why `all` exists as a distinct step above `usdc`.
  *
- * `mindvault_setup_wallet` is deliberately absent: account creation runs
+ * `zentrixpay_setup_wallet` is deliberately absent: account creation runs
  * through the sponsored-account service, so the agent's own wallet funds
  * nothing.
  */
 export const FEE_SPENDING_TOOLS = [
-  "mindvault_register_onchain",
-  "mindvault_update_metadata",
-  "mindvault_set_price",
-  "mindvault_transfer_ownership",
-  "mindvault_set_listed",
-  "mindvault_freeze",
-  "mindvault_royalty",
+  "zentrixpay_register_onchain",
+  "zentrixpay_update_metadata",
+  "zentrixpay_set_price",
+  "zentrixpay_transfer_ownership",
+  "zentrixpay_set_listed",
+  "zentrixpay_freeze",
+  "zentrixpay_royalty",
 ] as const;
 
 /** What a tool spends, or `null` when it spends nothing. */
@@ -116,7 +117,7 @@ export function paidOperationToolNames(): string[] {
  *
  * Throws on an unrecognized value rather than falling back to `off`. A typo in
  * a safety setting must not silently disable it — an operator who wrote
- * `MINDVAULT_CONFIRM_PAID_OPERATIONS=true` needs to hear about it at the first
+ * `ZENTRIXPAY_CONFIRM_PAID_OPERATIONS=true` needs to hear about it at the first
  * paid call, not discover months later that nothing was ever gated. An empty
  * or whitespace-only value reads as unset, which is the shape a shell leaves
  * behind for a variable that was exported but never given a value.
@@ -184,7 +185,7 @@ export function paidConfirmationRequiredError(
  * No-op when the policy is `off`, the tool spends nothing, the call is a dry
  * run, or the caller passed `confirmPaid: true`.
  *
- * Dry runs are exempt because `mindvault_publish`/`mindvault_buy` with
+ * Dry runs are exempt because `zentrixpay_publish`/`zentrixpay_buy` with
  * `dryRun: true` submit no payment and no transaction — gating them would
  * require confirming a spend in order to find out what the spend would be,
  * which defeats the purpose of having a dry run.

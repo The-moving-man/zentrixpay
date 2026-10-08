@@ -1,7 +1,7 @@
 /**
  * Structured diagnostics for sponsored-account service outages.
  *
- * `mindvault_setup_wallet` is the first tool an agent calls, and it depends on a
+ * `zentrixpay_setup_wallet` is the first tool an agent calls, and it depends on a
  * single external service — the sponsored-account service that mints and funds
  * the Stellar account. When that service is down the agent is stuck at step one,
  * so the failure has to explain itself: which service was called, whether it
@@ -247,7 +247,7 @@ function guidanceFor(outage: Omit<SponsoredOutage, "guidance">): string[] {
     case "timeout":
       steps.push(
         "The sponsored-account service accepted the connection but did not answer in time.",
-        "Retry, or raise MINDVAULT_HTTP_TIMEOUT_MS if the service is known to be slow.",
+        "Retry, or raise ZENTRIXPAY_HTTP_TIMEOUT_MS if the service is known to be slow.",
       );
       break;
     case "unavailable":

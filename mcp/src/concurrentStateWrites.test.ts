@@ -3,8 +3,8 @@
  *
  * MCP tool handlers are async and a client may have several in flight at once.
  * Several of them do a read-modify-write against the module-level `profiles`
- * map and then persist the whole map to `~/.mindvault/state.json`. The window
- * between the read and the write is not theoretical — `mindvault_import_wallet`
+ * map and then persist the whole map to `~/.zentrixpay/state.json`. The window
+ * between the read and the write is not theoretical — `zentrixpay_import_wallet`
  * awaits a dynamic `import("@stellar/stellar-sdk")` and a `Keypair.fromSecret`
  * in the middle of exactly that sequence:
  *
@@ -36,16 +36,16 @@ import { Mutex } from "./mutex.js";
 
 // Isolate HOME before importing index.js: STATE_DIR/STATE_FILE are resolved
 // from homedir() at module load, so a later assignment would not be seen.
-process.env.MINDVAULT_MOCK = "1";
+process.env.ZENTRIXPAY_MOCK = "1";
 process.env.STELLAR_NETWORK = "testnet";
-const home = mkdtempSync(join(tmpdir(), "mindvault-mcp-concurrent-"));
+const home = mkdtempSync(join(tmpdir(), "zentrixpay-mcp-concurrent-"));
 process.env.HOME = home;
 process.env.USERPROFILE = home;
 
 const { dispatchTool, _resetProfiles } = await import("./index.js");
 const { Keypair } = await import("@stellar/stellar-sdk");
 
-const STATE_FILE = join(home, ".mindvault", "state.json");
+const STATE_FILE = join(home, ".zentrixpay", "state.json");
 
 /** How many calls to overlap. Enough to interleave, small enough to stay fast. */
 const CONCURRENCY = 12;
@@ -98,7 +98,7 @@ describe("concurrent state writes (#591)", () => {
 
     await Promise.all(
       identities.map((id) =>
-        dispatchTool("mindvault_import_wallet", {
+        dispatchTool("zentrixpay_import_wallet", {
           secretKey: id.secretKey,
           profile: id.profile,
           persist: true,
@@ -118,7 +118,7 @@ describe("concurrent state writes (#591)", () => {
 
     await Promise.all(
       identities.map((id) =>
-        dispatchTool("mindvault_import_wallet", {
+        dispatchTool("zentrixpay_import_wallet", {
           secretKey: id.secretKey,
           profile: id.profile,
           persist: true,
@@ -145,7 +145,7 @@ describe("concurrent state writes (#591)", () => {
 
     const writes = Promise.all(
       identities.map((id) =>
-        dispatchTool("mindvault_import_wallet", {
+        dispatchTool("zentrixpay_import_wallet", {
           secretKey: id.secretKey,
           profile: id.profile,
           persist: true,
@@ -180,7 +180,7 @@ describe("concurrent state writes (#591)", () => {
 
     await Promise.all(
       identities.map((id) =>
-        dispatchTool("mindvault_import_wallet", {
+        dispatchTool("zentrixpay_import_wallet", {
           secretKey: id.secretKey,
           profile: id.profile,
           persist: true,
@@ -199,9 +199,9 @@ describe("concurrent state writes (#591)", () => {
     const good = makeIdentities(4, "after-failure");
 
     const results = await Promise.allSettled([
-      dispatchTool("mindvault_import_wallet", { secretKey: "not-a-stellar-key", persist: true }),
+      dispatchTool("zentrixpay_import_wallet", { secretKey: "not-a-stellar-key", persist: true }),
       ...good.map((id) =>
-        dispatchTool("mindvault_import_wallet", {
+        dispatchTool("zentrixpay_import_wallet", {
           secretKey: id.secretKey,
           profile: id.profile,
           persist: true,
@@ -227,13 +227,13 @@ describe("concurrent state writes (#591)", () => {
 
     await Promise.all([
       ...identities.map((id) =>
-        dispatchTool("mindvault_import_wallet", {
+        dispatchTool("zentrixpay_import_wallet", {
           secretKey: id.secretKey,
           profile: id.profile,
           persist: true,
         }),
       ),
-      ...Array.from({ length: CONCURRENCY }, () => dispatchTool("mindvault_list_profiles", {})),
+      ...Array.from({ length: CONCURRENCY }, () => dispatchTool("zentrixpay_list_profiles", {})),
     ]);
 
     const state = readPersistedState();
@@ -247,7 +247,7 @@ describe("concurrent state writes (#591)", () => {
     // subsequent concurrent write into an unhandled rejection: saveState logs
     // and continues, so the tool calls themselves still resolve.
     const seed = makeIdentities(1, "seed")[0];
-    await dispatchTool("mindvault_import_wallet", {
+    await dispatchTool("zentrixpay_import_wallet", {
       secretKey: seed.secretKey,
       profile: seed.profile,
       persist: true,
@@ -257,7 +257,7 @@ describe("concurrent state writes (#591)", () => {
     const identities = makeIdentities(4, "readonly-file");
     const results = await Promise.allSettled(
       identities.map((id) =>
-        dispatchTool("mindvault_import_wallet", {
+        dispatchTool("zentrixpay_import_wallet", {
           secretKey: id.secretKey,
           profile: id.profile,
           persist: true,

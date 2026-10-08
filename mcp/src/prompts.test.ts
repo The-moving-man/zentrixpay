@@ -54,8 +54,8 @@ describe("prompts", () => {
       expect(result.messages).toHaveLength(2);
       expect(result.messages[0].content.text).toContain("My Tutorial");
       expect(result.messages[0].content.text).toContain("5.00");
-      expect(result.messages[1].content.text).toContain("mindvault_setup_wallet");
-      expect(result.messages[1].content.text).toContain("mindvault_publish");
+      expect(result.messages[1].content.text).toContain("zentrixpay_setup_wallet");
+      expect(result.messages[1].content.text).toContain("zentrixpay_publish");
     });
 
     it("returns buy workflow with argument substitution", () => {
@@ -64,7 +64,7 @@ describe("prompts", () => {
       expect(result.description).toContain("buy");
       expect(result.messages).toHaveLength(2);
       expect(result.messages[0].content.text).toContain("res-123");
-      expect(result.messages[1].content.text).toContain("mindvault_buy");
+      expect(result.messages[1].content.text).toContain("zentrixpay_buy");
     });
 
     it("throws for unknown prompt", () => {

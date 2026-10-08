@@ -35,7 +35,7 @@ vi.mock("@x402/fetch", () => ({
   }),
 }));
 
-vi.mock("@mindvault/registry-client", async (importOriginal) => {
+vi.mock("@zentrixpay/registry-client", async (importOriginal) => {
   const actual = (await importOriginal()) as any;
   return {
     ...actual,
@@ -226,7 +226,7 @@ describe("prewarmCatalogCache", () => {
 describe("clientConfig", () => {
   it("defaults to a placeholder path and testnet under the test harness", () => {
     const result = clientConfig("cursor");
-    expect(result).toContain("/absolute/path/to/mindvault/mcp/dist/index.js");
+    expect(result).toContain("/absolute/path/to/zentrixpay/mcp/dist/index.js");
     expect(result).toContain('"STELLAR_NETWORK": "testnet"');
   });
 
@@ -235,12 +235,12 @@ describe("clientConfig", () => {
     const parsed = JSON.parse(result.replace(/^## .*\n\n```json\n/, "").replace(/\n```$/, ""));
     expect(parsed.servers).toBeDefined();
     expect(parsed.mcpServers).toBeUndefined();
-    expect(parsed.servers.mindvault.type).toBe("stdio");
+    expect(parsed.servers.zentrixpay.type).toBe("stdio");
   });
 
   it("emits TOML for codex", () => {
     const result = clientConfig("codex");
-    expect(result).toContain("[mcp_servers.mindvault]");
+    expect(result).toContain("[mcp_servers.zentrixpay]");
     expect(result).toContain('command = "node"');
     expect(result).not.toContain("{");
   });
@@ -944,7 +944,7 @@ describe("txStatus", () => {
   });
 });
 
-// ── mindvault_buy (#313) ────────────────────────────────────────────────────
+// ── zentrixpay_buy (#313) ────────────────────────────────────────────────────
 
 const testWallet = { publicKey: "GPUB...TEST", secretKey: "SECRET...KEY" };
 
@@ -1183,7 +1183,7 @@ describe("buy – purchase receipt persistence", () => {
     expect(purchases[0].timestamp).toBeDefined();
   });
 
-  it("persists receipt to ~/.mindvault/purchases.json with deterministic structure", async () => {
+  it("persists receipt to ~/.zentrixpay/purchases.json with deterministic structure", async () => {
     const resourcePayload = {
       id: "res-002",
       title: "Tutorial",
@@ -1277,7 +1277,7 @@ describe("dry-run – publish validation", () => {
   });
 
   it("returns dry-run result without submitting payment", async () => {
-    const result = await dispatchTool("mindvault_publish", {
+    const result = await dispatchTool("zentrixpay_publish", {
       title: "Test Resource",
       price: "5.00",
       externalUrl: "https://example.com/data",
@@ -1293,7 +1293,7 @@ describe("dry-run – publish validation", () => {
   });
 
   it("validates title in dry-run", async () => {
-    const result = await dispatchTool("mindvault_publish", {
+    const result = await dispatchTool("zentrixpay_publish", {
       title: "",
       price: "5.00",
       externalUrl: "https://example.com/data",
@@ -1306,7 +1306,7 @@ describe("dry-run – publish validation", () => {
   });
 
   it("validates price in dry-run", async () => {
-    const result = await dispatchTool("mindvault_publish", {
+    const result = await dispatchTool("zentrixpay_publish", {
       title: "Test",
       price: "invalid",
       externalUrl: "https://example.com/data",
@@ -1318,7 +1318,7 @@ describe("dry-run – publish validation", () => {
   });
 
   it("validates URL in dry-run", async () => {
-    const result = await dispatchTool("mindvault_publish", {
+    const result = await dispatchTool("zentrixpay_publish", {
       title: "Test",
       price: "5.00",
       externalUrl: "not-a-url",
@@ -1330,7 +1330,7 @@ describe("dry-run – publish validation", () => {
   });
 
   it("shows required wallet state in intentions", async () => {
-    const result = await dispatchTool("mindvault_publish", {
+    const result = await dispatchTool("zentrixpay_publish", {
       title: "Test",
       price: "5.00",
       externalUrl: "https://example.com/data",
@@ -1343,7 +1343,7 @@ describe("dry-run – publish validation", () => {
   });
 
   it("shows network and endpoint in intentions", async () => {
-    const result = await dispatchTool("mindvault_publish", {
+    const result = await dispatchTool("zentrixpay_publish", {
       title: "Test",
       price: "5.00",
       externalUrl: "https://example.com/data",
@@ -1360,7 +1360,7 @@ describe("dry-run – publish validation", () => {
 describe("dry-run – buy validation", () => {
   beforeEach(() => {
     _setAgentWallet(testWallet);
-    vi.stubEnv("MINDVAULT_MAX_AUTO_PAY_USDC", undefined);
+    vi.stubEnv("ZENTRIXPAY_MAX_AUTO_PAY_USDC", undefined);
     vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse({ price: "5.00" }));
   });
 
@@ -1373,7 +1373,7 @@ describe("dry-run – buy validation", () => {
   it("uses the live payment ceiling and per-call override for the quoted price", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse({ price: "10.01" }));
 
-    const result = await dispatchTool("mindvault_buy", {
+    const result = await dispatchTool("zentrixpay_buy", {
       resourceId: "res-001",
       dryRun: true,
       maxAutoPayUsdc: "10.01",
@@ -1386,12 +1386,12 @@ describe("dry-run – buy validation", () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse({ price: "10.01" }));
 
     await expect(
-      dispatchTool("mindvault_buy", { resourceId: "res-001", dryRun: true }),
+      dispatchTool("zentrixpay_buy", { resourceId: "res-001", dryRun: true }),
     ).rejects.toThrow(/exceeds the automatic payment ceiling/);
   });
 
   it("returns dry-run result without submitting payment", async () => {
-    const result = await dispatchTool("mindvault_buy", {
+    const result = await dispatchTool("zentrixpay_buy", {
       resourceId: "res-001",
       dryRun: true,
     });
@@ -1406,7 +1406,7 @@ describe("dry-run – buy validation", () => {
   });
 
   it("validates resource ID in dry-run", async () => {
-    const result = await dispatchTool("mindvault_buy", {
+    const result = await dispatchTool("zentrixpay_buy", {
       resourceId: "res@invalid",
       dryRun: true,
     });
@@ -1417,7 +1417,7 @@ describe("dry-run – buy validation", () => {
   });
 
   it("shows required wallet state in intentions", async () => {
-    const result = await dispatchTool("mindvault_buy", {
+    const result = await dispatchTool("zentrixpay_buy", {
       resourceId: "res-001",
       dryRun: true,
     });
@@ -1427,7 +1427,7 @@ describe("dry-run – buy validation", () => {
   });
 
   it("shows network and endpoint in intentions", async () => {
-    const result = await dispatchTool("mindvault_buy", {
+    const result = await dispatchTool("zentrixpay_buy", {
       resourceId: "res-001",
       dryRun: true,
     });
@@ -1439,7 +1439,7 @@ describe("dry-run – buy validation", () => {
   });
 });
 
-// ── mindvault_register_onchain (#313) ───────────────────────────────────────
+// ── zentrixpay_register_onchain (#313) ───────────────────────────────────────
 
 describe("registerOnchain – happy path", () => {
   beforeEach(() => {
@@ -1665,9 +1665,9 @@ describe("setupWallet – sponsored account failure diagnostics", () => {
       mockResponse({ error: "service temporarily unavailable" }, false, 503),
     );
 
-    await expect(dispatchTool("mindvault_setup_wallet", {})).rejects.toThrow();
+    await expect(dispatchTool("zentrixpay_setup_wallet", {})).rejects.toThrow();
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
     } catch (err: any) {
       const msg = err.message;
       expect(msg).toContain("failed to create wallet");
@@ -1682,7 +1682,7 @@ describe("setupWallet – sponsored account failure diagnostics", () => {
     );
 
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
     } catch (err: any) {
       const msg = err.message;
       expect(msg).toContain("Rate limit");
@@ -1696,7 +1696,7 @@ describe("setupWallet – sponsored account failure diagnostics", () => {
     );
 
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
     } catch (err: any) {
       const msg = err.message;
       expect(msg).toContain("Service:");
@@ -1718,7 +1718,7 @@ describe("setupWallet – sponsored account failure diagnostics", () => {
     );
 
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
     } catch (err: any) {
       const msg = err.message;
       expect(msg).not.toContain("SPONSOR_DB_FAILED");
@@ -1733,7 +1733,7 @@ describe("setupWallet – sponsored account failure diagnostics", () => {
     );
 
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
     } catch (err: any) {
       const msg = err.message;
       expect(msg).toContain("Next:");
@@ -1745,7 +1745,7 @@ describe("setupWallet – sponsored account failure diagnostics", () => {
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("ECONNREFUSED: Connection refused"));
 
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
     } catch (err: any) {
       const msg = err.message;
       expect(msg).toContain("Next:");
@@ -1760,7 +1760,7 @@ describe("setupWallet – sponsored account failure diagnostics", () => {
 
     expect.assertions(5);
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
     } catch (err: any) {
       const msg = err.message;
       expect(msg).toContain("Service:");
@@ -1778,7 +1778,7 @@ describe("setupWallet – sponsored account failure diagnostics", () => {
 
     expect.assertions(2);
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
     } catch (err: any) {
       expect(err.message).toContain("Retryable: no");
       expect(err.message).toContain("Issue: rejected");
@@ -1792,7 +1792,7 @@ describe("setupWallet – sponsored account failure diagnostics", () => {
 
     expect.assertions(2);
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
     } catch (err: any) {
       expect(err.message).toContain("Retry-After: 20s");
       expect(err.message).toContain("20s wait");
@@ -1830,7 +1830,7 @@ describe("repairSponsoredAccount", () => {
     );
 
     const result = JSON.parse(
-      await dispatchTool("mindvault_repair_sponsored_account", {
+      await dispatchTool("zentrixpay_repair_sponsored_account", {
         secretKey,
         profile: "recovered",
       }),
@@ -1848,7 +1848,7 @@ describe("repairSponsoredAccount", () => {
   it("does not restore a key when Horizon says the account is missing", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse({}, false, 404));
 
-    await expect(dispatchTool("mindvault_repair_sponsored_account", { secretKey })).rejects.toThrow(
+    await expect(dispatchTool("zentrixpay_repair_sponsored_account", { secretKey })).rejects.toThrow(
       /does not exist.*no local key was changed/i,
     );
   });
@@ -2145,8 +2145,8 @@ describe("dispatchTool argument validation", () => {
 
   it("rejects an unknown tool without touching the network", async () => {
     const spy = vi.spyOn(globalThis, "fetch");
-    await expect(dispatchTool("mindvault_nope", {})).rejects.toThrow(
-      "Unknown tool: mindvault_nope",
+    await expect(dispatchTool("zentrixpay_nope", {})).rejects.toThrow(
+      "Unknown tool: zentrixpay_nope",
     );
     expect(spy).not.toHaveBeenCalled();
   });
@@ -2154,24 +2154,24 @@ describe("dispatchTool argument validation", () => {
   it("rejects invalid arguments before any request is made", async () => {
     const spy = vi.spyOn(globalThis, "fetch");
     await expect(
-      dispatchTool("mindvault_preview", { resourceId: "../etc/passwd" }),
-    ).rejects.toThrow("Invalid arguments for mindvault_preview");
+      dispatchTool("zentrixpay_preview", { resourceId: "../etc/passwd" }),
+    ).rejects.toThrow("Invalid arguments for zentrixpay_preview");
     expect(spy).not.toHaveBeenCalled();
   });
 
   it("rejects an unknown argument name instead of ignoring it", async () => {
     await expect(
-      dispatchTool("mindvault_search", { query: "stellar", resourceTyp: "link" }),
+      dispatchTool("zentrixpay_search", { query: "stellar", resourceTyp: "link" }),
     ).rejects.toThrow("resourceTyp is not a recognized argument");
   });
 
   it("reports a missing required argument by name", async () => {
-    await expect(dispatchTool("mindvault_buy", {})).rejects.toThrow("resourceId is required");
+    await expect(dispatchTool("zentrixpay_buy", {})).rejects.toThrow("resourceId is required");
   });
 
   it("passes normalized arguments through to the handler", async () => {
     const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse(singleResourceMeta));
-    await dispatchTool("mindvault_preview", { resourceId: "  res-001  " });
+    await dispatchTool("zentrixpay_preview", { resourceId: "  res-001  " });
     expect(spy).toHaveBeenCalledWith(
       expect.stringContaining("/resources/res-001/meta"),
       expect.anything(),
@@ -2179,14 +2179,14 @@ describe("dispatchTool argument validation", () => {
   });
 
   it("rejects limit above the contract cap via dispatchTool", async () => {
-    await expect(dispatchTool("mindvault_registry_list", { limit: 50 })).rejects.toThrow(
-      "Invalid arguments for mindvault_registry_list",
+    await expect(dispatchTool("zentrixpay_registry_list", { limit: 50 })).rejects.toThrow(
+      "Invalid arguments for zentrixpay_registry_list",
     );
   });
 
   it("produces the same error message for the same invalid call", async () => {
-    const first = await dispatchTool("mindvault_tx_status", { txHash: "nope" }).catch((e) => e);
-    const second = await dispatchTool("mindvault_tx_status", { txHash: "nope" }).catch((e) => e);
+    const first = await dispatchTool("zentrixpay_tx_status", { txHash: "nope" }).catch((e) => e);
+    const second = await dispatchTool("zentrixpay_tx_status", { txHash: "nope" }).catch((e) => e);
     expect(first.message).toBe(second.message);
     expect(first.message).toContain("hexadecimal");
   });
@@ -2194,7 +2194,7 @@ describe("dispatchTool argument validation", () => {
 
 describe("verifyAttestation", () => {
   afterEach(() => {
-    delete process.env.MINDVAULT_MOCK;
+    delete process.env.ZENTRIXPAY_MOCK;
     getAttestationHashMock.mockReset();
   });
 
@@ -2213,11 +2213,11 @@ describe("verifyAttestation", () => {
     );
     const error = await verifyAttestation("mock1", "mock-attestation-1").catch((err) => err);
     expect(error.message).toContain("Category: contract");
-    expect(error.message).toContain("mindvault_check_bindings");
+    expect(error.message).toContain("zentrixpay_check_bindings");
   });
 
   it("reports a matching mock attestation", async () => {
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     const parsed = JSON.parse(await verifyAttestation("mock1", "mock-attestation-1"));
     expect(parsed.matches).toBe(true);
     expect(parsed.verified).toBe(true);
@@ -2225,7 +2225,7 @@ describe("verifyAttestation", () => {
   });
 
   it("reports a mismatch without treating it as a transport failure", async () => {
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     const parsed = JSON.parse(await verifyAttestation("mock1", "different"));
     expect(parsed.matches).toBe(false);
     expect(parsed.verified).toBe(false);
@@ -2233,7 +2233,7 @@ describe("verifyAttestation", () => {
   });
 
   it("reports when no attestation is registered", async () => {
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     const parsed = JSON.parse(await verifyAttestation("mock2", "different"));
     expect(parsed.registeredAttestationHash).toBeNull();
     expect(parsed.matches).toBe(false);
@@ -2241,8 +2241,8 @@ describe("verifyAttestation", () => {
   });
 
   it("dispatches through the MCP tool name", async () => {
-    process.env.MINDVAULT_MOCK = "1";
-    const result = await dispatchTool("mindvault_verify_attestation", {
+    process.env.ZENTRIXPAY_MOCK = "1";
+    const result = await dispatchTool("zentrixpay_verify_attestation", {
       resourceId: "mock1",
       attestationHash: "mock-attestation-1",
     });
@@ -2250,7 +2250,7 @@ describe("verifyAttestation", () => {
   });
 
   it("rejects an attestation hash longer than the contract limit", async () => {
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     await expect(verifyAttestation("mock1", "a".repeat(65))).rejects.toThrow(
       "at most 64 characters",
     );
@@ -2273,7 +2273,7 @@ describe("updateMetadata", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await updateMetadata("res-001", "ipfs://Qm123");
       const parsed = JSON.parse(res);
@@ -2282,7 +2282,7 @@ describe("updateMetadata", () => {
       expect(parsed.metadata).toBe("ipfs://Qm123");
       expect(parsed.txHash).toBeTruthy();
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -2291,14 +2291,14 @@ describe("updateMetadata", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await updateMetadata("res-001", "https://example.com/meta.json/");
       const parsed = JSON.parse(res);
       // Trailing slash must be stripped before the on-chain call.
       expect(parsed.metadata).toBe("https://example.com/meta.json");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 });
@@ -2384,7 +2384,7 @@ describe("setPrice", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await setPrice("res-001", "10.00");
       const parsed = JSON.parse(res);
@@ -2397,7 +2397,7 @@ describe("setPrice", () => {
         `https://stellar.expert/explorer/testnet/tx/${parsed.txHash}`,
       );
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -2406,13 +2406,13 @@ describe("setPrice", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     process.env.STELLAR_NETWORK = "mainnet";
     try {
       const parsed = JSON.parse(await setPrice("res-001", "10.00"));
       expect(parsed.explorerUrl).toBe(`https://stellar.expert/explorer/public/tx/${parsed.txHash}`);
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
       delete process.env.STELLAR_NETWORK;
     }
   });
@@ -2422,15 +2422,15 @@ describe("setPrice", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
-      const res = await dispatchTool("mindvault_set_price", {
+      const res = await dispatchTool("zentrixpay_set_price", {
         resourceId: "res-001",
         price: "10.00",
       });
       expect(res).toContain("success");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 });
@@ -2453,7 +2453,7 @@ describe("transferOwnership", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await transferOwnership(
         "res-001",
@@ -2465,7 +2465,7 @@ describe("transferOwnership", () => {
       expect(parsed.newCreator).toBe("GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH");
       expect(parsed.txHash).toBeTruthy();
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -2474,15 +2474,15 @@ describe("transferOwnership", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
-      const res = await dispatchTool("mindvault_transfer_ownership", {
+      const res = await dispatchTool("zentrixpay_transfer_ownership", {
         resourceId: "res-001",
         newCreator: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       });
       expect(res).toContain("success");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 });
@@ -2503,7 +2503,7 @@ describe("acceptTransfer", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await acceptTransfer("res-001");
       const parsed = JSON.parse(res);
@@ -2511,7 +2511,7 @@ describe("acceptTransfer", () => {
       expect(parsed.resourceId).toBe("res-001");
       expect(parsed.txHash).toBeTruthy();
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -2520,12 +2520,12 @@ describe("acceptTransfer", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
-      const res = await dispatchTool("mindvault_accept_transfer", { resourceId: "res-001" });
+      const res = await dispatchTool("zentrixpay_accept_transfer", { resourceId: "res-001" });
       expect(res).toContain("success");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 });
@@ -2546,7 +2546,7 @@ describe("cancelTransfer", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await cancelTransfer("res-001");
       const parsed = JSON.parse(res);
@@ -2554,7 +2554,7 @@ describe("cancelTransfer", () => {
       expect(parsed.resourceId).toBe("res-001");
       expect(parsed.txHash).toBeTruthy();
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -2563,12 +2563,12 @@ describe("cancelTransfer", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
-      const res = await dispatchTool("mindvault_cancel_transfer", { resourceId: "res-001" });
+      const res = await dispatchTool("zentrixpay_cancel_transfer", { resourceId: "res-001" });
       expect(res).toContain("success");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 });
@@ -2581,7 +2581,7 @@ describe("pendingTransfer", () => {
   });
 
   it("succeeds in mock mode and returns a found pending transfer", async () => {
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await pendingTransfer("res-001");
       const parsed = JSON.parse(res);
@@ -2592,24 +2592,24 @@ describe("pendingTransfer", () => {
       expect(parsed.proposedNewOwner).toMatch(/^G[A-Z2-7]{55}$/);
       expect(parsed.message).toContain("res-001");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
   it("dispatches through dispatchTool with valid arguments in mock mode", async () => {
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
-      const res = await dispatchTool("mindvault_pending_transfer", { resourceId: "res-001" });
+      const res = await dispatchTool("zentrixpay_pending_transfer", { resourceId: "res-001" });
       const parsed = JSON.parse(res);
       expect(parsed.found).toBe(true);
       expect(parsed.resourceId).toBe("res-001");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
   it("returns consistent output shape with required schema fields", async () => {
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await pendingTransfer("res-001");
       const parsed = JSON.parse(res);
@@ -2620,7 +2620,7 @@ describe("pendingTransfer", () => {
       expect(parsed).toHaveProperty("message");
       expect(parsed).toHaveProperty("contract");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 });
@@ -2641,7 +2641,7 @@ describe("setListed", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await setListed("res-001", false);
       const parsed = JSON.parse(res);
@@ -2650,7 +2650,7 @@ describe("setListed", () => {
       expect(parsed.listed).toBe(false);
       expect(parsed.txHash).toBeTruthy();
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -2659,15 +2659,15 @@ describe("setListed", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
-      const res = await dispatchTool("mindvault_set_listed", {
+      const res = await dispatchTool("zentrixpay_set_listed", {
         resourceId: "res-001",
         listed: true,
       });
       expect(res).toContain("success");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 });
@@ -2686,14 +2686,14 @@ describe("setTags (#832)", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await setTags("res-001", ["dataset", "research"]);
       expect(res).toContain('Tags updated for resource "res-001".');
       expect(res).toContain("Tags: dataset, research");
       expect(res).toContain("MOCK_TX_SET_TAGS_res-001");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -2702,15 +2702,15 @@ describe("setTags (#832)", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
-      const res = await dispatchTool("mindvault_set_tags", {
+      const res = await dispatchTool("zentrixpay_set_tags", {
         resourceId: "res-001",
         tags: [" Dataset ", "DATASET", "research"],
       });
       expect(res).toContain("Tags: dataset, research");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -2719,12 +2719,12 @@ describe("setTags (#832)", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
-      const res = await dispatchTool("mindvault_set_tags", { resourceId: "res-001", tags: [] });
+      const res = await dispatchTool("zentrixpay_set_tags", { resourceId: "res-001", tags: [] });
       expect(res).toContain("Tags: (none)");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 });
@@ -2743,7 +2743,7 @@ describe("API health preflight before mutation tools (#603)", () => {
       .mockImplementation(async () => mockResponse({ error: "down" }, false, 401));
 
     await expect(
-      dispatchTool("mindvault_register", { name: "n", email: "e@example.com" }),
+      dispatchTool("zentrixpay_register", { name: "n", email: "e@example.com" }),
     ).rejects.toThrow("not reachable");
 
     // Only the preflight GET happened — no POST /publishers.
@@ -2757,12 +2757,12 @@ describe("API health preflight before mutation tools (#603)", () => {
     );
 
     await expect(
-      dispatchTool("mindvault_publish", {
+      dispatchTool("zentrixpay_publish", {
         title: "t",
         price: "5.00",
         externalUrl: "https://example.com/x",
       }),
-    ).rejects.toThrow("mindvault_publish was not attempted");
+    ).rejects.toThrow("zentrixpay_publish was not attempted");
   });
 
   it("refuses rotate_key when the API is unreachable", async () => {
@@ -2770,7 +2770,7 @@ describe("API health preflight before mutation tools (#603)", () => {
       mockResponse({ error: "down" }, false, 401),
     );
 
-    await expect(dispatchTool("mindvault_rotate_publisher_key", {})).rejects.toThrow(
+    await expect(dispatchTool("zentrixpay_rotate_publisher_key", {})).rejects.toThrow(
       "not reachable",
     );
   });
@@ -2783,7 +2783,7 @@ describe("API health preflight before mutation tools (#603)", () => {
     // Preflight passes; the handler then fails on the missing wallet before
     // issuing any POST — proving the gate is passed, not that the tool ran.
     await expect(
-      dispatchTool("mindvault_register", { name: "n", email: "e@example.com" }),
+      dispatchTool("zentrixpay_register", { name: "n", email: "e@example.com" }),
     ).rejects.toThrow("No wallet in profile");
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
@@ -2793,7 +2793,7 @@ describe("API health preflight before mutation tools (#603)", () => {
       .spyOn(globalThis, "fetch")
       .mockImplementation(async () => mockResponse(sampleResources));
 
-    const result = await dispatchTool("mindvault_publish", {
+    const result = await dispatchTool("zentrixpay_publish", {
       title: "t",
       price: "5.00",
       externalUrl: "https://example.com/x",
@@ -2827,7 +2827,7 @@ describe("setupWallet – half-completed sponsored creation", () => {
       mockResponse({ publicKey: sponsored.publicKey(), secretKey: sponsored.secret() }),
     );
 
-    const out = await dispatchTool("mindvault_setup_wallet", {});
+    const out = await dispatchTool("zentrixpay_setup_wallet", {});
     expect(out).toContain("Wallet created.");
     expect(out).toContain(`Address: ${sponsored.publicKey()}`);
     expect(out).toContain("persisted");
@@ -2840,7 +2840,7 @@ describe("setupWallet – half-completed sponsored creation", () => {
       mockResponse({ publicKey: sponsored.publicKey() }),
     );
 
-    await expect(dispatchTool("mindvault_setup_wallet", {})).rejects.toThrow(
+    await expect(dispatchTool("zentrixpay_setup_wallet", {})).rejects.toThrow(
       /no secret key|cannot sign/i,
     );
   });
@@ -2850,7 +2850,7 @@ describe("setupWallet – half-completed sponsored creation", () => {
       mockResponse({ publicKey: sponsored.publicKey(), secretKey: other.secret() }),
     );
 
-    await expect(dispatchTool("mindvault_setup_wallet", {})).rejects.toThrow(/belongs to/i);
+    await expect(dispatchTool("zentrixpay_setup_wallet", {})).rejects.toThrow(/belongs to/i);
   });
 
   it("explains that nothing was persisted and a funded account may be orphaned", async () => {
@@ -2859,7 +2859,7 @@ describe("setupWallet – half-completed sponsored creation", () => {
     );
 
     try {
-      await dispatchTool("mindvault_setup_wallet", {});
+      await dispatchTool("zentrixpay_setup_wallet", {});
       throw new Error("expected setup_wallet to reject");
     } catch (err: any) {
       expect(err.message).toContain("Nothing was persisted");
@@ -2872,10 +2872,10 @@ describe("setupWallet – half-completed sponsored creation", () => {
       mockResponse({ publicKey: sponsored.publicKey(), secretKey: other.secret() }),
     );
 
-    await expect(dispatchTool("mindvault_setup_wallet", {})).rejects.toThrow();
+    await expect(dispatchTool("zentrixpay_setup_wallet", {})).rejects.toThrow();
     // No wallet was stored, so the next tool must report the wallet as missing
     // rather than reporting a balance for an address this agent cannot use.
-    await expect(walletInfo()).rejects.toThrow(/mindvault_setup_wallet/);
+    await expect(walletInfo()).rejects.toThrow(/zentrixpay_setup_wallet/);
   });
 
   it("warns in wallet_info when the stored secret does not own the address", async () => {
@@ -2943,8 +2943,8 @@ describe("state-mutating calls are serialized (#550)", () => {
     );
 
     const [alice, bob] = await Promise.all([
-      dispatchTool("mindvault_setup_wallet", { profile: "alice" }),
-      dispatchTool("mindvault_setup_wallet", { profile: "bob" }),
+      dispatchTool("zentrixpay_setup_wallet", { profile: "alice" }),
+      dispatchTool("zentrixpay_setup_wallet", { profile: "bob" }),
     ]);
 
     expect(alice).toContain("Wallet created.");
@@ -2966,8 +2966,8 @@ describe("state-mutating calls are serialized (#550)", () => {
     );
 
     const [profile, wallet] = await Promise.all([
-      dispatchTool("mindvault_use_profile", { name: "buyer" }),
-      dispatchTool("mindvault_setup_wallet", { profile: "bob" }),
+      dispatchTool("zentrixpay_use_profile", { name: "buyer" }),
+      dispatchTool("zentrixpay_setup_wallet", { profile: "bob" }),
     ]);
 
     expect(profile).toContain("Active profile: buyer");
@@ -3130,7 +3130,7 @@ describe("offline catalog cache fallback (#556)", () => {
 
     // register must surface the network failure — not silently serve stale data.
     await expect(
-      dispatchTool("mindvault_register", { name: "N", email: "e@example.com" }),
+      dispatchTool("zentrixpay_register", { name: "N", email: "e@example.com" }),
     ).rejects.toThrow();
   });
 });
@@ -3151,7 +3151,7 @@ describe("disputeResource", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await disputeResource("res-001", "flag", "Duplicate listing");
       const parsed = JSON.parse(res);
@@ -3161,7 +3161,7 @@ describe("disputeResource", () => {
       expect(parsed.reason).toBe("Duplicate listing");
       expect(parsed.txHash).toMatch(/MOCK_TX_DISPUTE_FLAG/);
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -3170,7 +3170,7 @@ describe("disputeResource", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       const res = await disputeResource("res-001", "unflag", "Issue resolved");
       const parsed = JSON.parse(res);
@@ -3178,7 +3178,7 @@ describe("disputeResource", () => {
       expect(parsed.action).toBe("unflag");
       expect(parsed.txHash).toMatch(/MOCK_TX_DISPUTE_UNFLAG/);
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -3187,9 +3187,9 @@ describe("disputeResource", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
-      const res = await dispatchTool("mindvault_dispute", {
+      const res = await dispatchTool("zentrixpay_dispute", {
         resourceId: "res-001",
         action: "flag",
         reason: "Test flag",
@@ -3197,7 +3197,7 @@ describe("disputeResource", () => {
       expect(res).toContain("success");
       expect(res).toContain("flag");
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -3206,17 +3206,17 @@ describe("disputeResource", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       await expect(
-        dispatchTool("mindvault_dispute", {
+        dispatchTool("zentrixpay_dispute", {
           resourceId: "res-001",
           action: "delete",
           reason: "bad",
         }),
       ).rejects.toThrow();
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 
@@ -3225,13 +3225,13 @@ describe("disputeResource", () => {
       publicKey: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
       secretKey: "SD1234567890123456789012345678901234567890123456789012345",
     });
-    process.env.MINDVAULT_MOCK = "1";
+    process.env.ZENTRIXPAY_MOCK = "1";
     try {
       await expect(
-        dispatchTool("mindvault_dispute", { resourceId: "res-001", action: "flag" }),
+        dispatchTool("zentrixpay_dispute", { resourceId: "res-001", action: "flag" }),
       ).rejects.toThrow();
     } finally {
-      delete process.env.MINDVAULT_MOCK;
+      delete process.env.ZENTRIXPAY_MOCK;
     }
   });
 });

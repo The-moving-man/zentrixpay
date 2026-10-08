@@ -1,6 +1,6 @@
-# MindVault Architecture
+# ZentrixPay Architecture
 
-Two distinct concerns sit at the heart of MindVault: **who gets paid and how**, and **who owns what and at what price**. x402 + USDC handles the first. The vault-registry Soroban contract handles the second. Neither depends on the other at runtime, but together they make the system both programmable and trustless.
+Two distinct concerns sit at the heart of ZentrixPay: **who gets paid and how**, and **who owns what and at what price**. x402 + USDC handles the first. The vault-registry Soroban contract handles the second. Neither depends on the other at runtime, but together they make the system both programmable and trustless.
 
 ---
 
@@ -37,7 +37,7 @@ Two distinct concerns sit at the heart of MindVault: **who gets paid and how**, 
         │  2. Server reads price + owner from contract
         ▼
 ┌─────────────────────────────────────────────────┐
-│              MindVault Server                   │
+│              ZentrixPay Server                   │
 │  (Express + @x402/express middleware)           │
 │                                                 │
 │  GET /resources/:id                             │
@@ -72,7 +72,7 @@ When a buyer (human or AI agent) requests a paywalled resource:
 
 3. The signed authorization entry is attached to the retry request. The server passes it to the x402 facilitator at `x402.org/facilitator`, which **verifies** the signature and **settles** the USDC transfer on-chain.
 
-4. Once the facilitator confirms settlement, the server delivers the resource. The USDC goes directly to the creator — MindVault takes no cut.
+4. Once the facilitator confirms settlement, the server delivers the resource. The USDC goes directly to the creator — ZentrixPay takes no cut.
 
 **Key properties of this layer:**
 
@@ -95,13 +95,13 @@ The vault-registry is a Soroban smart contract deployed on Stellar. It is the **
 | `verified` | On-chain mirror of the server's verification result: `Pending`, `Verified`, or `Rejected` |
 | `frozen`   | Once `true`, `metadata` can never be changed again                                        |
 
-Anyone can read this data directly from the Soroban RPC without going through the MindVault API. The `list(start, limit)` method returns pages of resources in insertion order, enabling a full catalog to be built from chain with no off-chain index.
+Anyone can read this data directly from the Soroban RPC without going through the ZentrixPay API. The `list(start, limit)` method returns pages of resources in insertion order, enabling a full catalog to be built from chain with no off-chain index.
 
 Mutations (`register`, `set_price`, `update_metadata`, `set_tags`, `transfer_ownership`, `set_listed`, `freeze_metadata`) all require the creator's Soroban `require_auth` signature. Attempting to transfer ownership to the current owner is protected against and will return a deterministic error. The server builds unsigned transactions that the creator signs client-side; the platform key never touches a creator's funds or ownership.
 
 **Key properties of this layer:**
 
-- Ownership is on-chain and enforced cryptographically — MindVault cannot reassign a resource without the creator's signature.
+- Ownership is on-chain and enforced cryptographically — ZentrixPay cannot reassign a resource without the creator's signature.
 - The price the buyer actually pays (read from the contract at 402 time) is the canonical price, not a server-side value that could diverge silently.
 - The `metadata` field anchors content integrity: storing a content hash here lets any client verify the delivered bytes against the registry entry. `freeze_metadata` lets a creator make that pointer permanent for marketplaces that need immutability guarantees.
 
@@ -110,7 +110,7 @@ Mutations (`register`, `set_price`, `update_metadata`, `set_tags`, `transfer_own
 Two roles exist alongside the per-resource `creator`:
 
 - **admin** — set via `nominate_new_admin`/`accept_admin` (a two-step handoff: the current admin nominates a successor, who must accept before the change takes effect). The admin can grant or revoke the **verifier** role and can repair the pagination index (`repair_index`, see [`index-repair.md`](index-repair.md)). The admin cannot touch any resource's price, metadata, listing, tags, or ownership.
-- **verifier** — any number of addresses the admin grants via `add_verifier`. A verifier's only privilege is `set_verification_status`, which mirrors the server's AI-originality check result on-chain so any client can filter or audit "verified" resources without trusting the MindVault API. Only `Pending→Verified`, `Pending→Rejected`, `Verified→Rejected`, and `Rejected→Verified` transitions are allowed — self-transitions and reverting to `Pending` are rejected deterministically, and every transition emits both the old and new status.
+- **verifier** — any number of addresses the admin grants via `add_verifier`. A verifier's only privilege is `set_verification_status`, which mirrors the server's AI-originality check result on-chain so any client can filter or audit "verified" resources without trusting the ZentrixPay API. Only `Pending→Verified`, `Pending→Rejected`, `Verified→Rejected`, and `Rejected→Verified` transitions are allowed — self-transitions and reverting to `Pending` are rejected deterministically, and every transition emits both the old and new status.
 
 Both roles are intentionally narrow: neither can move funds, change a resource's price or metadata, or reassign ownership. They only gate the two orthogonal, non-financial concerns of on-chain verification state and index integrity.
 
@@ -124,7 +124,7 @@ vault-registry (chain)
       │  server reads price + creator at 402 time
       │  server writes registration tx (creator-signed)
       │
-MindVault server
+ZentrixPay server
       │
       │  server verifies payment via x402 facilitator
       │  server delivers content after settlement
@@ -138,7 +138,7 @@ The two on-chain components — the registry contract and the USDC SAC — are i
 
 ## Shared TypeScript client
 
-The `@mindvault/registry-client` workspace package (`packages/registry-client/`) wraps the auto-generated Soroban bindings in a single stable import. All three consumers — `server/`, `web/`, and `mcp/` — depend on `"@mindvault/registry-client": "workspace:*"`. This ensures every package uses the same generated types and the same network defaults.
+The `@zentrixpay/registry-client` workspace package (`packages/registry-client/`) wraps the auto-generated Soroban bindings in a single stable import. All three consumers — `server/`, `web/`, and `mcp/` — depend on `"@zentrixpay/registry-client": "workspace:*"`. This ensures every package uses the same generated types and the same network defaults.
 
 After the vault-registry contract is redeployed (e.g., to add the `list` method), regenerate the bindings from the repo root:
 

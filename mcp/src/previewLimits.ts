@@ -1,7 +1,7 @@
 /**
  * Size limits for catalog resource previews (#582).
  *
- * `mindvault_preview` echoes publisher-supplied metadata straight back to the
+ * `zentrixpay_preview` echoes publisher-supplied metadata straight back to the
  * agent. Titles and descriptions have no upper bound at the source, so a single
  * preview can dominate an agent's context window — the same failure the shared
  * response budget (see truncation.ts) guards against for `browse` and `search`.
@@ -23,10 +23,10 @@
  */
 
 /** Environment variable overriding the whole-response byte budget. */
-export const PREVIEW_MAX_BYTES_ENV_VAR = "MINDVAULT_PREVIEW_MAX_BYTES";
+export const PREVIEW_MAX_BYTES_ENV_VAR = "ZENTRIXPAY_PREVIEW_MAX_BYTES";
 
 /** Environment variable overriding the per-field code-point budget. */
-export const PREVIEW_FIELD_MAX_CHARS_ENV_VAR = "MINDVAULT_PREVIEW_FIELD_MAX_CHARS";
+export const PREVIEW_FIELD_MAX_CHARS_ENV_VAR = "ZENTRIXPAY_PREVIEW_FIELD_MAX_CHARS";
 
 /** Default byte ceiling for a serialized preview (8 KiB). */
 export const DEFAULT_PREVIEW_MAX_BYTES = 8 * 1024;

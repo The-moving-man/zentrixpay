@@ -17,8 +17,8 @@ const state = vi.hoisted(() => ({
   recordResourceHistory: vi.fn(),
 }));
 
-vi.mock("@mindvault/registry-client", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@mindvault/registry-client")>()),
+vi.mock("@zentrixpay/registry-client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@zentrixpay/registry-client")>()),
   createRegistryClient: (opts: unknown) => {
     state.createRegistryClient(opts);
     return {
@@ -40,7 +40,7 @@ vi.mock("../runtime.js", () => ({
   REGISTRY_NETWORK_PASSPHRASE: "Test SDF Network ; September 2015",
   SOROBAN_RPC_URL: "https://soroban-testnet.stellar.org",
   requireWallet: () => {
-    if (!state.wallet) throw new Error("No wallet in profile. Run mindvault_setup_wallet first.");
+    if (!state.wallet) throw new Error("No wallet in profile. Run zentrixpay_setup_wallet first.");
     return state.wallet;
   },
 }));

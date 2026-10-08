@@ -32,7 +32,7 @@ interface BackfillStats {
 async function main() {
   const isDryRun = process.argv.includes("--dry-run");
 
-  console.log("=== MindVault Registry Backfill ===");
+  console.log("=== ZentrixPay Registry Backfill ===");
   console.log(`Mode: ${isDryRun ? "DRY RUN" : "LIVE"}`);
   console.log(`Registry Contract: ${config.REGISTRY_CONTRACT_ID}`);
   console.log(`Registry Account: ${registryKeypair.publicKey()}`);

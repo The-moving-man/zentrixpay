@@ -1,7 +1,7 @@
 /**
- * Tests for the mindvault_preview_metadata_hash tool (#604).
+ * Tests for the zentrixpay_preview_metadata_hash tool (#604).
  *
- * Bootstrap follows index.test.ts rather than the MINDVAULT_MOCK harness: the
+ * Bootstrap follows index.test.ts rather than the ZENTRIXPAY_MOCK harness: the
  * registry client is replaced with a controllable fake, so the on-chain read
  * is deterministic without a network while everything else — argument
  * validation, dispatch, error mapping, structuredContent wiring — runs for
@@ -18,7 +18,7 @@ import { mkdtempSync, rmSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { Errors as RegistryErrors } from "@mindvault/registry-client";
+import { Errors as RegistryErrors } from "@zentrixpay/registry-client";
 import type { IntegrationHarness } from "./integrationHarness.js";
 
 // Controllable registry fake: "ok" resolves with `metadata`, "contract"
@@ -32,7 +32,7 @@ const registryControl = vi.hoisted(() => ({
     | { kind: "transport"; err: Error },
 }));
 
-vi.mock("@mindvault/registry-client", async (importOriginal) => {
+vi.mock("@zentrixpay/registry-client", async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,
@@ -57,7 +57,7 @@ vi.mock("@mindvault/registry-client", async (importOriginal) => {
 // Isolate state persistence from the developer machine (same as the other
 // harness tests) and pin the network preset before index.js loads.
 process.env.STELLAR_NETWORK = "testnet";
-const harnessHome = mkdtempSync(join(tmpdir(), "mindvault-mcp-hash-"));
+const harnessHome = mkdtempSync(join(tmpdir(), "zentrixpay-mcp-hash-"));
 process.env.HOME = harnessHome;
 process.env.USERPROFILE = harnessHome;
 
@@ -79,7 +79,7 @@ interface HashPreviewStructured {
   };
 }
 
-describe("mindvault_preview_metadata_hash", () => {
+describe("zentrixpay_preview_metadata_hash", () => {
   let harness: IntegrationHarness;
 
   beforeAll(async () => {
@@ -93,7 +93,7 @@ describe("mindvault_preview_metadata_hash", () => {
 
   it("is advertised with a read-only annotation and an output schema", async () => {
     const { tools } = await harness.listTools();
-    const tool = tools.find((t) => t.name === "mindvault_preview_metadata_hash") as {
+    const tool = tools.find((t) => t.name === "zentrixpay_preview_metadata_hash") as {
       annotations?: { readOnlyHint?: boolean };
       outputSchema?: unknown;
     };
@@ -103,7 +103,7 @@ describe("mindvault_preview_metadata_hash", () => {
   });
 
   it("requires the resourceId argument", async () => {
-    const result = await harness.callTool("mindvault_preview_metadata_hash", {});
+    const result = await harness.callTool("zentrixpay_preview_metadata_hash", {});
     expect(result.isError).toBe(true);
     expect((result.content ?? []).map((c) => c.text ?? "").join("\n")).toMatch(
       /resourceId is required/i,
@@ -113,7 +113,7 @@ describe("mindvault_preview_metadata_hash", () => {
   it("reports the metadata pointer of a registered resource", async () => {
     registryControl.state = { kind: "ok", metadata: "Intro to Stellar" };
     try {
-      const result = await harness.callTool("mindvault_preview_metadata_hash", {
+      const result = await harness.callTool("zentrixpay_preview_metadata_hash", {
         resourceId: "res-001",
       });
       expect(result.isError).toBeUndefined();
@@ -146,7 +146,7 @@ describe("mindvault_preview_metadata_hash", () => {
       }),
     };
     try {
-      const result = await harness.callTool("mindvault_preview_metadata_hash", {
+      const result = await harness.callTool("zentrixpay_preview_metadata_hash", {
         resourceId: "res-001",
       });
       const out = (result.structuredContent ?? undefined) as HashPreviewStructured | undefined;
@@ -164,7 +164,7 @@ describe("mindvault_preview_metadata_hash", () => {
   it("surfaces a registry not-found as an input error, not a digest report", async () => {
     registryControl.state = { kind: "contract", err: new Error(RegistryErrors[2].message) };
     try {
-      const result = await harness.callTool("mindvault_preview_metadata_hash", {
+      const result = await harness.callTool("zentrixpay_preview_metadata_hash", {
         resourceId: "no-such-resource",
       });
       expect(result.isError).toBe(true);
@@ -179,7 +179,7 @@ describe("mindvault_preview_metadata_hash", () => {
   it("maps a transport failure to the classified soroban error", async () => {
     registryControl.state = { kind: "transport", err: new Error("RPC connection refused") };
     try {
-      const result = await harness.callTool("mindvault_preview_metadata_hash", {
+      const result = await harness.callTool("zentrixpay_preview_metadata_hash", {
         resourceId: "res-001",
       });
       expect(result.isError).toBe(true);

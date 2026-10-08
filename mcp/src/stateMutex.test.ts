@@ -153,59 +153,59 @@ describe("stateMutex", () => {
 
   describe("serializesStateTool", () => {
     it("returns true for state-mutating tools", () => {
-      expect(serializesStateTool("mindvault_reset")).toBe(true);
-      expect(serializesStateTool("mindvault_restore_state")).toBe(true);
-      expect(serializesStateTool("mindvault_setup_wallet")).toBe(true);
-      expect(serializesStateTool("mindvault_import_wallet")).toBe(true);
-      expect(serializesStateTool("mindvault_use_profile")).toBe(true);
-      expect(serializesStateTool("mindvault_register")).toBe(true);
-      expect(serializesStateTool("mindvault_rotate_publisher_key")).toBe(true);
+      expect(serializesStateTool("zentrixpay_reset")).toBe(true);
+      expect(serializesStateTool("zentrixpay_restore_state")).toBe(true);
+      expect(serializesStateTool("zentrixpay_setup_wallet")).toBe(true);
+      expect(serializesStateTool("zentrixpay_import_wallet")).toBe(true);
+      expect(serializesStateTool("zentrixpay_use_profile")).toBe(true);
+      expect(serializesStateTool("zentrixpay_register")).toBe(true);
+      expect(serializesStateTool("zentrixpay_rotate_publisher_key")).toBe(true);
     });
 
     it("returns true for credential-spending tools", () => {
-      expect(serializesStateTool("mindvault_publish")).toBe(true);
-      expect(serializesStateTool("mindvault_buy")).toBe(true);
+      expect(serializesStateTool("zentrixpay_publish")).toBe(true);
+      expect(serializesStateTool("zentrixpay_buy")).toBe(true);
     });
 
     it("returns false for read-only tools", () => {
-      expect(serializesStateTool("mindvault_browse")).toBe(false);
-      expect(serializesStateTool("mindvault_search")).toBe(false);
-      expect(serializesStateTool("mindvault_preview")).toBe(false);
-      expect(serializesStateTool("mindvault_wallet_info")).toBe(false);
-      expect(serializesStateTool("mindvault_list_profiles")).toBe(false);
-      expect(serializesStateTool("mindvault_publish_status")).toBe(false);
-      expect(serializesStateTool("mindvault_agent_status")).toBe(false);
-      expect(serializesStateTool("mindvault_registry_info")).toBe(false);
-      expect(serializesStateTool("mindvault_network_profile")).toBe(false);
-      expect(serializesStateTool("mindvault_check_bindings")).toBe(false);
-      expect(serializesStateTool("mindvault_check_consistency")).toBe(false);
-      expect(serializesStateTool("mindvault_registry_lookup")).toBe(false);
-      expect(serializesStateTool("mindvault_registry_list")).toBe(false);
-      expect(serializesStateTool("mindvault_tx_status")).toBe(false);
-      expect(serializesStateTool("mindvault_metrics")).toBe(false);
-      expect(serializesStateTool("mindvault_check_state_permissions")).toBe(false);
-      expect(serializesStateTool("mindvault_registry_health")).toBe(false);
-      expect(serializesStateTool("mindvault_verify_install")).toBe(false);
-      expect(serializesStateTool("mindvault_backup_state")).toBe(false);
+      expect(serializesStateTool("zentrixpay_browse")).toBe(false);
+      expect(serializesStateTool("zentrixpay_search")).toBe(false);
+      expect(serializesStateTool("zentrixpay_preview")).toBe(false);
+      expect(serializesStateTool("zentrixpay_wallet_info")).toBe(false);
+      expect(serializesStateTool("zentrixpay_list_profiles")).toBe(false);
+      expect(serializesStateTool("zentrixpay_publish_status")).toBe(false);
+      expect(serializesStateTool("zentrixpay_agent_status")).toBe(false);
+      expect(serializesStateTool("zentrixpay_registry_info")).toBe(false);
+      expect(serializesStateTool("zentrixpay_network_profile")).toBe(false);
+      expect(serializesStateTool("zentrixpay_check_bindings")).toBe(false);
+      expect(serializesStateTool("zentrixpay_check_consistency")).toBe(false);
+      expect(serializesStateTool("zentrixpay_registry_lookup")).toBe(false);
+      expect(serializesStateTool("zentrixpay_registry_list")).toBe(false);
+      expect(serializesStateTool("zentrixpay_tx_status")).toBe(false);
+      expect(serializesStateTool("zentrixpay_metrics")).toBe(false);
+      expect(serializesStateTool("zentrixpay_check_state_permissions")).toBe(false);
+      expect(serializesStateTool("zentrixpay_registry_health")).toBe(false);
+      expect(serializesStateTool("zentrixpay_verify_install")).toBe(false);
+      expect(serializesStateTool("zentrixpay_backup_state")).toBe(false);
     });
 
     it("returns false for unknown tools", () => {
-      expect(serializesStateTool("mindvault_unknown")).toBe(false);
+      expect(serializesStateTool("zentrixpay_unknown")).toBe(false);
     });
   });
 
   describe("STATE_SERIALIZED_TOOLS", () => {
     it("contains exactly the expected tools", () => {
       const expected = new Set([
-        "mindvault_reset",
-        "mindvault_restore_state",
-        "mindvault_setup_wallet",
-        "mindvault_import_wallet",
-        "mindvault_use_profile",
-        "mindvault_register",
-        "mindvault_rotate_publisher_key",
-        "mindvault_publish",
-        "mindvault_buy",
+        "zentrixpay_reset",
+        "zentrixpay_restore_state",
+        "zentrixpay_setup_wallet",
+        "zentrixpay_import_wallet",
+        "zentrixpay_use_profile",
+        "zentrixpay_register",
+        "zentrixpay_rotate_publisher_key",
+        "zentrixpay_publish",
+        "zentrixpay_buy",
       ]);
       expect(STATE_SERIALIZED_TOOLS).toEqual(expected);
     });

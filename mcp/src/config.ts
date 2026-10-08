@@ -1,5 +1,5 @@
 /**
- * Resolved runtime configuration for the MindVault MCP server.
+ * Resolved runtime configuration for the ZentrixPay MCP server.
  *
  * Network selection, service URLs, and the vault-registry contract id used to be
  * computed as top-level `const` side effects in index.ts, interleaved with two
@@ -26,7 +26,7 @@ import {
   X402_NETWORK_IDS,
   type NetworkPreset,
   type StellarDeploymentNetwork,
-} from "@mindvault/registry-client";
+} from "@zentrixpay/registry-client";
 import {
   collectStartupDiagnostics,
   formatDiagnostics,
@@ -34,8 +34,8 @@ import {
   type StartupDiagnostic,
 } from "./diagnostics.js";
 
-/** MindVault API base URL used when `MINDVAULT_URL` is unset. */
-export const DEFAULT_MINDVAULT_URL = "https://mindvault-hyr3.onrender.com";
+/** ZentrixPay API base URL used when `ZENTRIXPAY_URL` is unset. */
+export const DEFAULT_ZENTRIXPAY_URL = "http://localhost:4021";
 
 /** Sponsored-account service URL used when `SPONSORED_ACCOUNT_URL` is unset. */
 export const DEFAULT_SPONSORED_ACCOUNT_URL = "https://stellar-sponsored-agent-account.onrender.com";
@@ -54,7 +54,7 @@ export interface McpConfig {
   readonly networkPreset: NetworkPreset;
   /** x402 payment network, from `NETWORK` or the preset, normalized. */
   readonly x402Network: X402NetworkId;
-  /** MindVault API base URL (`MINDVAULT_URL`). */
+  /** ZentrixPay API base URL (`ZENTRIXPAY_URL`). */
   readonly baseUrl: string;
   /** vault-registry contract id (`VAULT_REGISTRY_CONTRACT_ID` or preset default; `""` when neither). */
   readonly registryContractId: string;
@@ -68,7 +68,7 @@ export interface McpConfig {
   readonly sorobanRpcUrl: string;
   /**
    * Platform (vault operator) wallet address, from `PLATFORM_WALLET_ADDRESS`.
-   * Used by `mindvault_wallet_balances` to report the platform balance next to
+   * Used by `zentrixpay_wallet_balances` to report the platform balance next to
    * the agent wallets. `null` when not configured. This is the MCP-side twin of
    * the server's `PAY_TO`: it names the wallet that receives publisher payouts.
    */
@@ -89,7 +89,7 @@ export function buildConfig(env: NodeJS.ProcessEnv = process.env): McpConfig {
     stellarNetwork,
     networkPreset,
     x402Network: normalizeX402Network(env.NETWORK ?? networkPreset.x402Network) as X402NetworkId,
-    baseUrl: env.MINDVAULT_URL ?? DEFAULT_MINDVAULT_URL,
+    baseUrl: env.ZENTRIXPAY_URL ?? DEFAULT_ZENTRIXPAY_URL,
     registryContractId:
       env.VAULT_REGISTRY_CONTRACT_ID ?? networkPreset.defaultRegistryContractId ?? "",
     registryNetworkPassphrase: networkPreset.networkPassphrase,

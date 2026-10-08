@@ -16,18 +16,18 @@
  * Every one of those had happened before this test existed, because the
  * ListTools handler in index.ts carried a hand-maintained copy of (1):
  *
- *   - `mindvault_update_metadata`, `mindvault_set_price`,
- *     `mindvault_transfer_ownership`, `mindvault_set_listed`,
- *     `mindvault_export_receipts` and `mindvault_recover_catalog_cache` were
+ *   - `zentrixpay_update_metadata`, `zentrixpay_set_price`,
+ *     `zentrixpay_transfer_ownership`, `zentrixpay_set_listed`,
+ *     `zentrixpay_export_receipts` and `zentrixpay_recover_catalog_cache` were
  *     implemented, validated and documented, but absent from the copy — so no
  *     agent could discover them.
- *   - `mindvault_publish_status` and `mindvault_purchase_history` existed only
+ *   - `zentrixpay_publish_status` and `zentrixpay_purchase_history` existed only
  *     in the copy, so `docs/mcp-tool-reference.md` (generated from `tools.ts`)
  *     never listed them.
- *   - `mindvault_reset` advertised a `confirm` argument that `resetGuard` reads
+ *   - `zentrixpay_reset` advertised a `confirm` argument that `resetGuard` reads
  *     and `TOOL_ARGUMENT_SPECS` did not declare, so every confirmed reset was
  *     rejected as an unknown argument and the tool could never do anything.
- *   - `mindvault_publish` and `mindvault_buy` had quietly stopped advertising
+ *   - `zentrixpay_publish` and `zentrixpay_buy` had quietly stopped advertising
  *     `dryRun` and `maxAutoPayUsdc`.
  *
  * The copy is gone (`toolSurface.ts` derives the response from
@@ -54,9 +54,9 @@ import {
 } from "./validation.js";
 import { startIntegrationHarness, type IntegrationHarness } from "./integrationHarness.js";
 
-process.env.MINDVAULT_MOCK = "1";
+process.env.ZENTRIXPAY_MOCK = "1";
 process.env.STELLAR_NETWORK = "testnet";
-const home = mkdtempSync(join(tmpdir(), "mindvault-mcp-contract-"));
+const home = mkdtempSync(join(tmpdir(), "zentrixpay-mcp-contract-"));
 process.env.HOME = home;
 process.env.USERPROFILE = home;
 
@@ -177,21 +177,21 @@ function sampleValue(spec: ArgumentSpec): unknown {
 
 /** Specs whose pattern the generic string sample cannot satisfy. */
 const SAMPLE_OVERRIDES: Record<string, Record<string, unknown>> = {
-  mindvault_register: { email: "probe@example.com" },
-  mindvault_publish: { price: "1.00", externalUrl: "https://example.com/probe" },
-  mindvault_set_price: { price: "1.00" },
-  mindvault_transfer_ownership: {
+  zentrixpay_register: { email: "probe@example.com" },
+  zentrixpay_publish: { price: "1.00", externalUrl: "https://example.com/probe" },
+  zentrixpay_set_price: { price: "1.00" },
+  zentrixpay_transfer_ownership: {
     newCreator: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
   },
-  mindvault_update_metadata: { metadata: "ipfs://QmProbe" },
-  mindvault_freeze: { confirm: "freeze_metadata" },
-  mindvault_royalty: {
+  zentrixpay_update_metadata: { metadata: "ipfs://QmProbe" },
+  zentrixpay_freeze: { confirm: "freeze_metadata" },
+  zentrixpay_royalty: {
     royaltyRecipient: "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
   },
-  mindvault_import_wallet: {
+  zentrixpay_import_wallet: {
     secretKey: "SAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
   },
-  mindvault_publish_batch: {
+  zentrixpay_publish_batch: {
     items: [{ title: "Probe Resource", price: "1.00", externalUrl: "https://example.com/probe" }],
   },
 };
@@ -301,7 +301,7 @@ describe("ListTools ↔ the argument validator", () => {
   });
 
   it("advertises exactly the arguments the validator accepts", () => {
-    // The `mindvault_reset.confirm` failure: an argument advertised in the
+    // The `zentrixpay_reset.confirm` failure: an argument advertised in the
     // schema and rejected by the validator makes the tool unusable, and an
     // argument the validator accepts but the schema hides is undiscoverable.
     const exempt = new Set(TOOLS_WITHOUT_ARG_VALIDATION);
@@ -332,16 +332,16 @@ describe("ListTools ↔ the argument validator", () => {
     // The contract has to hold at call time, not only in the metadata: a
     // schema that lists an argument is a promise the dispatcher honours it.
     await expect(
-      dispatchTool("mindvault_registry_lookup", { resourceId: "mock-1", nonsense: true }),
+      dispatchTool("zentrixpay_registry_lookup", { resourceId: "mock-1", nonsense: true }),
     ).rejects.toThrow(/not a recognized argument/i);
   });
 
-  it("accepts every argument mindvault_reset advertises", async () => {
+  it("accepts every argument zentrixpay_reset advertises", async () => {
     // Regression for the drift that made `confirm` unusable: the guard read it,
     // ListTools advertised it, and the validator threw on it.
-    const properties = Object.keys(byName.get("mindvault_reset")?.inputSchema?.properties ?? {});
+    const properties = Object.keys(byName.get("zentrixpay_reset")?.inputSchema?.properties ?? {});
     expect(properties).toContain("confirm");
-    await expect(dispatchTool("mindvault_reset", { confirm: true })).resolves.toBeTypeOf("string");
+    await expect(dispatchTool("zentrixpay_reset", { confirm: true })).resolves.toBeTypeOf("string");
   });
 });
 

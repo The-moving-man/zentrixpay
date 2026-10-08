@@ -147,11 +147,11 @@ the rejection is a **delta**: the MCP server stamps `X-Timestamp` with its own
 **system-clock problem**, not a credential problem.
 
 `mcp/src/errorMapping.ts` detects that message and returns a targeted next step
-instead of the "run `mindvault_register`" advice a revoked key would get:
+instead of the "run `zentrixpay_register`" advice a revoked key would get:
 
 ```text
 Publish failed: Request timestamp outside allowed window (request signature timestamp rejected as outside the allowed window)
-Source: MindVault API · Category: auth · HTTP 401
+Source: ZentrixPay API · Category: auth · HTTP 401
 Next: The request signature was rejected because its timestamp fell outside the accepted 5-minute window — the local clock is probably skewed, not the key. Sync the system clock (e.g. enable NTP), then retry; the message disappears once the clocks agree.
 ```
 

@@ -1,7 +1,7 @@
 /**
  * Contract binding version/interface check.
  *
- * Verifies that the installed `@mindvault/registry-client` bindings match the
+ * Verifies that the installed `@zentrixpay/registry-client` bindings match the
  * interface of the deployed `vault-registry` contract. The bindings embed a
  * contract spec (the function set they were generated against); the deployed
  * contract exposes its own spec on-chain. Comparing the two catches the common
@@ -143,7 +143,7 @@ export function formatBindingCheck(ctx: BindingReportContext): string {
   if (comparison.missingFromBindings.length > 0) {
     lines.push(
       `Deployed contract exposes methods the bindings lack: ${comparison.missingFromBindings.join(", ")}`,
-      `  → The bindings are stale. Regenerate them with 'pnpm contract:bindings' and rebuild @mindvault/registry-client.`,
+      `  → The bindings are stale. Regenerate them with 'pnpm contract:bindings' and rebuild @zentrixpay/registry-client.`,
     );
   }
   return lines.join("\n");

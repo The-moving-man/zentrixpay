@@ -1,7 +1,7 @@
 /**
  * Regression tests for stdout contamination (#607).
  *
- * The MindVault MCP server communicates with its host over stdio (JSON-RPC).
+ * The ZentrixPay MCP server communicates with its host over stdio (JSON-RPC).
  * Any stray bytes written to stdout by tool handlers — console.log, bare
  * process.stdout.write, or debug helpers — would corrupt the transport framing
  * and crash the client. These tests spy on both stdout.write and console.log
@@ -41,7 +41,7 @@ vi.mock("@x402/fetch", () => ({
   }),
 }));
 
-vi.mock("@mindvault/registry-client", async (importOriginal) => {
+vi.mock("@zentrixpay/registry-client", async (importOriginal) => {
   const actual = (await importOriginal()) as any;
   return {
     ...actual,

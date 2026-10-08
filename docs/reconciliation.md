@@ -1,6 +1,6 @@
 # Reconciliation
 
-Detects and reports discrepancies between the MindVault database and the
+Detects and reports discrepancies between the ZentrixPay database and the
 on-chain Stellar registry.
 
 ## What reconciliation checks
@@ -96,7 +96,7 @@ Checking missing001 ... MISSING ON-CHAIN
 Checking clx5n8z00aaaabbbbcccc ... OK
 ...
 ========================================
-MindVault Reconciliation Summary
+ZentrixPay Reconciliation Summary
 Run at: 2026-05-28T10:32:00.000Z
 Resources checked:      42
 In sync:                39
@@ -154,7 +154,7 @@ followed by `Result: ALL CLEAR`:
 
 ```
 ========================================
-MindVault Reconciliation Summary
+ZentrixPay Reconciliation Summary
 Run at: 2026-05-28T10:32:00.000Z
 Resources checked:      42
 In sync:                42

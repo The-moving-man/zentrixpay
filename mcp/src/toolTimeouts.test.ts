@@ -40,7 +40,7 @@ vi.mock("@x402/fetch", () => ({
   }),
 }));
 
-vi.mock("@mindvault/registry-client", async (importOriginal) => {
+vi.mock("@zentrixpay/registry-client", async (importOriginal) => {
   const actual = (await importOriginal()) as any;
   return {
     ...actual,
@@ -52,9 +52,9 @@ vi.mock("@mindvault/registry-client", async (importOriginal) => {
 });
 
 // Budgets are read once at module load, so they must be set before the import.
-process.env.MINDVAULT_HTTP_TIMEOUT_MS = "50";
-process.env.MINDVAULT_HORIZON_TIMEOUT_MS = "50";
-process.env.MINDVAULT_SOROBAN_TIMEOUT_MS = "50";
+process.env.ZENTRIXPAY_HTTP_TIMEOUT_MS = "50";
+process.env.ZENTRIXPAY_HORIZON_TIMEOUT_MS = "50";
+process.env.ZENTRIXPAY_SOROBAN_TIMEOUT_MS = "50";
 
 const { browse, txStatus, networkProfile, walletInfo, _setAgentWallet } =
   await import("./index.js");
@@ -85,7 +85,7 @@ describe("outbound API calls carry a deadline", () => {
 
     expect(message).toContain("Category: timeout");
     expect(message).toContain("Request timed out after 50ms");
-    expect(message).toContain("MINDVAULT_HTTP_TIMEOUT_MS");
+    expect(message).toContain("ZENTRIXPAY_HTTP_TIMEOUT_MS");
   });
 
   it("aborts the in-flight request rather than leaking the socket", async () => {

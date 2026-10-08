@@ -1,5 +1,5 @@
 /**
- * Startup configuration diagnostics for the MindVault MCP server.
+ * Startup configuration diagnostics for the ZentrixPay MCP server.
  *
  * Collects every problem with the server's environment in a single pass — rather
  * than failing on the first one — so an operator sees the full list of what to
@@ -18,7 +18,7 @@ import {
   parseStellarNetwork,
   resolveStellarNetwork,
   validateNetworkConfig,
-} from "@mindvault/registry-client";
+} from "@zentrixpay/registry-client";
 import { isExplicitMainnetDenial, unsafeMainnetAllow } from "./mainnetGuardrails.js";
 
 export type DiagnosticSeverity = "error" | "warning";
@@ -33,7 +33,7 @@ export interface StartupDiagnostic {
   expected?: string;
 }
 
-/** Values accepted (case-insensitively) as booleans for MINDVAULT_METRICS. */
+/** Values accepted (case-insensitively) as booleans for ZENTRIXPAY_METRICS. */
 const BOOLEAN_VALUES = new Set(["1", "0", "true", "false", "yes", "no", "on", "off"]);
 
 /** Stellar secret keys: 'S' + 55 base32 chars. Redacted so they never leak. */
@@ -72,7 +72,7 @@ export function collectStartupDiagnostics(
 ): StartupDiagnostic[] {
   const diagnostics: StartupDiagnostic[] = [];
 
-  // Every outbound call (MindVault API, Horizon, Soroban RPC, x402 payments)
+  // Every outbound call (ZentrixPay API, Horizon, Soroban RPC, x402 payments)
   // goes through the global `fetch`. Node <20, or an unusual runtime that never
   // shipped one, would otherwise fail deep inside the first tool call with a
   // bare `ReferenceError: fetch is not defined` — surface it here instead, at
@@ -147,7 +147,7 @@ export function collectStartupDiagnostics(
 
   // URL-shaped variables must be absolute http(s) URLs when set.
   for (const variable of [
-    "MINDVAULT_URL",
+    "ZENTRIXPAY_URL",
     "SPONSORED_ACCOUNT_URL",
     "HORIZON_URL",
     "SOROBAN_RPC_URL",
@@ -158,37 +158,37 @@ export function collectStartupDiagnostics(
         variable,
         severity: "error",
         message: `Not a valid URL: ${JSON.stringify(redactSecrets(value))}.`,
-        expected: "an absolute http(s) URL (e.g. https://mindvault.example.com)",
+        expected: "an absolute http(s) URL (e.g. https://zentrixpay.example.com)",
       });
     }
   }
 
-  // MINDVAULT_METRICS is opt-in; a value that is neither truthy nor falsy is
+  // ZENTRIXPAY_METRICS is opt-in; a value that is neither truthy nor falsy is
   // almost certainly a mistake (metrics silently stay off).
-  const metrics = env.MINDVAULT_METRICS;
+  const metrics = env.ZENTRIXPAY_METRICS;
   if (
     typeof metrics === "string" &&
     metrics.trim() &&
     !BOOLEAN_VALUES.has(metrics.trim().toLowerCase())
   ) {
     diagnostics.push({
-      variable: "MINDVAULT_METRICS",
+      variable: "ZENTRIXPAY_METRICS",
       severity: "warning",
       message: `Unrecognized value ${JSON.stringify(metrics)}; metrics stay disabled.`,
       expected: "1/true/yes/on to enable, or leave unset",
     });
   }
 
-  // MINDVAULT_ALLOW_MAINNET (#606) — the mainnet guardrail parses this value
+  // ZENTRIXPAY_ALLOW_MAINNET (#606) — the mainnet guardrail parses this value
   // fail-safe: only 1/true/yes widen the mutation policy, everything else
   // keeps per-call confirmation. A set value that unlocks nothing is therefore
-  // harmless but almost certainly unintended — a bare "$MINDVAULT_ALLOW_MAINNET"
+  // harmless but almost certainly unintended — a bare "$ZENTRIXPAY_ALLOW_MAINNET"
   // template placeholder left unexpanded, `on`/`enabled` from another config
   // dialect, or a plain typo. Silently doing nothing is the confusing kind of
   // safe; say so at startup. Explicit denials (0/false/no/off) re-affirm the
   // default on purpose and stay quiet. A warning, not an error: the fallback
   // is exactly the safe default, so there is nothing to fix before starting.
-  const allowMainnet = env.MINDVAULT_ALLOW_MAINNET;
+  const allowMainnet = env.ZENTRIXPAY_ALLOW_MAINNET;
   if (
     typeof allowMainnet === "string" &&
     allowMainnet.trim() !== "" &&
@@ -196,7 +196,7 @@ export function collectStartupDiagnostics(
     !isExplicitMainnetDenial(allowMainnet)
   ) {
     diagnostics.push({
-      variable: "MINDVAULT_ALLOW_MAINNET",
+      variable: "ZENTRIXPAY_ALLOW_MAINNET",
       severity: "warning",
       message: `Value ${JSON.stringify(allowMainnet)} does not unlock mainnet mutations; per-call confirmMainnet remains required.`,
       expected:
@@ -217,7 +217,7 @@ export function hasBlockingDiagnostics(diagnostics: StartupDiagnostic[]): boolea
  * Ordering follows the input, so callers get stable output for a given env.
  */
 export function formatDiagnostics(diagnostics: StartupDiagnostic[]): string {
-  if (diagnostics.length === 0) return "MindVault MCP: configuration OK.";
+  if (diagnostics.length === 0) return "ZentrixPay MCP: configuration OK.";
 
   const lines: string[] = [];
   const errors = diagnostics.filter((d) => d.severity === "error");
@@ -229,11 +229,11 @@ export function formatDiagnostics(diagnostics: StartupDiagnostic[]): string {
   };
 
   if (errors.length > 0) {
-    lines.push(`MindVault MCP: ${errors.length} configuration error(s):`);
+    lines.push(`ZentrixPay MCP: ${errors.length} configuration error(s):`);
     lines.push(...errors.map(render));
   }
   if (warnings.length > 0) {
-    lines.push(`MindVault MCP: ${warnings.length} configuration warning(s):`);
+    lines.push(`ZentrixPay MCP: ${warnings.length} configuration warning(s):`);
     lines.push(...warnings.map(render));
   }
   return lines.join("\n");

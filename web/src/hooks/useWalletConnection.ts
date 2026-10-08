@@ -10,7 +10,7 @@ export interface WalletState {
   disconnect: () => void;
 }
 
-const STORAGE_KEY = "mindvault-wallet-address";
+const STORAGE_KEY = "zentrixpay-wallet-address";
 
 /**
  * Manages Freighter wallet connection with localStorage persistence.

@@ -110,7 +110,7 @@ export interface ServerIdentity {
   version: string;
 }
 
-export const DEFAULT_IDENTITY: ServerIdentity = { name: "mindvault", version: "1.0.0" };
+export const DEFAULT_IDENTITY: ServerIdentity = { name: "zentrixpay", version: "1.0.0" };
 
 function defaultFormatError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
@@ -126,7 +126,7 @@ function defaultFormatError(error: unknown): string {
  * Every tool call runs under a fresh correlation ID (#572), which is stamped on
  * the audit entries the call produces and attached to the result's `_meta`.
  */
-export function createMindVaultServer(
+export function createZentrixPayServer(
   behaviour: ServerBehaviour,
   identity: ServerIdentity = DEFAULT_IDENTITY,
 ): Server {
@@ -290,7 +290,7 @@ export async function startServer(
 /**
  * Build and start in one call, for a host that has a transport ready.
  *
- * `createMindVaultServer` and `startServer` stay separate underneath, because
+ * `createZentrixPayServer` and `startServer` stay separate underneath, because
  * a test usually wants the server without starting it.
  */
 export async function createAndStart(
@@ -299,5 +299,5 @@ export async function createAndStart(
   options: StartOptions = {},
   identity: ServerIdentity = DEFAULT_IDENTITY,
 ): Promise<RunningServer> {
-  return startServer(createMindVaultServer(behaviour, identity), transport, options);
+  return startServer(createZentrixPayServer(behaviour, identity), transport, options);
 }

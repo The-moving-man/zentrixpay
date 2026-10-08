@@ -1,12 +1,12 @@
 {
-  "name": "@mindvault/mcp",
+  "name": "@zentrixpay/mcp",
   "version": "1.0.0",
   "type": "module",
-  "description": "MCP server for MindVault — AI agent access to the vault",
+  "description": "MCP server for ZentrixPay — find, call and sell pay-per-call APIs from AI agents",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/distributed-nerd/mindvault.git",
+    "url": "git+https://github.com/anitajordan22244-afk/zentrixpay.git",
     "directory": "mcp"
   },
   "keywords": [
@@ -23,7 +23,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "mindvault-mcp": "dist/index.js"
+    "zentrixpay-mcp": "dist/index.js"
   },
   "files": [
     "dist",
@@ -43,7 +43,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mindvault/registry-client": "workspace:*",
+    "@zentrixpay/registry-client": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.12.1",
     "@stellar/stellar-sdk": "^15.0.1",
     "@x402/fetch": "^2.9.0",

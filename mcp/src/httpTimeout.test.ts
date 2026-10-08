@@ -101,7 +101,7 @@ describe("fetchWithTimeout — slow fetch", () => {
     vi.useFakeTimers();
     const promise = fetchWithTimeout(hangingFetch(), "https://example.test", {}, "soroban", 1_234);
     const assertion = expect(promise).rejects.toThrow(
-      /Request timed out after 1234ms \(soroban\).*MINDVAULT_SOROBAN_TIMEOUT_MS/s,
+      /Request timed out after 1234ms \(soroban\).*ZENTRIXPAY_SOROBAN_TIMEOUT_MS/s,
     );
 
     await vi.advanceTimersByTimeAsync(1_234);
@@ -215,13 +215,13 @@ describe("describeTimeouts", () => {
 });
 
 describe("resolveUserAgent", () => {
-  it("returns the default when MINDVAULT_USER_AGENT is not set", () => {
+  it("returns the default when ZENTRIXPAY_USER_AGENT is not set", () => {
     expect(resolveUserAgent({})).toBe(DEFAULT_USER_AGENT);
-    expect(DEFAULT_USER_AGENT).toBe("mindvault-mcp/1.0.0");
+    expect(DEFAULT_USER_AGENT).toBe("zentrixpay-mcp/1.0.0");
   });
 
   it("documents the correct env var name", () => {
-    expect(USER_AGENT_ENV_VAR).toBe("MINDVAULT_USER_AGENT");
+    expect(USER_AGENT_ENV_VAR).toBe("ZENTRIXPAY_USER_AGENT");
   });
 
   it("returns a custom value when the env var is set", () => {
@@ -241,7 +241,7 @@ describe("resolveUserAgent", () => {
   });
 
   it("preserves values that include parenthetical comments", () => {
-    const ua = "my-agent/1.0 (mindvault-mcp)";
+    const ua = "my-agent/1.0 (zentrixpay-mcp)";
     expect(resolveUserAgent({ [USER_AGENT_ENV_VAR]: ua })).toBe(ua);
   });
 });

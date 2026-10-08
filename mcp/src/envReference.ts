@@ -69,8 +69,8 @@ export const ENV_VAR_DOCS: EnvVarDoc[] = [
     source: "mcp/src/config.ts",
   },
   {
-    name: "MINDVAULT_URL",
-    description: "Base URL of the MindVault API the catalog tools browse and buy from.",
+    name: "ZENTRIXPAY_URL",
+    description: "Base URL of the ZentrixPay API the catalog tools browse and buy from.",
     default: "the built-in production default (see mcp/src/config.ts)",
     source: "mcp/src/config.ts",
   },
@@ -115,20 +115,20 @@ export const ENV_VAR_DOCS: EnvVarDoc[] = [
     source: "mcp/src/config.ts",
   },
   {
-    name: "MINDVAULT_SOROBAN_RPC_URLS",
+    name: "ZENTRIXPAY_SOROBAN_RPC_URLS",
     description:
       "Comma-separated failover list of Soroban RPC endpoints in priority order. Overrides SOROBAN_RPC_URL when set.",
     default: "unset — single endpoint from SOROBAN_RPC_URL / the preset",
     source: "mcp/src/rpcFailover.ts",
   },
   {
-    name: "MINDVAULT_RPC_FAILOVER_COOLDOWN_MS",
+    name: "ZENTRIXPAY_RPC_FAILOVER_COOLDOWN_MS",
     description: "How long a failed Soroban endpoint is skipped before it is retried.",
     default: `${DEFAULT_COOLDOWN_MS} (ms)`,
     source: "mcp/src/rpcFailover.ts",
   },
   {
-    name: "MINDVAULT_RPC_FAILOVER_MAX_ATTEMPTS",
+    name: "ZENTRIXPAY_RPC_FAILOVER_MAX_ATTEMPTS",
     description: "Endpoint tries per call during failover. 0 tries every configured endpoint.",
     default: `${DEFAULT_MAX_ATTEMPTS} (unlimited)`,
     source: "mcp/src/rpcFailover.ts",
@@ -136,7 +136,7 @@ export const ENV_VAR_DOCS: EnvVarDoc[] = [
 
   // ── Guardrails & policies ──────────────────────────────────────────────────
   {
-    name: "MINDVAULT_ALLOW_MAINNET",
+    name: "ZENTRIXPAY_ALLOW_MAINNET",
     description:
       "Operator-side unlock for mainnet mutations. Parsed fail-safe: only the documented opt-in spellings widen the policy, anything else — including an unexpanded template placeholder — keeps per-call confirmation (#606). A set-but-ineffective value raises a startup warning.",
     default: DEFAULT_MAINNET_MUTATION_POLICY,
@@ -144,7 +144,7 @@ export const ENV_VAR_DOCS: EnvVarDoc[] = [
     source: "mcp/src/mainnetGuardrails.ts",
   },
   {
-    name: "MINDVAULT_READ_ONLY",
+    name: "ZENTRIXPAY_READ_ONLY",
     description:
       "Restrict the server to read-only tools. Only tools whose definition declares readOnlyHint are advertised, and the dispatcher refuses every other tool even for clients holding a cached tool list.",
     default: "unset (full surface)",
@@ -152,7 +152,7 @@ export const ENV_VAR_DOCS: EnvVarDoc[] = [
     source: "mcp/src/readOnlyMode.ts",
   },
   {
-    name: "MINDVAULT_CONFIRM_PAID_OPERATIONS",
+    name: "ZENTRIXPAY_CONFIRM_PAID_OPERATIONS",
     description:
       "Require an explicit confirmPaid: true before tools spend from the agent wallet, independently of network. An unrecognized value is an error, not a fallback to off.",
     default: DEFAULT_PAID_CONFIRMATION_POLICY,
@@ -160,120 +160,120 @@ export const ENV_VAR_DOCS: EnvVarDoc[] = [
     source: "mcp/src/paidOperations.ts",
   },
   {
-    name: "MINDVAULT_MAX_AUTO_PAY_USDC",
+    name: "ZENTRIXPAY_MAX_AUTO_PAY_USDC",
     description:
-      "Ceiling for the automatic x402 settlement inside mindvault_buy. A purchase above the ceiling needs a per-call maxAutoPayUsdc at least equal to the price.",
+      "Ceiling for the automatic x402 settlement inside zentrixpay_buy. A purchase above the ceiling needs a per-call maxAutoPayUsdc at least equal to the price.",
     default: `${DEFAULT_MAX_AUTO_PAY_USDC} USDC`,
     source: "mcp/src/paymentCeiling.ts",
   },
 
   // ── Catalog & cache ────────────────────────────────────────────────────────
   {
-    name: "MINDVAULT_CATALOG_CACHE_TTL_MS",
+    name: "ZENTRIXPAY_CATALOG_CACHE_TTL_MS",
     description:
       "Age at which an offline catalog snapshot is served with a staleness warning instead of silently.",
     default: `${DEFAULT_CATALOG_CACHE_CONFIG.ttlMs} (ms)`,
     source: "mcp/src/catalogCache.ts",
   },
   {
-    name: "MINDVAULT_CATALOG_CACHE_MAX_AGE_MS",
+    name: "ZENTRIXPAY_CATALOG_CACHE_MAX_AGE_MS",
     description:
       "Age past which an offline snapshot is withheld entirely. 0 keeps the pre-#573 behaviour of always serving, labelled when old. Clamped up to the TTL when set lower.",
     default: `${DEFAULT_CATALOG_CACHE_CONFIG.maxAgeMs} (never withhold)`,
     source: "mcp/src/catalogCache.ts",
   },
   {
-    name: "MINDVAULT_PREVIEW_MAX_BYTES",
+    name: "ZENTRIXPAY_PREVIEW_MAX_BYTES",
     description:
-      "Byte ceiling for a serialized mindvault_preview response; 0 disables. Values below the 1024 floor are raised to it.",
+      "Byte ceiling for a serialized zentrixpay_preview response; 0 disables. Values below the 1024 floor are raised to it.",
     default: `${DEFAULT_PREVIEW_MAX_BYTES} (bytes)`,
     source: "mcp/src/previewLimits.ts",
   },
   {
-    name: "MINDVAULT_PREVIEW_FIELD_MAX_CHARS",
+    name: "ZENTRIXPAY_PREVIEW_FIELD_MAX_CHARS",
     description:
       "Character ceiling for each free-text preview field (title, description); 0 disables.",
     default: `${DEFAULT_PREVIEW_FIELD_MAX_CHARS} (chars)`,
     source: "mcp/src/previewLimits.ts",
   },
   {
-    name: "MINDVAULT_PURCHASES_FILE",
-    description: "Path of the purchase-receipt file mindvault_buy appends to.",
-    default: "~/.mindvault/purchases.json",
+    name: "ZENTRIXPAY_PURCHASES_FILE",
+    description: "Path of the purchase-receipt file zentrixpay_buy appends to.",
+    default: "~/.zentrixpay/purchases.json",
     source: "mcp/src/purchaseHistory.ts",
   },
 
   // ── Timeouts & retries ─────────────────────────────────────────────────────
   {
-    name: "MINDVAULT_HTTP_TIMEOUT_MS",
+    name: "ZENTRIXPAY_HTTP_TIMEOUT_MS",
     description:
-      "Request deadline for the MindVault API and sponsored-account service. 0 disables.",
+      "Request deadline for the ZentrixPay API and sponsored-account service. 0 disables.",
     default: `${DEFAULT_TIMEOUTS.http} (ms)`,
     source: "mcp/src/httpTimeout.ts",
   },
   {
-    name: "MINDVAULT_HORIZON_TIMEOUT_MS",
+    name: "ZENTRIXPAY_HORIZON_TIMEOUT_MS",
     description: "Request deadline for Horizon balance/account reads. 0 disables.",
     default: `${DEFAULT_TIMEOUTS.horizon} (ms)`,
     source: "mcp/src/httpTimeout.ts",
   },
   {
-    name: "MINDVAULT_SOROBAN_TIMEOUT_MS",
+    name: "ZENTRIXPAY_SOROBAN_TIMEOUT_MS",
     description: "Request deadline for Soroban RPC calls. 0 disables.",
     default: `${DEFAULT_TIMEOUTS.soroban} (ms)`,
     source: "mcp/src/httpTimeout.ts",
   },
   {
-    name: "MINDVAULT_PAYMENT_TIMEOUT_MS",
+    name: "ZENTRIXPAY_PAYMENT_TIMEOUT_MS",
     description:
       "Request deadline for x402 paid fetches, which include on-chain settlement. 0 disables.",
     default: `${DEFAULT_TIMEOUTS.payment} (ms)`,
     source: "mcp/src/httpTimeout.ts",
   },
   {
-    name: "MINDVAULT_TOOL_TIMEOUTS",
+    name: "ZENTRIXPAY_TOOL_TIMEOUTS",
     description:
-      "Per-tool timeout overrides as a comma/space-separated list of tool=milliseconds entries. The mindvault_ prefix is optional; 0 removes the deadline for that tool.",
+      "Per-tool timeout overrides as a comma/space-separated list of tool=milliseconds entries. The zentrixpay_ prefix is optional; 0 removes the deadline for that tool.",
     default: "unset — every tool uses its service budget",
     source: "mcp/src/toolTimeoutOverrides.ts",
   },
   {
-    name: "MINDVAULT_TOOL_DURATION_BUDGET_MS",
+    name: "ZENTRIXPAY_TOOL_DURATION_BUDGET_MS",
     description:
       "Duration budget a tool call should finish within; exceeded calls are counted by the metrics recorder.",
     default: `${DEFAULT_TOOL_DURATION_BUDGET_MS} (ms)`,
     source: "mcp/src/metrics.ts",
   },
   {
-    name: "MINDVAULT_RETRY_ATTEMPTS",
+    name: "ZENTRIXPAY_RETRY_ATTEMPTS",
     description:
       "Total attempts (including the first) for idempotent calls. 1 disables retrying. Never applies to payments.",
     default: `${DEFAULT_RETRY_POLICY.attempts}`,
     source: "mcp/src/retry.ts",
   },
   {
-    name: "MINDVAULT_RETRY_BASE_DELAY_MS",
+    name: "ZENTRIXPAY_RETRY_BASE_DELAY_MS",
     description: "Backoff delay before the first retry; doubles each attempt.",
     default: `${DEFAULT_RETRY_POLICY.baseDelayMs} (ms)`,
     source: "mcp/src/retry.ts",
   },
   {
-    name: "MINDVAULT_RETRY_MAX_DELAY_MS",
+    name: "ZENTRIXPAY_RETRY_MAX_DELAY_MS",
     description: "Ceiling on the exponential backoff delay before jitter is applied.",
     default: `${DEFAULT_RETRY_POLICY.maxDelayMs} (ms)`,
     source: "mcp/src/retry.ts",
   },
   {
-    name: "MINDVAULT_RETRY_ATTEMPTS_<TOOL>",
+    name: "ZENTRIXPAY_RETRY_ATTEMPTS_<TOOL>",
     description:
-      "Per-tool retry overrides, derived from the global names by suffixing the uppercased tool name — e.g. MINDVAULT_RETRY_ATTEMPTS_MINDVAULT_BROWSE=5 for mindvault_browse.",
+      "Per-tool retry overrides, derived from the global names by suffixing the uppercased tool name — e.g. ZENTRIXPAY_RETRY_ATTEMPTS_ZENTRIXPAY_BROWSE=5 for zentrixpay_browse.",
     default: "unset — the global retry policy applies",
     source: "mcp/src/retry.ts",
   },
 
   // ── Observability & mode ───────────────────────────────────────────────────
   {
-    name: "MINDVAULT_METRICS",
+    name: "ZENTRIXPAY_METRICS",
     description:
       "Opt-in per-tool metrics (call/error counts, durations, budget overruns). Output contains tool names and counts only.",
     default: "unset (disabled)",
@@ -281,7 +281,7 @@ export const ENV_VAR_DOCS: EnvVarDoc[] = [
     source: "mcp/src/metrics.ts",
   },
   {
-    name: "MINDVAULT_AUDIT_LOG",
+    name: "ZENTRIXPAY_AUDIT_LOG",
     description:
       'Enable audit logging of tool calls to stderr. Exactly "1" enables; other spellings do not.',
     default: "unset (disabled)",
@@ -289,39 +289,39 @@ export const ENV_VAR_DOCS: EnvVarDoc[] = [
     source: "mcp/src/auditLog.ts",
   },
   {
-    name: "MINDVAULT_AUDIT_LOG_FILE",
+    name: "ZENTRIXPAY_AUDIT_LOG_FILE",
     description:
       "Append audit entries to this file as JSON Lines (in addition to stderr), with size-based rotation.",
     default: "unset — file sink off, stderr only",
     source: "mcp/src/auditLogRotation.ts",
   },
   {
-    name: "MINDVAULT_AUDIT_LOG_MAX_BYTES",
+    name: "ZENTRIXPAY_AUDIT_LOG_MAX_BYTES",
     description: "Rotate the audit log file once it would exceed this size. Floor of 1024 bytes.",
     default: `${DEFAULT_MAX_BYTES} (bytes)`,
     source: "mcp/src/auditLogRotation.ts",
   },
   {
-    name: "MINDVAULT_AUDIT_LOG_MAX_FILES",
+    name: "ZENTRIXPAY_AUDIT_LOG_MAX_FILES",
     description: "Rotated audit-log generations kept besides the live file.",
     default: `${DEFAULT_MAX_FILES} (files)`,
     source: "mcp/src/auditLogRotation.ts",
   },
   {
-    name: "MINDVAULT_USER_AGENT",
+    name: "ZENTRIXPAY_USER_AGENT",
     description: "User-Agent header sent on outbound API calls.",
     default: DEFAULT_USER_AGENT,
     source: "mcp/src/httpTimeout.ts",
   },
   {
-    name: "MINDVAULT_AGENT_SECRET",
+    name: "ZENTRIXPAY_AGENT_SECRET",
     description:
-      "Stellar secret key used to derive the agent wallet when none is configured in the active profile. Prefer mindvault_setup_wallet; a secret in an environment variable is a last resort and never logged.",
+      "Stellar secret key used to derive the agent wallet when none is configured in the active profile. Prefer zentrixpay_setup_wallet; a secret in an environment variable is a last resort and never logged.",
     default: "unset — the active profile's wallet is used",
     source: "mcp/src/runtime.ts",
   },
   {
-    name: "MINDVAULT_MOCK",
+    name: "ZENTRIXPAY_MOCK",
     description:
       "Contributor mock mode: every outbound HTTP call and on-chain lookup is replaced with deterministic in-memory responses. Development and tests only — never for production.",
     default: "unset (live mode)",

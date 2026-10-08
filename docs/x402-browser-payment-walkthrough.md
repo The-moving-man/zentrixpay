@@ -1,6 +1,6 @@
 # x402 Browser Payment Walkthrough
 
-This guide walks through the **browser buyer path**: finding a resource in the MindVault web catalog, opening its paywalled URL, signing a USDC payment with a Stellar browser wallet, and receiving the protected content.
+This guide walks through the **browser buyer path**: finding a resource in the ZentrixPay web catalog, opening its paywalled URL, signing a USDC payment with a Stellar browser wallet, and receiving the protected content.
 
 For the full protocol sequence (verify → settle → deliver), see the [x402 buy/pay sequence diagram](x402-sequence-diagram.md).
 
@@ -11,7 +11,7 @@ For the full protocol sequence (verify → settle → deliver), see the [x402 bu
 Before buying a resource from the browser:
 
 1. **Freighter installed and unlocked** — see [wallet connection troubleshooting](wallet-connection-troubleshooting.md).
-2. **Stellar Testnet selected** in Freighter (MindVault demo deployments use `stellar:testnet`).
+2. **Stellar Testnet selected** in Freighter (ZentrixPay demo deployments use `stellar:testnet`).
 3. **Testnet USDC funded** — enough to cover the resource price plus a small fee buffer. See [Stellar testnet funding](stellar-testnet-funding.md).
 4. **USDC trustline** on your classic Stellar account (required before sending USDC).
 
@@ -19,7 +19,7 @@ Before buying a resource from the browser:
 
 ## Step 1: Find a resource in the web catalog
 
-1. Open the MindVault web app (local: `http://localhost:5173`, or your deployed URL).
+1. Open the ZentrixPay web app (local: `http://localhost:5173`, or your deployed URL).
 2. Browse the catalog grid. Each card shows the title, price in USDC, verification status, and owner wallet.
 3. Click **Buy** on the resource you want — or **Copy URL** to pay from another x402 client.
 
@@ -37,7 +37,7 @@ https://<server>/resources/<resource-id>
 
 Paste the copied URL into a new browser tab (or navigate to it directly).
 
-If you have **not** yet paid, the MindVault server responds with:
+If you have **not** yet paid, the ZentrixPay server responds with:
 
 ```http
 HTTP/1.1 402 Payment Required
@@ -72,7 +72,7 @@ An x402-aware browser client performs these steps (see [x402 on Stellar](https:/
 2. **Build** a Soroban authorization entry for a USDC transfer from your wallet to the creator's `payTo` address.
 3. **Sign** the entry with your Stellar keypair via a browser wallet extension.
 
-### Freighter in MindVault today
+### Freighter in ZentrixPay today
 
 The web app connects Freighter through `useWalletConnection` (`web/src/hooks/useWalletConnection.ts`) for wallet identity in the catalog header. Publisher flows (on-chain registration, price changes) use `window.freighterApi.signTransaction()` in modals such as `RegisterModal`.
 
@@ -82,7 +82,7 @@ For **resource purchases**, the signing step is the same class of wallet approva
 2. Review the USDC amount and recipient (the resource creator).
 3. Click **Approve** to sign.
 
-> **Tip:** If the popup is blocked, allow popups for the MindVault site. See [wallet connection troubleshooting — popup blocked](wallet-connection-troubleshooting.md#popup-blocked-or-browser-permission-issues).
+> **Tip:** If the popup is blocked, allow popups for the ZentrixPay site. See [wallet connection troubleshooting — popup blocked](wallet-connection-troubleshooting.md#popup-blocked-or-browser-permission-issues).
 
 After signing, the client attaches the signed authorization as a base64 `X-Payment` header and **retries** the same `GET /resources/:id` request.
 
@@ -94,7 +94,7 @@ On the retry, the server (`@x402/express` via `server/src/lib/x402.ts`):
 
 1. Sends the signed auth entry to the **x402 facilitator** (`FACILITATOR_URL`, default `https://www.x402.org/facilitator`) for `/verify`.
 2. On success, calls `/settle` to submit the USDC transfer on Stellar testnet.
-3. USDC moves **directly from buyer → creator**; MindVault takes no cut of the resource price.
+3. USDC moves **directly from buyer → creator**; ZentrixPay takes no cut of the resource price.
 
 If verification or settlement fails, the server returns another `402` or `500` — see [troubleshooting](#troubleshooting) below.
 
@@ -156,8 +156,8 @@ The file downloads to your browser; check response headers for the receipt.
 ```mermaid
 sequenceDiagram
     participant User as Browser user
-    participant Web as MindVault Web (catalog)
-    participant Server as MindVault Server
+    participant Web as ZentrixPay Web (catalog)
+    participant Server as ZentrixPay Server
     participant Wallet as Freighter
     participant Facilitator as x402 Facilitator
 
@@ -232,7 +232,7 @@ See [x402 payment troubleshooting — bad or expired authorization](x402-payment
 
 **Cause:** Plain browsers are not x402-aware. Something must implement the sign-and-retry loop.
 
-**Fix:** Use an x402-capable client. For automated testing, run `pnpm --filter @mindvault/server e2e`. For agents, use the [MCP quickstart](mcp-quickstart.md).
+**Fix:** Use an x402-capable client. For automated testing, run `pnpm --filter @zentrixpay/server e2e`. For agents, use the [MCP quickstart](mcp-quickstart.md).
 
 See [x402 payment troubleshooting — 402 never retries](x402-payment-troubleshooting.md#http-402-returned-but-the-client-never-retries).
 
