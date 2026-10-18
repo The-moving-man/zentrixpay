@@ -188,49 +188,18 @@ export const updateApiSchema = z
   })
   .strict();
 
-const MAX_STATS_BUCKETS = 1000;
-
-export const apiStatsQuerySchema = z
-  .object({
-    interval: z.enum(["hour", "day"]).optional(),
-    from: z.iso.datetime({ offset: true }).optional(),
-    to: z.iso.datetime({ offset: true }).optional(),
-  })
-  .transform((q, ctx) => {
-    if (!q.interval) {
-      if (q.from || q.to) {
-        ctx.addIssue({ code: "custom", message: "from/to require interval", path: ["interval"] });
-        return z.NEVER;
-      }
-      return { interval: undefined };
-    }
-    const bucketMs = q.interval === "hour" ? 3_600_000 : 86_400_000;
-    const to = q.to ? new Date(q.to) : new Date();
-    // Defaults: the last 24 hours by hour, or the last 30 days by day.
-    const defaultBuckets = q.interval === "hour" ? 24 : 30;
-    const from = q.from ? new Date(q.from) : new Date(to.getTime() - bucketMs * defaultBuckets);
-    if (from >= to) {
-      ctx.addIssue({ code: "custom", message: "from must be before to", path: ["from"] });
-      return z.NEVER;
-    }
-    if ((to.getTime() - from.getTime()) / bucketMs > MAX_STATS_BUCKETS) {
-      ctx.addIssue({
-        code: "custom",
-        message: `range spans more than ${MAX_STATS_BUCKETS} ${q.interval} buckets`,
-        path: ["from"],
-      });
-      return z.NEVER;
-    }
-    return { interval: q.interval, from, to };
-  });
-
-export const payerCallsQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).default(20),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+export const apiCatalogSortValues = ["newest", "price_asc", "price_desc", "popular"] as const;
 
 export const apiCatalogQuerySchema = z.object({
   q: z.string().trim().max(100).optional(),
+  // ?tag=a&tag=b — repeatable; an API must carry every requested tag.
+  tag: z
+    .preprocess(
+      (v) => (v === undefined ? undefined : Array.isArray(v) ? v : [v]),
+      z.array(z.string().trim().min(1).max(32).toLowerCase()).max(10),
+    )
+    .optional(),
+  sort: z.enum(apiCatalogSortValues).default("newest"),
   limit: z.coerce.number().int().min(1).max(CATALOG_MAX_LIMIT).default(CATALOG_DEFAULT_LIMIT),
   offset: z.coerce.number().int().min(0).default(0),
 });

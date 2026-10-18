@@ -1,1 +1,24 @@
-pnpm exec commitlint --edit "$1"
+#!/usr/bin/env sh
+# commit-msg hook: run commitlint without requiring a global pnpm.
+# Falls back to `npx pnpm@<version>` when pnpm is not on PATH, and prints
+# instructions to enable corepack when neither pnpm nor npx is available.
+
+PNPM_VERSION="9.15.0"
+
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm exec commitlint --edit "$1"
+elif command -v npx >/dev/null 2>&1; then
+  npx --yes "pnpm@${PNPM_VERSION}" exec commitlint --edit "$1"
+else
+  echo "Error: neither 'pnpm' nor 'npx' was found on your PATH." >&2
+  echo "" >&2
+  echo "This project's git hooks require pnpm. To make it available, run:" >&2
+  echo "" >&2
+  echo "  corepack enable" >&2
+  echo "" >&2
+  echo "Then re-run your commit. Alternatively, install pnpm globally:" >&2
+  echo "" >&2
+  echo "  npm install -g pnpm@${PNPM_VERSION}" >&2
+  echo "" >&2
+  exit 1
+fi

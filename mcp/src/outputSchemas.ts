@@ -396,13 +396,17 @@ export const PURCHASE_HISTORY_OUTPUT_SCHEMA = {
       items: {
         type: "object",
         properties: {
-          resourceId: { type: "string" },
+          // "api_call" — labels every entry as a pay-per-call API call (#100).
+          kind: { type: "string", const: "api_call" },
+          // Human-readable API name from the provider's registration.
+          apiName: { type: "string" },
+          // API id used to look up the API in the catalog.
+          apiId: { type: "string" },
           amount: { type: "string" },
           network: { type: "string" },
           txHash: { type: ["string", "null"] },
           timestamp: { type: "string" },
           receiptRef: { type: ["string", "null"] },
-          title: { type: "string" },
           profile: { type: "string" },
           // Pre-resolved Stellar Expert URL for the settlement transaction.
           // Null when txHash was not recorded. Pass txHash to zentrixpay_tx_status
@@ -410,7 +414,9 @@ export const PURCHASE_HISTORY_OUTPUT_SCHEMA = {
           explorerUrl: { type: ["string", "null"] },
         },
         required: [
-          "resourceId",
+          "kind",
+          "apiName",
+          "apiId",
           "amount",
           "network",
           "txHash",
@@ -705,12 +711,59 @@ export const PUBLISH_BATCH_OUTPUT_SCHEMA = {
   required: ["requested", "verified", "rejected", "errored", "onchainStatus", "txHash", "items"],
 } as const;
 
+/** Output schema for zentrixpay_call (#98). */
+export const ZENTRIXPAY_CALL_OUTPUT_SCHEMA = {
+  type: "object",
+  properties: {
+    api: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        name: { type: "string" },
+      },
+      required: ["id", "name"],
+    },
+    request: {
+      type: "object",
+      properties: {
+        method: { type: "string" },
+        url: { type: "string" },
+      },
+      required: ["method", "url"],
+    },
+    status: { type: "integer" },
+    charged: { type: "boolean" },
+    amount: { type: "string" },
+    txHash: { type: ["string", "null"] },
+    contentType: { type: ["string", "null"] },
+    /**
+     * Text responses: a string (possibly truncated).
+     * Binary responses: an object with encoding, sizeBytes and base64 data (#101).
+     */
+    body: {
+      oneOf: [
+        { type: "string" },
+        {
+          type: "object",
+          properties: {
+            encoding: { type: "string", const: "base64" },
+            sizeBytes: { type: "integer" },
+            data: { type: "string" },
+          },
+          required: ["encoding", "sizeBytes", "data"],
+        },
+      ],
+    },
+  },
+  required: ["api", "request", "status", "charged", "amount", "txHash", "contentType", "body"],
+} as const;
+
 /** Tools that must stay text-only (no schema, no structuredContent). */
 export const TEXT_ONLY_TOOLS = [
-  // Pay-per-call API tools return their JSON as text.
+  // Pay-per-call API tools return their JSON as text, except zentrixpay_call
+  // which now declares an outputSchema (#98).
   "zentrixpay_list_apis",
   "zentrixpay_api_info",
-  "zentrixpay_call",
   "zentrixpay_register_api",
   "zentrixpay_update_api",
   "zentrixpay_verify_api_ownership",

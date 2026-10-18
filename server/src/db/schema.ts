@@ -148,15 +148,14 @@ export const apis = pgTable(
     ownershipVerifiedAt: timestamp("ownership_verified_at"),
     listed: boolean("listed").notNull().default(false),
     tags: jsonb("tags").$type<string[]>().notNull().default([]),
-    // Payer wallet access control, checked before payment. A null allowlist
-    // admits every wallet; the denylist always wins.
-    payerAllowlist: jsonb("payer_allowlist").$type<string[]>(),
-    payerDenylist: jsonb("payer_denylist").$type<string[]>().notNull().default([]),
+    // Soft delete: archived APIs are hidden everywhere but keep their call history.
+    archivedAt: timestamp("archived_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => ({
     publisherIdx: index("idx_apis_publisher_id").on(table.publisherId),
     catalogIdx: index("idx_apis_listed_created_at").on(table.listed, table.createdAt),
+    tagsIdx: index("idx_apis_tags").using("gin", table.tags),
   }),
 );
 

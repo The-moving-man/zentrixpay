@@ -1,17 +1,23 @@
+import { describe, expect, it, vi } from "vitest";
+import {
+  createApiToolHandler,
+  type ApiToolDeps,
+  type ApiToolDefinition,
+} from "./apiTools.js";
+
 /**
- * Pay-per-call API tools.
+ * Handler-level tests for the pay-per-call tools.
  *
- * ZentrixPay providers sell access to their HTTP APIs one call at a time.
- * Each API has a proxy URL (`<server>/api/<id>`); a call is paid with x402 in
- * USDC on Stellar and forwarded to the provider. These tools let an agent find
- * APIs, call them (paying per call), and — as a provider — register and manage
- * its own APIs.
- *
- * Handlers are built from injected dependencies so this module does not import
- * index.ts (which owns wallet state, the paid fetch and HTTP plumbing).
+ * These complement the dispatcher-level integration test by exercising
+ * `createApiToolHandler` directly with injected dependencies, so we can assert
+ * on the exact guard behavior (method allow-list, auto-pay ceiling, funds
+ * short-circuit, mainnet / paid-confirmation guards) and on the side effects
+ * (purchase recording, settlement tx hash) without going through the network.
  */
 
 import type { ToolDefinition } from "./tools.js";
+import { assertWithinSessionSpendLimit, recordSessionSpend } from "./paymentCeiling.js";
+import { ZENTRIXPAY_CALL_OUTPUT_SCHEMA } from "./outputSchemas.js";
 
 const API_ID = {
   type: "string",
@@ -19,60 +25,38 @@ const API_ID = {
   examples: ["k3v9x2m1q8w7e6r5t4y3u2i1"],
 };
 
-const CONFIRM_PAID = {
-  type: "boolean",
-  description:
-    "Confirm this USDC spend. Required only when ZENTRIXPAY_CONFIRM_PAID_OPERATIONS asks for confirmation.",
-};
+function makeDeps(overrides: Partial<ApiToolDeps> = {}): ApiToolDeps {
+  const deps: ApiToolDeps = {
+    fetch: vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      headers: new Headers({ "content-type": "application/json" }),
+      json: async () => ({ result: "ok" }),
+      text: async () => JSON.stringify({ result: "ok" }),
+    })) as unknown as ApiToolDeps["fetch"],
+    getBalanceUsdc: vi.fn(async () => 1),
+    pay: vi.fn(async () => ({ txHash: "0xsettlement" })),
+    recordPurchase: vi.fn(async () => undefined),
+    isMainnet: false,
+    confirmPaidCall: undefined,
+    ...overrides,
+  };
+  return deps;
+}
 
-const CONFIRM_MAINNET = {
-  type: "boolean",
-  description:
-    "Required on mainnet (or set ZENTRIXPAY_ALLOW_MAINNET=1). Explicitly confirm this action on the public Stellar network.",
-};
+describe("createApiToolHandler / zentrixpay_call", () => {
+  it("rejects a method not allowed by the API", async () => {
+    const deps = makeDeps();
+    const handler = createApiToolHandler(TOOL, deps);
 
-const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+    const result = await handler({ method: "DELETE" });
 
-const API_FIELDS = {
-  name: { type: "string", description: "Display name of the API.", examples: ["Weather API"] },
-  description: { type: "string", description: "What the API does, shown in the catalog." },
-  upstreamUrl: {
-    type: "string",
-    description:
-      "Base URL of the real API. Calls to <proxyUrl>/<path> are forwarded to <upstreamUrl>/<path>. Never shown to callers.",
-    examples: ["https://api.example.com/v1"],
-  },
-  price: {
-    type: "string",
-    description: "Price per call in USDC (max 7 decimals).",
-    examples: ["0.01"],
-  },
-  walletAddress: {
-    type: "string",
-    description: "Stellar address that receives payments. Defaults to the publisher wallet.",
-  },
-  allowedMethods: {
-    type: "array",
-    items: { type: "string", enum: HTTP_METHODS },
-    description: 'HTTP methods callers may use. Defaults to ["GET"].',
-  },
-  upstreamHeaderName: {
-    type: "string",
-    description:
-      "Name of a secret header ZentrixPay adds to every forwarded call (e.g. your own API key header). Stored encrypted.",
-    examples: ["x-api-key"],
-  },
-  upstreamHeaderValue: {
-    type: "string",
-    description: "Value for upstreamHeaderName. Never shown to callers.",
-  },
-  timeoutMs: {
-    type: "integer",
-    minimum: 1000,
-    description: "Upstream timeout per call in milliseconds (capped by the server).",
-  },
-  tags: { type: "array", items: { type: "string" }, description: "Up to 10 catalog tags." },
-};
+    expect(result.isError).toBe(true);
+    expect(String(result.content)).toMatch(/method/i);
+    expect(deps.fetch).not.toHaveBeenCalled();
+    expect(deps.pay).not.toHaveBeenCalled();
+    expect(deps.recordPurchase).not.toHaveBeenCalled();
+  });
 
 export const API_TOOL_DEFINITIONS: ToolDefinition[] = [
   {
@@ -161,11 +145,17 @@ export const API_TOOL_DEFINITIONS: ToolDefinition[] = [
           description:
             "Per-call maximum automatic payment in USDC. Required when the price is above ZENTRIXPAY_MAX_AUTO_PAY_USDC.",
         },
+        dryRun: {
+          type: "boolean",
+          description:
+            "When true, resolve the request (URL, method, price) and return a preview without making any paid call or spending USDC.",
+        },
         confirmPaid: CONFIRM_PAID,
         confirmMainnet: CONFIRM_MAINNET,
       },
       required: ["apiId"],
     },
+    outputSchema: ZENTRIXPAY_CALL_OUTPUT_SCHEMA as unknown as Record<string, unknown>,
     annotations: {
       title: "Call API (paid)",
       readOnlyHint: false,
@@ -260,41 +250,48 @@ export const API_TOOL_DEFINITIONS: ToolDefinition[] = [
   },
 ];
 
-export const API_TOOL_NAMES: ReadonlySet<string> = new Set(
-  API_TOOL_DEFINITIONS.map((tool) => tool.name),
-);
+    const result = await handler({ method: "POST" });
 
-export interface ApiJsonResponse {
-  ok: boolean;
-  status: number;
-  data: any;
+    expect(result.isError).toBe(true);
+    expect(String(result.content)).toMatch(/ceiling|max/i);
+    expect(deps.fetch).not.toHaveBeenCalled();
+    expect(deps.pay).not.toHaveBeenCalled();
+    expect(deps.recordPurchase).not.toHaveBeenCalled();
+  });
+
+  it("short-circuits when funds are insufficient", async () => {
+    const deps = makeDeps({
+      getBalanceUsdc: vi.fn(async () => 0.01),
+    });
+    const handler = createApiToolHandler(TOOL, deps);
+
+    const result = await handler({ method: "POST" });
+
+/**
+ * Binary content-type prefixes and patterns that should not be decoded as text.
+ * When matched, `call()` returns size, type and a base64 payload instead of
+ * attempting to render the raw bytes as a string (#101).
+ */
+const BINARY_CONTENT_TYPE_PATTERNS = [
+  /^image\//,
+  /^audio\//,
+  /^video\//,
+  /^application\/pdf/,
+  /^application\/zip/,
+  /^application\/gzip/,
+  /^application\/octet-stream/,
+  /^application\/x-tar/,
+  /^application\/x-bzip/,
+  /^application\/wasm/,
+  /^font\//,
+];
+
+/** Returns true when `contentType` signals binary (non-text) content. */
+function isBinaryContentType(contentType: string | null): boolean {
+  if (!contentType) return false;
+  const ct = contentType.toLowerCase().split(";")[0].trim();
+  return BINARY_CONTENT_TYPE_PATTERNS.some((p) => p.test(ct));
 }
-
-export interface ApiToolDeps {
-  baseUrl(): string;
-  network(): string;
-  jsonFetch(url: string, init?: RequestInit): Promise<ApiJsonResponse>;
-  requireApiKey(): string;
-  requireWallet(): { publicKey: string; secretKey: string };
-  paidFetch(wallet: { publicKey: string; secretKey: string }): typeof fetch;
-  assertWithinCeiling(price: string, maxAutoPayUsdc?: string): void;
-  insufficientFundsMessage(
-    wallet: { publicKey: string; secretKey: string },
-    amount: string,
-    action: string,
-  ): Promise<string | null>;
-  recordPurchase(input: {
-    resourceId: string;
-    amount: string;
-    network: string;
-    txHash: string | null;
-    receiptRef: string | null;
-    title?: string;
-  }): void;
-}
-
-/** Bounded so a large API response cannot flood the agent's context. */
-const MAX_BODY_CHARS = 20_000;
 
 function str(args: Record<string, unknown>, key: string, required = false): string | undefined {
   const value = args[key];
@@ -306,98 +303,49 @@ function str(args: Record<string, unknown>, key: string, required = false): stri
   return value;
 }
 
-function apiId(args: Record<string, unknown>): string {
-  const id = str(args, "apiId", true)!;
-  if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) throw new Error("apiId has an invalid format");
-  return id;
-}
+  it("performs a successful paid call and records the purchase with the settlement tx hash", async () => {
+    const deps = makeDeps();
+    const handler = createApiToolHandler(TOOL, deps);
 
-function stringMap(args: Record<string, unknown>, key: string): Record<string, string> {
-  const value = args[key];
-  if (value === undefined || value === null) return {};
-  if (typeof value !== "object" || Array.isArray(value))
-    throw new Error(`${key} must be an object`);
-  const out: Record<string, string> = {};
-  for (const [k, v] of Object.entries(value)) out[k] = String(v);
-  return out;
-}
+    const result = await handler({ method: "POST", body: { foo: "bar" } });
 
-function serverError(operation: string, res: ApiJsonResponse): Error {
-  const detail =
-    typeof res.data === "object" && res.data?.error !== undefined
-      ? typeof res.data.error === "string"
-        ? res.data.error
-        : JSON.stringify(res.data.error)
-      : String(res.data).slice(0, 500);
-  return new Error(`${operation} failed [${res.status}]: ${detail}`);
-}
+    expect(result.isError).toBeFalsy();
+    expect(deps.fetch).toHaveBeenCalledTimes(1);
+    expect(deps.pay).toHaveBeenCalledTimes(1);
+    expect(deps.recordPurchase).toHaveBeenCalledTimes(1);
 
-/** Copy only the API fields a tool call supplied into a request body. */
-function apiBody(args: Record<string, unknown>): Record<string, unknown> {
-  const body: Record<string, unknown> = {};
-  for (const key of [
-    "name",
-    "description",
-    "upstreamUrl",
-    "price",
-    "walletAddress",
-    "allowedMethods",
-    "timeoutMs",
-    "tags",
-    "listed",
-  ]) {
-    if (args[key] !== undefined) body[key] = args[key];
-  }
-  const headerName = str(args, "upstreamHeaderName");
-  const headerValue = str(args, "upstreamHeaderValue");
-  if (headerName || headerValue) {
-    if (!headerName || !headerValue) {
-      throw new Error("upstreamHeaderName and upstreamHeaderValue must be given together");
-    }
-    body.upstreamHeader = { name: headerName, value: headerValue };
-  }
-  if (args.removeUpstreamHeader === true) body.upstreamHeader = null;
-  return body;
-}
-
-/** Transaction hash from an x402 PAYMENT-RESPONSE header, when present. */
-function settlementTx(header: string | null): string | null {
-  if (!header) return null;
-  try {
-    const decoded = JSON.parse(Buffer.from(header, "base64").toString("utf8"));
-    return typeof decoded?.transaction === "string" ? decoded.transaction : null;
-  } catch {
-    return null;
-  }
-}
-
-function json(value: unknown): string {
-  return JSON.stringify(value, null, 2);
-}
-
-export function createApiToolHandler(deps: ApiToolDeps) {
-  const authed = (init: RequestInit = {}): RequestInit => ({
-    ...init,
-    headers: { ...(init.headers as Record<string, string>), "x-api-key": deps.requireApiKey() },
+    const purchaseArg = (deps.recordPurchase as ReturnType<typeof vi.fn>).mock
+      .calls[0][0];
+    expect(purchaseArg).toMatchObject({
+      tool: "zentrixpay_call",
+      txHash: "0xsettlement",
+    });
   });
 
-  async function getApi(id: string) {
-    const res = await deps.jsonFetch(`${deps.baseUrl()}/apis/${encodeURIComponent(id)}`);
-    if (!res.ok) throw serverError("API lookup", res);
-    return res.data as {
-      id: string;
-      name: string;
-      price: string;
-      allowedMethods: string[];
-      proxyUrl: string;
-    };
-  }
+  it("does not charge or record a purchase when the upstream call fails (>=400)", async () => {
+    const deps = makeDeps({
+      fetch: vi.fn(async () => ({
+        ok: false,
+        status: 500,
+        headers: new Headers({ "content-type": "application/json" }),
+        json: async () => ({ error: "boom" }),
+        text: async () => JSON.stringify({ error: "boom" }),
+      })) as unknown as ApiToolDeps["fetch"],
+    });
+    const handler = createApiToolHandler(TOOL, deps);
 
-  async function call(args: Record<string, unknown>): Promise<string> {
-    const id = apiId(args);
-    const method = (str(args, "method") ?? "GET").toUpperCase();
-    if (!HTTP_METHODS.includes(method))
-      throw new Error(`method must be one of ${HTTP_METHODS.join(", ")}`);
+    const result = await handler({ method: "POST" });
+
+    expect(result.isError).toBe(true);
+    expect(deps.pay).not.toHaveBeenCalled();
+    expect(deps.recordPurchase).not.toHaveBeenCalled();
+  });
+
+  it("rejects unknown arguments", async () => {
+    const deps = makeDeps();
+    const handler = createApiToolHandler(TOOL, deps);
+
+    const result = await handler({ method: "POST", bogus: true });
 
     const api = await getApi(id);
     if (!api.allowedMethods.includes(method)) {
@@ -405,35 +353,65 @@ export function createApiToolHandler(deps: ApiToolDeps) {
         `${api.name} does not accept ${method}; allowed: ${api.allowedMethods.join(", ")}`,
       );
     }
-    deps.assertWithinCeiling(api.price, str(args, "maxAutoPayUsdc"));
-
-    const wallet = deps.requireWallet();
-    const short = await deps.insufficientFundsMessage(wallet, api.price, `call "${api.name}"`);
-    if (short) return short;
 
     const path = (str(args, "path") ?? "").replace(/^\/+/, "");
     const url = new URL(`${api.proxyUrl}${path ? `/${path}` : ""}`);
     for (const [k, v] of Object.entries(stringMap(args, "query"))) url.searchParams.append(k, v);
 
-    const headers = stringMap(args, "headers");
-    let body: string | undefined;
-    if (args.body !== undefined && args.body !== null) {
-      if (typeof args.body === "string") {
-        body = args.body;
-      } else {
-        body = JSON.stringify(args.body);
-        if (!Object.keys(headers).some((h) => h.toLowerCase() === "content-type")) {
-          headers["content-type"] = "application/json";
-        }
-      }
+    // Dry-run: return the resolved request details and price without paying.
+    if (args.dryRun === true) {
+      return json({
+        dryRun: true,
+        api: { id: api.id, name: api.name },
+        request: { method, url: url.toString() },
+        price: `${api.price} USDC`,
+        note: "No payment was made. Pass dryRun: false (or omit it) to execute the call.",
+      });
     }
 
+    deps.assertWithinCeiling(api.price, str(args, "maxAutoPayUsdc"));
+    assertWithinSessionSpendLimit({ price: api.price });
+
+  it("blocks paid calls on mainnet without explicit confirmation", async () => {
+    const deps = makeDeps({ isMainnet: true });
+    const handler = createApiToolHandler(TOOL, deps);
+
+    const result = await handler({ method: "POST" });
+
+    expect(result.isError).toBe(true);
+    expect(String(result.content)).toMatch(/mainnet|confirm/i);
+    expect(deps.pay).not.toHaveBeenCalled();
+    expect(deps.recordPurchase).not.toHaveBeenCalled();
+  });
+
     const res = await deps.paidFetch(wallet)(url.toString(), { method, headers, body });
-    const text = await res.text();
+    const contentType = res.headers.get("content-type");
     const charged = res.status < 400;
     const txHash = settlementTx(
       res.headers.get("payment-response") ?? res.headers.get("x-payment-response"),
     );
+
+    let bodyPayload: unknown;
+    if (isBinaryContentType(contentType)) {
+      // Binary response: return size, type and base64 instead of raw bytes (#101).
+      const buffer = await res.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      const base64 = Buffer.from(bytes).toString("base64");
+      bodyPayload = {
+        encoding: "base64",
+        sizeBytes: bytes.byteLength,
+        data:
+          base64.length > MAX_BODY_CHARS
+            ? `${base64.slice(0, MAX_BODY_CHARS)}…[truncated ${base64.length - MAX_BODY_CHARS} base64 chars]`
+            : base64,
+      };
+    } else {
+      const text = await res.text();
+      bodyPayload =
+        text.length > MAX_BODY_CHARS
+          ? `${text.slice(0, MAX_BODY_CHARS)}\n…[truncated ${text.length - MAX_BODY_CHARS} chars]`
+          : text;
+    }
 
     if (charged) {
       deps.recordPurchase({
@@ -444,6 +422,7 @@ export function createApiToolHandler(deps: ApiToolDeps) {
         receiptRef: null,
         title: api.name,
       });
+      recordSessionSpend(api.price);
     }
 
     return json({
@@ -453,78 +432,21 @@ export function createApiToolHandler(deps: ApiToolDeps) {
       charged,
       amount: charged ? `${api.price} USDC` : "0 USDC (not charged: the call failed)",
       txHash,
-      contentType: res.headers.get("content-type"),
-      body:
-        text.length > MAX_BODY_CHARS
-          ? `${text.slice(0, MAX_BODY_CHARS)}\n…[truncated ${text.length - MAX_BODY_CHARS} chars]`
-          : text,
+      contentType,
+      body: bodyPayload,
     });
   }
 
-  return async function handle(name: string, args: Record<string, unknown>): Promise<string> {
-    // Same contract as the generic validator: an argument the schema does not
-    // advertise is an error, not something to silently ignore.
-    const known = API_TOOL_DEFINITIONS.find((t) => t.name === name)?.inputSchema.properties ?? {};
-    const unknown = Object.keys(args).filter((key) => !(key in known));
-    if (unknown.length > 0) {
-      throw new Error(
-        `Invalid arguments for ${name}: ${unknown.join(", ")} is not a recognized argument`,
-      );
-    }
-    const base = deps.baseUrl();
-    switch (name) {
-      case "zentrixpay_list_apis": {
-        const url = new URL(`${base}/apis`);
-        for (const key of ["q", "limit", "offset"]) {
-          if (args[key] !== undefined) url.searchParams.set(key, String(args[key]));
-        }
-        const res = await deps.jsonFetch(url.toString());
-        if (!res.ok) throw serverError("Listing APIs", res);
-        return json(res.data);
-      }
-      case "zentrixpay_api_info":
-        return json(await getApi(apiId(args)));
-      case "zentrixpay_call":
-        return call(args);
-      case "zentrixpay_register_api": {
-        const res = await deps.jsonFetch(
-          `${base}/apis`,
-          authed({ method: "POST", body: JSON.stringify(apiBody(args)) }),
-        );
-        if (!res.ok) throw serverError("Registering API", res);
-        return json(res.data);
-      }
-      case "zentrixpay_update_api": {
-        const res = await deps.jsonFetch(
-          `${base}/apis/${encodeURIComponent(apiId(args))}`,
-          authed({ method: "PATCH", body: JSON.stringify(apiBody(args)) }),
-        );
-        if (!res.ok) throw serverError("Updating API", res);
-        return json(res.data);
-      }
-      case "zentrixpay_verify_api_ownership": {
-        const res = await deps.jsonFetch(
-          `${base}/apis/${encodeURIComponent(apiId(args))}/verify-ownership`,
-          authed({ method: "POST" }),
-        );
-        if (!res.ok) throw serverError("Ownership verification", res);
-        return json(res.data);
-      }
-      case "zentrixpay_my_apis": {
-        const res = await deps.jsonFetch(`${base}/publishers/me/apis`, authed());
-        if (!res.ok) throw serverError("Listing your APIs", res);
-        return json(res.data);
-      }
-      case "zentrixpay_api_stats": {
-        const res = await deps.jsonFetch(
-          `${base}/apis/${encodeURIComponent(apiId(args))}/stats`,
-          authed(),
-        );
-        if (!res.ok) throw serverError("Loading API stats", res);
-        return json(res.data);
-      }
-      default:
-        throw new Error(`Unknown API tool: ${name}`);
-    }
-  };
-}
+  it("allows a paid call on mainnet once the paid-confirmation guard approves", async () => {
+    const confirmPaidCall = vi.fn(async () => true);
+    const deps = makeDeps({ isMainnet: true, confirmPaidCall });
+    const handler = createApiToolHandler(TOOL, deps);
+
+    const result = await handler({ method: "POST" });
+
+    expect(result.isError).toBeFalsy();
+    expect(confirmPaidCall).toHaveBeenCalled();
+    expect(deps.pay).toHaveBeenCalledTimes(1);
+    expect(deps.recordPurchase).toHaveBeenCalledTimes(1);
+  });
+});

@@ -1501,7 +1501,7 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
   {
     name: "zentrixpay_rotate_publisher_key",
     description:
-      "Rotate the publisher API key for the active profile. Calls the ZentrixPay server rotation endpoint (POST /publishers/rotate-key), stores the new key in the state file, and returns the updated publisher ID. The old key is invalidated server-side. Requires an existing registration (zentrixpay_register).",
+      "Rotate the publisher API key for the active profile. Calls the ZentrixPay server rotation endpoint (POST /publishers/me/rotate-key), stores the new key in the state file, and returns the updated publisher ID. The old key is invalidated server-side. Requires an existing registration (zentrixpay_register).",
     inputSchema: {
       type: "object",
       properties: {

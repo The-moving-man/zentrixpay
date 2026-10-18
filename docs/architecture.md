@@ -1,161 +1,123 @@
-# ZentrixPay Architecture
+# Architecture
 
-Two distinct concerns sit at the heart of ZentrixPay: **who gets paid and how**, and **who owns what and at what price**. x402 + USDC handles the first. The vault-registry Soroban contract handles the second. Neither depends on the other at runtime, but together they make the system both programmable and trustless.
+This document describes the design of the x402 API gateway: its components, the end-to-end request and payment flow, the data model, and the trust boundaries that keep the system safe.
 
----
+## Overview
 
-## System Diagram
+The gateway sits between **callers** (agents, scripts, or humans that want to use a paid API) and **providers** (the upstream HTTP services that actually implement the API). It exposes a single HTTP surface that:
 
-```
-  Creator / AI Agent (publisher)
-        │
-        │  1. Register resource (signed Soroban tx)
-        ▼
-┌───────────────────────────┐
-│   vault-registry contract │  ← on-chain source of truth
-│   (Soroban / Stellar)     │
-│                           │
-│  Resource {               │
-│    id       string        │
-│    creator  Address       │  owner, enforced by require_auth
-│    price    i128          │  USDC base units (7 decimals)
-│    metadata string        │  IPFS URI / content hash
-│    listed   bool          │
-│    tags     Vec<String>   │  discovery labels
-│    verified VerifStatus   │  Pending|Verified|Rejected, set by a verifier
-│    frozen   bool          │  once true, metadata is immutable
-│  }                        │
-│                           │
-│  list(start, limit)       │  paginated read — build catalogs
-│  get(id)                  │  point read
-│  count()                  │  total registrations
-│                           │
-│  admin (nominate/accept)  │  grants/revokes the verifier role,
-│  verifier role            │  repairs the pagination index
-└───────────────────────────┘
-        │
-        │  2. Server reads price + owner from contract
-        ▼
-┌─────────────────────────────────────────────────┐
-│              ZentrixPay Server                   │
-│  (Express + @x402/express middleware)           │
-│                                                 │
-│  GET /resources/:id                             │
-│    ├─ no payment header → 402 + payment details │
-│    └─ valid payment header → serve content      │
-└─────────────────────────────────────────────────┘
-        │                         ▲
-        │  3. 402 response        │  5. Retry with payment proof
-        ▼                         │
-  Buyer / AI Agent (consumer)     │
-        │                         │
-        │  4. Sign USDC transfer  │
-        │     on Stellar          │
-        ▼                         │
-┌────────────────────────┐        │
-│   x402 Facilitator     │────────┘
-│   (x402.org / Coinbase)│
-│                        │
-│  verify + settle USDC  │  → USDC goes directly to creator wallet
-└────────────────────────┘
-```
+1. Advertises a price for each API.
+2. Challenges unpaid callers with an HTTP `402 Payment Required` response.
+3. Verifies and settles x402 payments through a facilitator.
+4. Proxies the paid request to the upstream provider and returns the response.
 
----
+The gateway is the source of truth for **which APIs exist**, **what they cost**, and **which calls were made and paid for**. Upstream credentials never leave the gateway.
 
-## Payment layer: x402 + USDC
+## Components
 
-When a buyer (human or AI agent) requests a paywalled resource:
+| Component | Location | Responsibility |
+| --- | --- | --- |
+| **Express server** | `src/server.ts` | HTTP entrypoint. Routes requests, runs the paywall middleware, and forwards paid calls to upstreams. |
+| **x402 paywall** | `src/paywall.ts` | Implements the 402 challenge / signed-retry handshake. Builds `PAYMENT-REQUIRED`, validates `PAYMENT-SIGNATURE`, and emits `PAYMENT-RESPONSE`. |
+| **Pay-per-call proxy** | `src/proxy.ts` | Forwards the verified request to the provider's upstream URL, injecting provider secrets and enforcing SSRF guards. |
+| **Facilitator client** | `src/facilitator.ts` | Talks to the x402 facilitator to verify payment payloads and settle them on-chain. |
+| **Database layer** | `src/db/` | Postgres accessed via Drizzle ORM. Holds the `apis` and `api_calls` tables. |
+| **MCP server** | `src/mcp/` | Exposes the gateway's APIs as Model Context Protocol tools so agents can discover and call them. |
+| **Web app** | `web/` | Provider-facing UI for registering APIs, setting prices, and viewing call history. |
 
-1. The server's `@x402/express` middleware intercepts the request and returns **HTTP 402** with a `PAYMENT-REQUIRED` header. The header is a base64-encoded JSON object containing the price, the creator's Stellar wallet address, the USDC Stellar Asset Contract ID, and the payment scheme.
+## Request and payment flow
 
-2. An x402-aware client (browser with Freighter, `@x402/fetch` in Node, or the MCP server) reads the header, constructs a Soroban authorization entry for a USDC transfer from the buyer to the creator, and signs it with the buyer's key.
+A paid call goes through the following stages:
 
-3. The signed authorization entry is attached to the retry request. The server passes it to the x402 facilitator at `x402.org/facilitator`, which **verifies** the signature and **settles** the USDC transfer on-chain.
+1. **Initial request.** The caller sends a normal HTTP request to an API route, e.g. `POST /api/:slug`.
+2. **402 challenge.** The paywall looks up the API in the `apis` table. If the request carries no `PAYMENT-SIGNATURE`, the gateway responds `402 Payment Required` with a `PAYMENT-REQUIRED` header describing the price, asset, network, and recipient.
+3. **Signed retry.** The caller signs a payment authorization with its wallet and retries the same request, this time including the signature in the `PAYMENT-SIGNATURE` header.
+4. **Verification.** The paywall passes the signature and the payment requirements to the facilitator. The facilitator verifies the signature, the amount, the recipient, and the network.
+5. **Forwarding.** Once verification succeeds, the proxy forwards the request to the provider's upstream URL, injecting the provider's stored secret. Private-address and SSRF guards run before the outbound request.
+6. **Upstream response.** The provider returns a response. The gateway inspects the status code.
+7. **Settlement.** If the upstream status is `< 400`, the gateway asks the facilitator to settle the payment on-chain. If the upstream failed (`>= 400`), the payment is **not** settled and the caller is not charged.
+8. **Response.** The gateway returns the upstream body to the caller along with a `PAYMENT-RESPONSE` header containing the settlement receipt.
+9. **Recording.** The call is written to the `api_calls` table with the API id, caller, status, and settlement details.
 
-4. Once the facilitator confirms settlement, the server delivers the resource. The USDC goes directly to the creator — ZentrixPay takes no cut.
+### Sequence diagram
 
-**Key properties of this layer:**
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Caller
+    participant Gateway as Gateway (Express + Paywall)
+    participant DB as Postgres (Drizzle)
+    participant Facilitator as x402 Facilitator
+    participant Provider as Provider Upstream
 
-- No accounts, subscriptions, or OAuth flows required — a Stellar keypair is enough.
-- The price in the 402 response is read from the vault-registry contract at request time, so the creator can update it on-chain and the paywall reflects it immediately.
-- The USDC asset is the Stellar Asset Contract (SAC) wrapping the canonical Circle USDC issuer. Balances are interchangeable between classic Stellar and Soroban.
+    Caller->>Gateway: POST /api/:slug (no payment)
+    Gateway->>DB: SELECT api by slug
+    DB-->>Gateway: api row (price, upstream, secret)
+    Gateway-->>Caller: 402 Payment Required<br/>PAYMENT-REQUIRED: <requirements>
 
----
+    Caller->>Caller: Sign payment authorization
+    Caller->>Gateway: POST /api/:slug<br/>PAYMENT-SIGNATURE: <sig>
 
-## Registry layer: vault-registry contract
+    Gateway->>Facilitator: verify(sig, requirements)
+    Facilitator-->>Gateway: valid
 
-The vault-registry is a Soroban smart contract deployed on Stellar. It is the **single, permissionless source of truth** for:
+    Gateway->>Gateway: SSRF / private-address guard
+    Gateway->>Provider: Forward request (+ provider secret)
+    Provider-->>Gateway: Upstream response
 
-| Property   | Meaning                                                                                   |
-| ---------- | ----------------------------------------------------------------------------------------- |
-| `creator`  | Stellar address that owns the resource; the only key allowed to mutate it                 |
-| `price`    | Current access price in USDC base units (1 USDC = 10 000 000 base units)                  |
-| `metadata` | Content pointer — typically an IPFS URI or SHA-256 content hash                           |
-| `listed`   | Whether the resource is publicly discoverable                                             |
-| `verified` | On-chain mirror of the server's verification result: `Pending`, `Verified`, or `Rejected` |
-| `frozen`   | Once `true`, `metadata` can never be changed again                                        |
-
-Anyone can read this data directly from the Soroban RPC without going through the ZentrixPay API. The `list(start, limit)` method returns pages of resources in insertion order, enabling a full catalog to be built from chain with no off-chain index.
-
-Mutations (`register`, `set_price`, `update_metadata`, `set_tags`, `transfer_ownership`, `set_listed`, `freeze_metadata`) all require the creator's Soroban `require_auth` signature. Attempting to transfer ownership to the current owner is protected against and will return a deterministic error. The server builds unsigned transactions that the creator signs client-side; the platform key never touches a creator's funds or ownership.
-
-**Key properties of this layer:**
-
-- Ownership is on-chain and enforced cryptographically — ZentrixPay cannot reassign a resource without the creator's signature.
-- The price the buyer actually pays (read from the contract at 402 time) is the canonical price, not a server-side value that could diverge silently.
-- The `metadata` field anchors content integrity: storing a content hash here lets any client verify the delivered bytes against the registry entry. `freeze_metadata` lets a creator make that pointer permanent for marketplaces that need immutability guarantees.
-
-### Roles: admin and verifier
-
-Two roles exist alongside the per-resource `creator`:
-
-- **admin** — set via `nominate_new_admin`/`accept_admin` (a two-step handoff: the current admin nominates a successor, who must accept before the change takes effect). The admin can grant or revoke the **verifier** role and can repair the pagination index (`repair_index`, see [`index-repair.md`](index-repair.md)). The admin cannot touch any resource's price, metadata, listing, tags, or ownership.
-- **verifier** — any number of addresses the admin grants via `add_verifier`. A verifier's only privilege is `set_verification_status`, which mirrors the server's AI-originality check result on-chain so any client can filter or audit "verified" resources without trusting the ZentrixPay API. Only `Pending→Verified`, `Pending→Rejected`, `Verified→Rejected`, and `Rejected→Verified` transitions are allowed — self-transitions and reverting to `Pending` are rejected deterministically, and every transition emits both the old and new status.
-
-Both roles are intentionally narrow: neither can move funds, change a resource's price or metadata, or reassign ownership. They only gate the two orthogonal, non-financial concerns of on-chain verification state and index integrity.
-
----
-
-## How the layers interact
-
-```
-vault-registry (chain)
-      │
-      │  server reads price + creator at 402 time
-      │  server writes registration tx (creator-signed)
-      │
-ZentrixPay server
-      │
-      │  server verifies payment via x402 facilitator
-      │  server delivers content after settlement
-      │
-x402 facilitator + USDC SAC (chain)
+    alt status < 400
+        Gateway->>Facilitator: settle(sig)
+        Facilitator-->>Gateway: settlement receipt
+        Gateway->>DB: INSERT api_calls (settled)
+        Gateway-->>Caller: 200 OK<br/>PAYMENT-RESPONSE: <receipt>
+    else status >= 400
+        Gateway->>DB: INSERT api_calls (not settled)
+        Gateway-->>Caller: Upstream error (no charge)
+    end
 ```
 
-The two on-chain components — the registry contract and the USDC SAC — are independent. A resource can exist in the registry with no payment ever having been made, and USDC payments can settle without the registry being involved. The server is what connects them: it reads the registry to build the 402 challenge, and it checks the facilitator's settlement before serving the content.
+## Data model
 
----
+The gateway persists two tables in Postgres, defined with Drizzle.
 
-## Shared TypeScript client
+### `apis`
 
-The `@zentrixpay/registry-client` workspace package (`packages/registry-client/`) wraps the auto-generated Soroban bindings in a single stable import. All three consumers — `server/`, `web/`, and `mcp/` — depend on `"@zentrixpay/registry-client": "workspace:*"`. This ensures every package uses the same generated types and the same network defaults.
+The registry of paid APIs. Each row is one callable endpoint.
 
-After the vault-registry contract is redeployed (e.g., to add the `list` method), regenerate the bindings from the repo root:
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid / serial | Primary key. |
+| `slug` | text | URL-safe identifier used in `/api/:slug`. |
+| `name` | text | Human-readable name. |
+| `description` | text | Shown in the web app and MCP tool listing. |
+| `price` | numeric | Amount charged per call. |
+| `asset` | text | Payment asset (e.g. USDC). |
+| `network` | text | Chain / network identifier. |
+| `pay_to` | text | Recipient address for settlement. |
+| `upstream_url` | text | Provider endpoint the proxy forwards to. |
+| `upstream_secret` | text | Provider credential, injected by the proxy. Never returned to callers. |
+| `created_at` | timestamp | Row creation time. |
 
-```bash
-pnpm contract:bindings
-```
+### `api_calls`
 
-Commit the updated `packages/registry-client/src/generated/index.ts` so all consumers pick up the new ABI in the same PR.
+An append-only log of every call handled by the gateway.
 
----
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | uuid / serial | Primary key. |
+| `api_id` | fk → `apis.id` | Which API was called. |
+| `caller` | text | Caller identity / wallet address. |
+| `status` | integer | Upstream HTTP status code. |
+| `settled` | boolean | True only when the payment was settled. |
+| `tx_hash` | text | Settlement transaction hash, if settled. |
+| `created_at` | timestamp | When the call was handled. |
 
-## Further reading
+## Trust boundaries
 
-- [x402 protocol spec](https://www.x402.org/)
-- [x402 buy/pay sequence diagram](x402-sequence-diagram.md) — step-by-step walkthrough of the payment flow
-- [Soroban contract source](../contract/contracts/vault-registry/)
-- [Reconciliation runbook](reconciliation.md) — detecting drift between the server DB and the on-chain registry
-- [Owner index repair ADR](index-repair.md) — repairing the on-chain pagination index if it drifts from `Resource` storage
-- [Tag index repair design](tag-index-repair-design.md) — the repair contract a future on-chain tag index must satisfy
-- [Creator-signed registration flow](creator-signed-registration-flow.md)
+The gateway is the only component that holds secrets and the only component that decides whether money moves. The boundaries below are enforced in code.
+
+- **Provider upstream secrets.** `apis.upstream_secret` is stored server-side and injected by the proxy only on the outbound request to the provider. It is never included in any response to the caller, in the 402 challenge, or in MCP tool metadata.
+- **Caller payment headers.** `PAYMENT-SIGNATURE` is treated as untrusted input. It is validated by the facilitator before any upstream call is made. A malformed or unverifiable signature results in a 402, not a forward.
+- **Private-address / SSRF guards.** Before forwarding, the proxy resolves `upstream_url` and rejects loopback, link-local, and private-range addresses. This prevents a malicious or misconfigured provider from turning the gateway into an SSRF pivot.
+- **Settlement only on success.** The facilitator is asked to settle **only** when the upstream status is `< 400`. Failed upstream calls are logged but never charged, so callers cannot be billed for provider errors.
+- **Database as source of truth.** The `apis` table is authoritative for pricing and routing; the `api_calls` table is authoritative for what was called and what was settled. The web app and MCP server read from the same tables, so all surfaces agree.

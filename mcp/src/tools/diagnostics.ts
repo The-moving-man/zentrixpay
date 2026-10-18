@@ -172,7 +172,7 @@ export async function rotatePublisherKey(profileArg?: string): Promise<string> {
     throw new Error(`No publisher API key in profile "${target}". Run zentrixpay_register first.`);
   }
 
-  const res = await jsonFetch(`${BASE_URL}/publishers/rotate-key`, {
+  const res = await jsonFetch(`${BASE_URL}/publishers/me/rotate-key`, {
     method: "POST",
     headers: { "x-api-key": oldApiKey },
   });

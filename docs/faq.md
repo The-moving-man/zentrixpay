@@ -1,74 +1,173 @@
-# ZentrixPay FAQ
+# ZentrixPay Gateway FAQ
 
-Common questions from creators, human buyers, and AI agents using ZentrixPay.
+This FAQ covers the ZentrixPay gateway: how providers register and get paid, how callers (agents) pay for calls, how secrets are stored, and what happens when things go wrong. It replaces the older vault-oriented FAQ.
 
-## Creator Questions
+If you're looking for deployment steps, see the [Deployment Runbook](./deployment.md). For the protocol-level details, see the [Architecture Overview](./architecture.md) and the [API Reference](./api.md).
 
-### What fees does ZentrixPay charge?
+---
 
-ZentrixPay is currently designed so resource payments go directly from the buyer to the creator's Stellar wallet in USDC. The platform wallet receives the separate content-verification fee, not a cut of every resource purchase.
+## Fees
 
-On testnet, wallet funding and USDC come from faucets. In production, creators should still expect normal network costs and any facilitator or infrastructure fees configured for the deployment.
+### 1. What fees does the gateway charge?
 
-### When do creators get paid?
+The gateway charges a small protocol fee on each successful call, taken from the amount the caller pays. The fee is a percentage of the call price and is deducted before the provider's payout is credited. The current fee schedule is published in the [Deployment Runbook](./deployment.md) and is configurable per deployment.
 
-Creators are paid during the x402 settlement flow. A buyer requests a protected resource, signs the USDC payment, and retries the request with payment proof. Once the facilitator verifies and settles that payment on Stellar, the resource can be delivered and the creator receives the USDC transfer on-chain.
+### 2. Who pays the fee — the caller or the provider?
 
-### What wallet do I need as a creator?
+The caller pays the listed call price. The protocol fee is deducted from that price, so the provider receives `price - fee`. Callers never see a separate line item; the price they see is the price they pay.
 
-Creators need a Stellar wallet address that can receive USDC on the configured Stellar network. For browser use, ZentrixPay supports Stellar browser wallets through `@creit.tech/stellar-wallets-kit`. For agent publishing, the MCP server can create a sponsored agent wallet.
+### 3. Are fees charged on failed calls?
 
-### Can ZentrixPay move or edit my registered resources?
+No. Fees are only assessed on calls that complete successfully and produce a billable response. If a call fails before the provider returns a result, no fee is charged and no funds move. See [Failed calls](#failed-calls) below.
 
-The vault-registry contract records the creator address for each resource. Contract mutations require the creator's Soroban authorization, so the platform cannot silently transfer ownership or change protected metadata without the creator key participating in the transaction.
+### 4. Are there fees for registering as a provider?
 
-### Why is verification required before publishing?
+No. Provider registration and ownership verification are free. You only pay normal network gas costs for any on-chain transactions you choose to make (for example, claiming payouts).
 
-The verification step helps keep the catalog useful by checking submitted resources for basic quality and originality. It is implemented as a paid x402 service, so both browser publishers and AI-agent publishers use the same payment pattern before a resource goes live.
+---
 
-## Buyer Questions
+## Failed calls
 
-### Do buyers need an account?
+### 5. What counts as a "failed call"?
 
-No. ZentrixPay uses HTTP 402 and wallet-signed payment proof instead of account-gated subscriptions. A buyer needs a compatible wallet or x402-aware client, enough USDC for the resource price, and the protected resource URL.
+A call is considered failed if the gateway cannot obtain a valid response from the provider — for example, the provider times out, returns a 5xx error, or the response fails validation. A call that returns a well-formed error response *from the provider's own application logic* is still a successful gateway call and is billed normally.
 
-### What happens if payment succeeds but content is not delivered?
+### 6. Am I charged if the provider is down?
 
-Start with the transaction hash and the x402 response details. Confirm the USDC transfer settled on Stellar Explorer, then follow the checks in [x402 payment troubleshooting](x402-payment-troubleshooting.md). Operators can also compare local records with chain state using the reconciliation flow.
+No. If the provider is unreachable or times out, the call is marked failed and the caller is not charged. The gateway records the failure so providers can see their reliability metrics.
 
-### Are payments refundable?
+### 7. What happens to my request when a call fails?
 
-Refunds are not built into the current protocol flow. Resource purchases are settled as on-chain USDC transfers from buyer to creator.
+The gateway returns an error to the caller describing the failure (timeout, upstream error, validation failure). No payment is settled. You can safely retry; retries are independent calls and are billed only if they succeed.
 
-## AI Agent Questions
+### 8. Can a provider be penalized for repeated failures?
 
-### How does an AI agent get a wallet?
+Yes. The gateway tracks per-provider success rates. Providers with sustained failures may be deprioritized in routing or temporarily suspended. See the [Deployment Runbook](./deployment.md) for the current thresholds.
 
-The MCP server exposes `zentrixpay_setup_wallet`, which creates a sponsored Stellar testnet account for the agent. The sponsor covers the account reserve and USDC trustline requirement, so the agent can start without holding XLM first.
+---
 
-### Does a sponsored agent wallet include USDC?
+## Refunds
 
-No. Sponsorship covers the account setup and trustline reserve, not spendable USDC. The agent wallet still needs testnet USDC from a faucet or another funder before it can publish or buy resources.
+### 9. How do refunds work?
 
-### How does an agent publish a resource?
+Because failed calls are never charged, most "refunds" happen automatically: if a call fails, no payment is taken. For the rare case where a charge is settled but the result is later found to be invalid, the gateway issues a refund to the caller's balance. Refunds are credited to the caller's gateway balance, not sent on-chain directly.
 
-An agent runs `zentrixpay_setup_wallet`, funds the wallet, registers with `zentrixpay_register`, then calls `zentrixpay_publish`. The MCP server signs the verification payment with the agent wallet and stores the publisher API key in memory for the session.
+### 10. How long do refunds take?
 
-### How does an agent buy a resource?
+Automatic non-charges are immediate. Manual refunds for disputed calls are processed during the next settlement cycle, typically within one business day. On-chain withdrawal of a refunded balance follows the normal payout schedule.
 
-An agent browses or previews resources, then calls `zentrixpay_buy` with the resource ID. The MCP server reads the HTTP 402 payment instructions, signs the USDC payment using the agent wallet, retries the request with `X-Payment`, and returns the protected content after settlement.
+### 11. Can I dispute a charge?
 
-### Can one agent publish and another agent buy?
+Yes. If you believe a call was billed incorrectly, open a dispute with the call ID. The gateway will review the recorded request/response and either uphold the charge or refund it. Disputes must be filed within the window documented in the [Deployment Runbook](./deployment.md).
 
-Yes. Each MCP session has its own in-memory wallet state. One agent can publish a resource, and a second funded agent can browse the catalog and buy it using the same x402 flow as a human wallet client.
+---
 
-## Operations Questions
+## Secret storage (encrypted upstream headers)
 
-### Which network does ZentrixPay use today?
+### 12. How does the gateway store my upstream API keys and headers?
 
-The current documented demo flow uses Stellar testnet and testnet USDC. Production deployments should set the Stellar network passphrase, Soroban RPC URL, USDC contract ID, facilitator URL, and wallet secrets for the target network.
+Upstream credentials (API keys, auth headers, and other secrets a provider needs to reach its backend) are stored **encrypted at rest**. They are encrypted with a key managed by the gateway's secret store and are only decrypted in memory at the moment a call is proxied to the provider's upstream. They are never written to logs or returned in API responses.
 
-### Where can I inspect payments and contract state?
+### 13. Who can see my encrypted headers?
 
-Use Stellar Explorer for transaction hashes, wallet balances, and contract interactions. ZentrixPay docs also include the [deployment runbook](deployment-runbook.md), [reconciliation guide](reconciliation.md), and [architecture overview](architecture.md) for operator-level debugging.
+Only the gateway process handling the call, and only transiently in memory. Operators with database access see ciphertext, not plaintext. Access to the encryption key is restricted and audited. See the [Architecture Overview](./architecture.md) for the key-management model.
 
+### 14. Can I rotate a secret without re-registering?
+
+Yes. Update the provider's upstream headers via the provider API; the new value is re-encrypted and stored, and subsequent calls use it immediately. Old ciphertext is discarded. There is no need to re-register or re-verify ownership to rotate a secret.
+
+### 15. Are secrets ever sent to the caller?
+
+No. Upstream headers are injected by the gateway on the outbound request to the provider's backend. Callers only ever see the provider's response, never the credentials used to produce it.
+
+---
+
+## Testnet USDC
+
+### 16. What currency does the gateway use?
+
+The gateway settles in USDC. On testnet deployments it uses **testnet USDC**, which has no real value and is used purely for testing.
+
+### 17. How do I get testnet USDC?
+
+Testnet USDC is available from the faucet linked in the [Deployment Runbook](./deployment.md). You can also mint it directly if you control the test token contract on your local deployment.
+
+### 18. Is testnet USDC the same as mainnet USDC?
+
+No. Testnet USDC is a separate token on a test network and cannot be bridged or exchanged for mainnet USDC. Never send mainnet funds to a testnet address.
+
+### 19. Do testnet balances carry over to mainnet?
+
+No. Testnet balances, provider registrations, and call history are isolated to the testnet deployment. You must register and fund separately on mainnet.
+
+---
+
+## Provider registration
+
+### 20. How do I register as a provider?
+
+Register through the provider API by submitting your endpoint, pricing, and the upstream headers the gateway should use. Registration is free. Once registered and verified, your endpoint becomes eligible for routing. Full steps are in the [Deployment Runbook](./deployment.md).
+
+### 21. What do I need before registering?
+
+You need: a reachable HTTPS endpoint, a defined price per call, and any upstream credentials the gateway should inject. You also need to complete ownership verification (see below) before you can receive payouts.
+
+### 22. Can I register multiple endpoints?
+
+Yes. Each endpoint is registered as its own provider entry with its own pricing, secrets, and reliability metrics. You can manage them independently.
+
+### 23. How do I update my pricing or endpoint?
+
+Update the provider entry via the provider API. Changes take effect for subsequent calls. Existing in-flight calls use the configuration captured at call time.
+
+---
+
+## Ownership verification
+
+### 24. What is ownership verification?
+
+Ownership verification proves that you control the endpoint (or the on-chain identity) you registered. It prevents someone from registering an endpoint they don't own and redirecting payouts.
+
+### 25. How does verification work?
+
+The gateway issues a challenge — typically a token to serve at a well-known path on your endpoint, or a signed message from your payout address. You complete the challenge, and the gateway marks the provider as verified. Details are in the [Deployment Runbook](./deployment.md).
+
+### 26. What happens if I'm not verified?
+
+Unverified providers can be registered but are not eligible for routing or payouts. Complete verification to go live.
+
+### 27. Do I need to re-verify if I change my endpoint or payout address?
+
+Yes. Changing the endpoint URL or the payout address invalidates the prior verification and requires re-verification. Rotating upstream secrets does **not** require re-verification.
+
+---
+
+## Caller / agent payment flows
+
+### 28. How does an agent pay for a call?
+
+The caller (or agent) funds a gateway balance in USDC. When a call is made, the gateway checks the balance, proxies the call, and on success debits the call price from the balance. No per-call on-chain transaction is required, which keeps agent flows fast and cheap.
+
+### 29. Do I need to sign every call?
+
+No. Calls are authenticated with your gateway API key/credentials, and payment is settled against your prepaid balance. You sign only when funding the balance or withdrawing funds.
+
+### 30. What happens if my balance runs out mid-call?
+
+The gateway rejects calls when the balance is insufficient to cover the price, returning a payment-required error before the upstream is contacted. Top up your balance to resume. In-flight calls that were already authorized are settled normally.
+
+### 31. How do providers get paid?
+
+Provider earnings accrue to their gateway balance as calls succeed. Providers withdraw on the normal payout schedule (see the [Deployment Runbook](./deployment.md)), which settles on-chain in USDC. Payouts require completed ownership verification.
+
+### 32. Can an agent set a spending limit?
+
+Yes. Callers can configure per-call and per-period spending limits on their gateway account. Calls exceeding a limit are rejected before the upstream is contacted, protecting agents from runaway spend.
+
+---
+
+## Still have questions?
+
+- Deployment, configuration, and operational thresholds: [Deployment Runbook](./deployment.md)
+- Protocol and key-management details: [Architecture Overview](./architecture.md)
+- Endpoint and field-level details: [API Reference](./api.md)

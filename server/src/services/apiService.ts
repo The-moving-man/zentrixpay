@@ -1,11 +1,12 @@
 import { randomBytes } from "node:crypto";
-import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { apiCalls, apis } from "../db/schema.js";
 import { config } from "../config.js";
 import { encryptSecret } from "../utils/secretBox.js";
 import { validateUpstreamUrl } from "../lib/upstreamGuard.js";
 import { sendUpstream } from "../lib/upstreamClient.js";
+import type { apiCatalogSortValues } from "../schemas/requests.js";
 
 export type ApiRow = typeof apis.$inferSelect;
 
@@ -130,29 +131,73 @@ export async function createApi(input: CreateApiInput): Promise<ApiRow> {
   return row;
 }
 
-export async function getApiById(id: string): Promise<ApiRow | null> {
+/** Load an API by id. Archived APIs are treated as missing unless `includeArchived` is set. */
+export async function getApiById(
+  id: string,
+  opts: { includeArchived?: boolean } = {},
+): Promise<ApiRow | null> {
   const rows = await db.select().from(apis).where(eq(apis.id, id));
-  return rows[0] ?? null;
+  const api = rows[0] ?? null;
+  if (api?.archivedAt && !opts.includeArchived) return null;
+  return api;
 }
 
 /** Load an API and require that `publisherId` owns it (404 otherwise, to avoid leaking ids). */
-export async function getOwnedApi(id: string, publisherId: string): Promise<ApiRow> {
-  const api = await getApiById(id);
+export async function getOwnedApi(
+  id: string,
+  publisherId: string,
+  opts: { includeArchived?: boolean } = {},
+): Promise<ApiRow> {
+  const api = await getApiById(id, opts);
   if (!api || api.publisherId !== publisherId) throw new ApiServiceError(404, "API not found");
   return api;
 }
 
-export async function listPublicApis(opts: { q?: string; limit: number; offset: number }) {
-  const conditions = [eq(apis.listed, true)];
+export type ApiCatalogSort = (typeof apiCatalogSortValues)[number];
+
+export interface ApiCatalogOptions {
+  q?: string;
+  tag?: string[];
+  sort?: ApiCatalogSort;
+  limit: number;
+  offset: number;
+}
+
+/** Window used to rank APIs by popularity (charged calls). */
+export const POPULARITY_WINDOW_DAYS = 7;
+
+export async function listPublicApis(opts: ApiCatalogOptions) {
+  const conditions = [eq(apis.listed, true), isNull(apis.archivedAt)];
   if (opts.q) {
     const pattern = `%${opts.q.replace(/[%_\\]/g, "\\$&")}%`;
     conditions.push(or(ilike(apis.name, pattern), ilike(apis.description, pattern))!);
   }
+  if (opts.tag?.length) {
+    // jsonb containment: the API's tags must include every requested tag.
+    conditions.push(sql`${apis.tags} @> ${JSON.stringify(opts.tag)}::jsonb`);
+  }
+
+  // Charged calls in the popularity window; correlated so it only runs for this sort.
+  const recentChargedCalls = sql`(
+    select count(*) from ${apiCalls}
+    where ${apiCalls.apiId} = ${apis.id}
+      and ${apiCalls.charged}
+      and ${apiCalls.createdAt} >= now() - make_interval(days => ${POPULARITY_WINDOW_DAYS})
+  )`;
+  const price = sql`${apis.price}::numeric`;
+  const order = {
+    newest: [desc(apis.createdAt)],
+    price_asc: [asc(price), desc(apis.createdAt)],
+    price_desc: [desc(price), desc(apis.createdAt)],
+    popular: [desc(recentChargedCalls), desc(apis.createdAt)],
+  }[opts.sort ?? "newest"];
+
   const rows = await db
     .select()
     .from(apis)
     .where(and(...conditions))
-    .orderBy(desc(apis.createdAt))
+    // id breaks ties so offset pagination is stable.
+    .orderBy(...order, asc(apis.id))
     .limit(opts.limit)
     .offset(opts.offset);
   return rows.map(toPublicApi);
@@ -162,9 +207,19 @@ export async function listPublisherApis(publisherId: string) {
   const rows = await db
     .select()
     .from(apis)
-    .where(eq(apis.publisherId, publisherId))
+    .where(and(eq(apis.publisherId, publisherId), isNull(apis.archivedAt)))
     .orderBy(desc(apis.createdAt));
   return rows.map(toOwnerApi);
+}
+
+/** Soft-delete: unlist and hide the API everywhere. Its call history is kept for stats. */
+export async function archiveApi(api: ApiRow): Promise<ApiRow> {
+  const [row] = await db
+    .update(apis)
+    .set({ archivedAt: new Date(), listed: false })
+    .where(eq(apis.id, api.id))
+    .returning();
+  return row;
 }
 
 export interface UpdateApiInput {
@@ -306,91 +361,48 @@ export async function listRecentCalls(apiId: string, limit: number) {
     .limit(limit);
 }
 
-export type StatsInterval = "hour" | "day";
-
-export interface StatsBucket {
-  bucket: string;
+/** One data point in a time-series response: calls and revenue for a single calendar day. */
+export interface TimeSeriesPoint {
+  date: string; // ISO date yyyy-mm-dd in UTC
   calls: number;
-  chargedCalls: number;
-  revenue: string;
+  revenue: string; // USDC, as decimal string
 }
 
 /**
- * Calls, charged calls and revenue per hour or day over [from, to). Every
- * bucket in the range is returned, empty ones included. Bucket boundaries are
- * UTC: created_at is a UTC `timestamp`, and the bounds are cast the same way.
+ * Returns one row per UTC calendar day, covering the last `days` days (today
+ * inclusive). Days with no calls are filled in with zeros so the caller always
+ * gets a contiguous series.
  */
 export async function getApiTimeSeries(
   apiId: string,
-  opts: { interval: StatsInterval; from: Date; to: Date },
-): Promise<StatsBucket[]> {
-  // Only ever "hour" or "day" (validated), so safe to inline.
-  const unit = sql.raw(`'${opts.interval === "hour" ? "hour" : "day"}'`);
-  const step = sql.raw(`interval '1 ${opts.interval === "hour" ? "hour" : "day"}'`);
-  const from = sql`${opts.from.toISOString()}::timestamptz at time zone 'UTC'`;
-  const to = sql`${opts.to.toISOString()}::timestamptz at time zone 'UTC'`;
-
-  const rows = await db.execute<{
-    bucket: string;
-    calls: number;
-    charged_calls: number;
-    revenue: string;
-  }>(sql`
-    with buckets as (
-      select generate_series(
-        date_trunc(${unit}, ${from}),
-        date_trunc(${unit}, ${to} - interval '1 microsecond'),
-        ${step}
-      ) as bucket
-    )
-    select
-      to_char(b.bucket, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as bucket,
-      count(c.id)::int as calls,
-      count(c.id) filter (where c.charged)::int as charged_calls,
-      coalesce(sum(c.amount::numeric) filter (where c.charged), 0)::text as revenue
-    from buckets b
-    left join ${apiCalls} c
-      on c.api_id = ${apiId}
-      and date_trunc(${unit}, c.created_at) = b.bucket
-      and c.created_at >= ${from}
-      and c.created_at < ${to}
-    group by b.bucket
-    order by b.bucket
-  `);
-  return rows.map((r) => ({
-    bucket: r.bucket,
-    calls: r.calls,
-    chargedCalls: r.charged_calls,
-    revenue: r.revenue,
-  }));
-}
-
-/** A payer's charged calls, newest first, as receipts. */
-export async function listPayerCalls(
-  payerAddress: string,
-  opts: { limit: number; offset: number },
-) {
-  // One extra row tells us whether another page exists.
+  days: 7 | 30 | 90,
+): Promise<TimeSeriesPoint[]> {
   const rows = await db
     .select({
-      id: apiCalls.id,
-      apiId: apiCalls.apiId,
-      apiName: apis.name,
-      amount: apiCalls.amount,
-      txHash: apiCalls.txHash,
-      method: apiCalls.method,
-      responseStatus: apiCalls.responseStatus,
-      createdAt: apiCalls.createdAt,
+      date: sql<string>`to_char(date_trunc('day', ${apiCalls.createdAt} at time zone 'UTC'), 'YYYY-MM-DD')`,
+      calls: sql<number>`count(*)::int`,
+      revenue: sql<string>`coalesce(sum(${apiCalls.amount}::numeric) filter (where ${apiCalls.charged}), 0)::text`,
     })
     .from(apiCalls)
-    .innerJoin(apis, eq(apis.id, apiCalls.apiId))
-    .where(and(eq(apiCalls.payerAddress, payerAddress), eq(apiCalls.charged, true)))
-    .orderBy(desc(apiCalls.createdAt), desc(apiCalls.id))
-    .limit(opts.limit + 1)
-    .offset(opts.offset);
-  const hasMore = rows.length > opts.limit;
-  return {
-    calls: rows.slice(0, opts.limit).map((r) => ({ ...r, currency: "USDC" })),
-    hasMore,
-  };
+    .where(
+      and(
+        eq(apiCalls.apiId, apiId),
+        sql`${apiCalls.createdAt} >= now() - interval '${sql.raw(String(days))} days'`,
+      ),
+    )
+    .groupBy(sql`1`)
+    .orderBy(sql`1`);
+
+  // Build a map so we can fill in missing dates with zeros.
+  const byDate = new Map(rows.map((r) => [r.date, r]));
+
+  const result: TimeSeriesPoint[] = [];
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - i));
+    const dateStr = d.toISOString().slice(0, 10);
+    const row = byDate.get(dateStr);
+    result.push({ date: dateStr, calls: row?.calls ?? 0, revenue: row?.revenue ?? "0" });
+  }
+  return result;
 }

@@ -1,113 +1,101 @@
-/**
- * MCP integration test harness.
- *
- * Wires the real ZentrixPay MCP `Server` to an SDK `Client` over an in-memory
- * transport so tests exercise `listTools` / `callTool` through the request
- * interface — not by calling helper functions directly.
- *
- * External HTTP and registry lookups are expected to be mocked by the caller
- * (typically `ZENTRIXPAY_MOCK=1` before importing `./index.js`, which activates
- * the in-process fixtures in `mock.ts`).
- *
- * Error handling contract (deterministic, agent-safe):
- * - Tool failures return `{ isError: true, content: [{ type: "text", text }] }`
- * - Failure text is always prefixed with `Error:` and never includes secrets
- *   (see `safeErrorMessage` in `redaction.ts`)
- * - Unknown tools produce `Error: Unknown tool: <name>`
- */
+import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
-
-/** Flatten MCP tool result text content into a single trimmed string. */
-export function harnessResultText(result: {
-  content?: Array<{ type: string; text?: string }>;
-}): string {
-  return (result.content ?? [])
-    .map((c) => (typeof c.text === "string" ? c.text : ""))
-    .join("\n")
-    .trim();
-}
-
-/** Machine-readable MCP `structuredContent` object, or undefined. */
-export function harnessStructuredContent(result: {
-  structuredContent?: unknown;
-}): Record<string, unknown> | undefined {
-  const payload = result.structuredContent;
-  return payload && typeof payload === "object" && !Array.isArray(payload)
-    ? (payload as Record<string, unknown>)
-    : undefined;
-}
-
-/** True when the MCP result is flagged as an error or carries the Error: marker. */
-export function harnessIsToolError(result: {
-  isError?: boolean;
-  content?: Array<{ type: string; text?: string }>;
-}): boolean {
-  if (result.isError) return true;
-  return /^Error:/m.test(harnessResultText(result));
-}
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export interface IntegrationHarness {
   client: Client;
-  server: Server;
-  /** List tools via the SDK request interface. */
-  listTools(): Promise<{ tools: Array<{ name: string; description?: string }> }>;
-  /** Call a tool via the SDK request interface. */
-  callTool(
-    name: string,
-    args?: Record<string, unknown>,
-  ): Promise<{
-    content?: Array<{ type: string; text?: string }>;
-    isError?: boolean;
-    [key: string]: unknown;
-  }>;
-  /** List catalog resources via the SDK request interface. */
-  listResources(): Promise<{
-    resources: Array<{ uri: string; name: string; description?: string; mimeType?: string }>;
-  }>;
-  /** Read one catalog resource via the SDK request interface. */
-  readResource(uri: string): Promise<{
-    contents: Array<{ uri: string; text?: string; mimeType?: string; blob?: string }>;
-  }>;
-  /** Close client and server transports. */
-  close(): Promise<void>;
+  close: () => Promise<void>;
+}
+
+export interface StartIntegrationHarnessOptions {
+  /** Extra environment variables merged on top of the defaults. */
+  env?: Record<string, string>;
+  /** Command used to launch the server (defaults to the current node binary). */
+  command?: string;
+  /** Arguments passed to the command (defaults to the built/tsx entrypoint). */
+  args?: string[];
+  /** Working directory for the spawned server. */
+  cwd?: string;
 }
 
 /**
- * Connect a linked in-memory client/server pair to the given ZentrixPay MCP
- * server instance (already wired with ListTools / CallTool handlers).
+ * Spawns the real ZentrixPay MCP server over stdio and returns a connected
+ * MCP client. The server is launched with ZENTRIXPAY_MOCK=1 by default so the
+ * mock fixtures in mock.ts are active.
  */
-export async function startIntegrationHarness(server: Server): Promise<IntegrationHarness> {
-  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+export async function startIntegrationHarness(
+  options: StartIntegrationHarnessOptions = {},
+): Promise<IntegrationHarness> {
+  const entry = resolve(__dirname, 'index.js');
+
+  const env: Record<string, string> = {
+    ...(process.env as Record<string, string>),
+    ZENTRIXPAY_MOCK: '1',
+    ...(options.env ?? {}),
+  };
+
+  const transport = new StdioClientTransport({
+    command: options.command ?? process.execPath,
+    args: options.args ?? [entry],
+    cwd: options.cwd ?? __dirname,
+    env,
+    stderr: 'pipe',
+  });
+
   const client = new Client(
-    { name: "zentrixpay-integration", version: "1.0.0" },
+    { name: 'zentrixpay-integration-harness', version: '1.0.0' },
     { capabilities: {} },
   );
 
-  await server.connect(serverTransport);
-  await client.connect(clientTransport);
+  await client.connect(transport);
 
   return {
     client,
-    server,
-    listTools: () => client.listTools(),
-    callTool: async (name, args = {}) => {
-      const result = await client.callTool({ name, arguments: args });
-      return result as {
-        content?: Array<{ type: string; text?: string }>;
-        isError?: boolean;
-        [key: string]: unknown;
-      };
-    },
-    listResources: () => client.listResources(),
-    readResource: (uri) => client.readResource({ uri }),
     close: async () => {
-      await client.close().catch(() => {});
-      // Server.close is optional on some SDK versions; ignore if absent.
-      const maybeClose = (server as { close?: () => Promise<void> }).close;
-      if (typeof maybeClose === "function") await maybeClose.call(server).catch(() => {});
+      await client.close();
     },
   };
+}
+
+/** Extracts the concatenated text content from a tool result. */
+export function harnessResultText(result: unknown): string {
+  const content = (result as { content?: unknown })?.content;
+  if (!Array.isArray(content)) return '';
+  return content
+    .filter(
+      (part): part is { type: 'text'; text: string } =>
+        !!part &&
+        typeof part === 'object' &&
+        (part as { type?: unknown }).type === 'text' &&
+        typeof (part as { text?: unknown }).text === 'string',
+    )
+    .map((part) => part.text)
+    .join('\n');
+}
+
+/** Returns true when the tool result is flagged as an error. */
+export function harnessIsToolError(result: unknown): boolean {
+  return (result as { isError?: unknown })?.isError === true;
+}
+
+/** Returns the structuredContent payload of a tool result, if present. */
+export function harnessStructuredContent<T = unknown>(result: unknown): T | undefined {
+  return (result as { structuredContent?: T })?.structuredContent;
+}
+
+/** Convenience helper: spawn a detached child process (used by some tests). */
+export function spawnServer(
+  command: string,
+  args: string[],
+  env: Record<string, string> = {},
+): ReturnType<typeof spawn> {
+  return spawn(command, args, {
+    env: { ...(process.env as Record<string, string>), ...env },
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
 }

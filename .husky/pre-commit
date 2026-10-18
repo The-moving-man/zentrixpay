@@ -1,1 +1,32 @@
-pnpm exec lint-staged
+#!/usr/bin/env sh
+
+# Run lint-staged via pnpm. Falls back to `npx pnpm@<version>` when pnpm is not
+# on PATH (e.g. a machine with only Node installed and no corepack enabled).
+# If neither pnpm nor npx is available, print instructions and fail clearly.
+
+PNPM_VERSION="9.12.0"
+
+if command -v pnpm >/dev/null 2>&1; then
+  exec pnpm exec lint-staged
+fi
+
+if command -v npx >/dev/null 2>&1; then
+  exec npx --yes "pnpm@${PNPM_VERSION}" exec lint-staged
+fi
+
+cat >&2 <<'EOF'
+error: neither "pnpm" nor "npx" was found on your PATH.
+
+This repository's git hooks require pnpm. To fix this, install Node.js
+(which ships with npx) and enable corepack so pnpm is available:
+
+    corepack enable
+
+Alternatively, install pnpm globally:
+
+    npm install -g pnpm
+
+Then re-run your commit.
+EOF
+
+exit 1

@@ -2,7 +2,12 @@ import { Router, type Router as RouterType } from "express";
 import { apiKeyAuth } from "../middleware/apiKeyAuth.js";
 import { validate } from "../middleware/validate.js";
 import { publisherRegisterSchema } from "../schemas/requests.js";
-import { registerPublisher, getPublisherResources } from "../services/publisherService.js";
+import { requestSignatureAuth } from "../middleware/requestSignatureAuth.js";
+import {
+  registerPublisher,
+  getPublisherResources,
+  rotatePublisherKey,
+} from "../services/publisherService.js";
 import { eq, inArray } from "drizzle-orm";
 import { db } from "../db/client.js";
 import { publishers, resources, payments } from "../db/schema.js";
@@ -63,6 +68,17 @@ router.get("/publishers/me", apiKeyAuth, async (req, res) => {
     email: pub.email,
     walletAddress: pub.walletAddress,
     createdAt: pub.createdAt,
+  });
+});
+
+// POST /publishers/me/rotate-key — issue a new API key and invalidate the old one (authenticated)
+router.post("/publishers/me/rotate-key", apiKeyAuth, requestSignatureAuth, async (req, res) => {
+  const { publisher, apiKey } = await rotatePublisherKey(req.publisher!.id);
+  res.setHeader("Cache-Control", "no-store");
+  res.json({
+    id: publisher.id,
+    apiKey, // shown once — store it securely
+    rotatedAt: new Date().toISOString(),
   });
 });
 

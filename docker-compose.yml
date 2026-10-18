@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: app-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  mock-upstream:
+    image: node:20-alpine
+    container_name: app-mock-upstream
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      PORT: "4010"
+    command:
+      - node
+      - -e
+      - |
+        const http = require("http");
+        const port = Number(process.env.PORT || 4010);
+        const server = http.createServer((req, res) => {
+          res.setHeader("Content-Type", "application/json");
+          if (req.url === "/health") {
+            res.statusCode = 200;
+            res.end(JSON.stringify({ status: "ok" }));
+            return;
+          }
+          res.statusCode = 200;
+          res.end(
+            JSON.stringify({
+              mock: true,
+              method: req.method,
+              path: req.url,
+              timestamp: new Date().toISOString(),
+            })
+          );
+        });
+        server.listen(port, "0.0.0.0", () => {
+          console.log(`mock upstream listening on ${port}`);
+        });
+    ports:
+      - "4010:4010"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - |
+          require("http")
+            .get("http://127.0.0.1:4010/health", (res) => {
+              process.exit(res.statusCode === 200 ? 0 : 1);
+            })
+            .on("error", () => process.exit(1));
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  postgres-data:
+    driver: local

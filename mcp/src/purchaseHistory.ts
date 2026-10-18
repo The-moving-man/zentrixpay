@@ -296,8 +296,20 @@ export function formatPurchaseHistory(
       count: receipts.length,
       ...(filter.profile ? { profile: filter.profile } : {}),
       purchases: receipts.map((r) => ({
-        ...r,
-        // Convenience field: the Stellar Expert explorer URL for the settlement
+        // Label every entry as an API call so clients don't need to infer it
+        // from the shape of the receipt (#100).
+        kind: "api_call",
+        // Expose the API name directly under a clear key; `title` is kept for
+        // backwards-compatible consumers.
+        apiName: r.title ?? r.resourceId,
+        apiId: r.resourceId,
+        txHash: r.txHash,
+        amount: r.amount,
+        network: r.network,
+        timestamp: r.timestamp,
+        receiptRef: r.receiptRef,
+        ...(r.profile ? { profile: r.profile } : {}),
+        // Pre-resolved Stellar Expert explorer URL for the settlement
         // transaction. Consumers no longer need to join txHash with
         // zentrixpay_tx_status externally — the link is pre-resolved and always
         // null when no hash was recorded (e.g. buy completed before hash was

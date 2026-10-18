@@ -5,18 +5,6 @@ on:
     branches:
       - main
       - master
-    paths:
-      - "server/**"
-      - "web/**"
-      - "packages/**"
-      - "mcp/**"
-      - "contract/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
-      - ".eslintrc.cjs"
-      - ".prettierrc"
-      - "prettier.config.js"
 
 jobs:
   node-ci:
@@ -35,7 +23,14 @@ jobs:
       - run: pnpm run build:registry-client
       - run: pnpm --filter @zentrixpay/server typecheck
       - run: pnpm --filter @zentrixpay/server build
+      - run: pnpm --filter @zentrixpay/server test
+      - run: pnpm --filter @zentrixpay/web typecheck
       - run: pnpm --filter @zentrixpay/web build
+      - run: pnpm --filter @zentrixpay/web test
+      - run: pnpm --filter @zentrixpay/mcp typecheck
+      - run: pnpm --filter @zentrixpay/mcp test
+      - run: pnpm --filter @zentrixpay/registry-client typecheck
+      - run: pnpm --filter @zentrixpay/registry-client test
       # Build the MCP server, then start it the way an agent client does
       # (node dist/index.js over stdio) and drive fixture-backed tool calls.
       # Catches an install that compiles and packs but cannot boot or serve —
@@ -70,4 +65,5 @@ jobs:
             ${{ runner.os }}-cargo-
       - run: cd contract && cargo fmt --all -- --check
       - run: cd contract && cargo clippy --all-targets --all-features -- -D warnings
+      - run: cd contract && cargo build --all-targets --all-features
       - run: cd contract && cargo test

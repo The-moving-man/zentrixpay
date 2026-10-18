@@ -24,6 +24,20 @@ export async function registerPublisher(data: {
   return { publisher, apiKey };
 }
 
+/**
+ * Replace a publisher's API key. The new key is returned once; only its hash is
+ * stored, so the old key stops authenticating as soon as this commits.
+ */
+export async function rotatePublisherKey(publisherId: string) {
+  const apiKey = generateApiKey();
+  const [publisher] = await db
+    .update(publishers)
+    .set({ apiKeyHash: hashApiKey(apiKey) })
+    .where(eq(publishers.id, publisherId))
+    .returning();
+  return { publisher, apiKey };
+}
+
 export async function getPublisherById(id: string) {
   return db
     .select()

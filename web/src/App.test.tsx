@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import App from "./App.js";
 import {
   fetchApis,
@@ -21,6 +22,7 @@ vi.mock("./api/apis.js", async () => {
     updateApi: vi.fn(),
     verifyApiOwnership: vi.fn(),
     fetchApiStats: vi.fn(),
+    fetchApiById: vi.fn(),
   };
 });
 
@@ -58,23 +60,31 @@ beforeEach(() => {
   localStorage.clear();
 });
 
+function renderApp(path = "/") {
+  return render(
+    <MemoryRouter initialEntries={[path]}>
+      <App />
+    </MemoryRouter>,
+  );
+}
+
 describe("App", () => {
   it("lists APIs with price and methods", async () => {
-    render(<App />);
+    renderApp();
     expect(await screen.findByText("Weather API")).toBeInTheDocument();
     expect(screen.getByText(/0\.01 USDC/)).toBeInTheDocument();
     expect(screen.getByText("POST")).toBeInTheDocument();
   });
 
   it("searches the catalog", async () => {
-    render(<App />);
+    renderApp();
     await screen.findByText("Weather API");
     await userEvent.type(screen.getByLabelText("Search APIs"), "geo");
     await waitFor(() => expect(fetchApis).toHaveBeenLastCalledWith("geo", expect.anything()));
   });
 
   it("opens the try-it console with the call preview", async () => {
-    render(<App />);
+    renderApp();
     await userEvent.click(await screen.findByRole("button", { name: "Try it" }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     await userEvent.type(screen.getByLabelText("Path"), "forecast/lagos");
@@ -90,7 +100,7 @@ describe("App", () => {
       walletAddress: "GADA",
       apiKey: "mv_secret",
     });
-    render(<App />);
+    renderApp();
     await userEvent.click(screen.getByRole("button", { name: "Sell your API" }));
     await userEvent.type(screen.getByLabelText("Name"), "Ada");
     await userEvent.type(screen.getByLabelText("Email"), "ada@example.com");
